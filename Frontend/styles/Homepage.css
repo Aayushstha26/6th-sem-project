@@ -14,10 +14,7 @@ body{
     justify-content: space-between;
     padding: 20px;
 }
-.nav_bar{
-    /* padding: 20px; */
-    
-}
+
 ul{
     display: flex;
     flex-direction: row;
