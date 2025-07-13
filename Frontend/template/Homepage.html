@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Aava Treasures</title>
     <link rel="stylesheet" href="../styles/Homepage.css" />
+    <link rel="icon" href="../images/logo.png" type="image/png" />
   </head>
   <body>
     <div class="container" id="container">
@@ -12,7 +13,7 @@
         <div class="nav" id="nav">
           <div class="logo" id="logo">
             <a href="">
-              <img src="" alt="AAVA" />
+              <img src="../images/logo3.png" alt="AAVA" />
             </a>
           </div>
 
@@ -39,8 +40,30 @@
           </div>
         </div>
 
-        <div class="l_page">
-          <img id="www" src="../images/sparkling-avenues-desktop.webp" alt="" />
+        <div class="l_page slider">
+          <div class="slides">
+            <div class="slide active">
+              <img
+                src="../images/sparkling-avenues-desktop.webp"
+                alt="Slide 1"
+              />
+              <a href="details1.html" class="buy-btn">Buy Now</a>
+            </div>
+            <div class="slide">
+              <img
+                src="../images/jewellery-and-gems-website-design-development-services-hyderabad.jpg"
+                alt="Slide 2"
+              />
+              <a href="details2.html" class="buy-btn">Buy Now</a>
+            </div>
+            <div class="slide">
+              <img src="../images/IMG_2746.webp" alt="Slide 3" />
+              <a href="details3.html" class="buy-btn">Buy Now</a>
+            </div>
+          </div>
+
+          <button class="nav-btn prev" onclick="prevSlide()">❮</button>
+          <button class="nav-btn next" onclick="nextSlide()">❯</button>
         </div>
       </div>
 
@@ -51,7 +74,7 @@
 
       <div class="categories-slots">
         <div class="category">
-          <img src="../images/earrings.jpg" alt="Earrings" />
+          <img src="../images/earring1.jpg" alt="Earrings" />
           <span>Earrings</span>
         </div>
         <div class="category">
@@ -59,7 +82,7 @@
           <span>Bracelet</span>
         </div>
         <div class="category">
-          <img src="../images/necklace.jpg" alt="Necklace" />
+          <img src="../images/neckwears.jpg" alt="Necklace" />
           <span>Necklace</span>
         </div>
         <div class="category">
@@ -67,6 +90,92 @@
           <span>Rings</span>
         </div>
       </div>
+
+      <section class="latest" id="latest">
+        <div class="l-text">
+          <span id="l-title">New Arrivals</span>
+        </div>
+
+        <div class="new-arrivals-slots">
+          <div class="new-arrivals">
+            <img src="../images/er1.jpg" alt="Earrings" />
+            <div class="text">
+              <span class="name">Black Manmeet Earring</span>
+              <span class="c-s">Earrings</span>
+              <div class="price-tag">
+                <img
+                  class="tag"
+                  src="../images/price-tag.png"
+                  alt="Price Tag"
+                />
+                <span class="price">RS.1200</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="new-arrivals">
+            <img src="../images/necklace1.jpg" alt="Earrings" />
+            <div class="text">
+              <span class="name">Black Manmeet Earring</span>
+              <span class="c-s">Necklace</span>
+              <div class="price-tag">
+                <img
+                  class="tag"
+                  src="../images/price-tag.png"
+                  alt="Price Tag"
+                />
+                <span class="price">RS.1200</span>
+              </div>
+            </div>
+          </div>
+          <div class="new-arrivals">
+            <img src="../images/er2.jpg" alt="Earrings" />
+            <div class="text">
+              <span class="name">Black Manmeet Earring</span>
+              <span class="c-s">Earrings</span>
+              <div class="price-tag">
+                <img
+                  class="tag"
+                  src="../images/price-tag.png"
+                  alt="Price Tag"
+                />
+                <span class="price">RS.1200</span>
+              </div>
+            </div>
+          </div>
+          <div class="new-arrivals">
+            <img src="../images/bracelet1.jpg" alt="Earrings" />
+            <div class="text">
+              <span class="name">Black Manmeet Earring</span>
+              <span class="c-s">Bracelet</span>
+              <div class="price-tag">
+                <img
+                  class="tag"
+                  src="../images/price-tag.png"
+                  alt="Price Tag"
+                />
+                <span class="price">RS.1200</span>
+              </div>
+            </div>
+          </div>
+          <div class="new-arrivals">
+            <img src="../images/ring1.jpg" alt="Earrings" />
+            <div class="text">
+              <span class="name">Black Manmeet Earring</span>
+              <span class="c-s">Ring</span>
+              <div class="price-tag">
+                <img
+                  class="tag"
+                  src="../images/price-tag.png"
+                  alt="Price Tag"
+                />
+                <span class="price">RS.1200</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
+    <script src="../script/slider.js" defer></script>
   </body>
 </html>

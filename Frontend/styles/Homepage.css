@@ -27,6 +27,16 @@ li{
     font-size: 20px;
 }
 
+.logo{
+  height:100px ;
+}
+
+.logo img{
+  width: 120px;
+  height: auto;
+  background: transparent;
+}
+
 .right_part{
     display: flex;
     /* flex-direction: row; */
@@ -51,6 +61,98 @@ li{
     font-family: cursive;
     font-size: 30px;
 }
+
+/* Slider container */
+.l_page.slider {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  overflow: hidden;
+  background-color: #000;
+}
+
+/* Slides wrapper (optional if slides are absolutely positioned) */
+.slides {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* Each slide */
+.slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  transition: opacity 0.5s ease;
+}
+
+/* Visible slide */
+.slide.active {
+  display: block;
+  z-index: 1;
+}
+
+/* Image inside slide */
+.slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* "Buy Now" button */
+.buy-btn {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #bfa37c;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-size: 16px;
+  font-family: 'Inter', sans-serif;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.buy-btn:hover {
+  background-color: #a87b50;
+}
+
+/* Navigation buttons (prev/next) */
+.nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  font-size: 28px;
+  padding: 10px 16px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 2;
+  transition: background-color 0.3s ease;
+}
+
+.nav-btn:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.prev {
+  left: 20px;
+}
+
+.next {
+  right: 20px;
+}
+
+
 
 .categories-slots {
   display: flex;
@@ -104,4 +206,116 @@ li{
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* Section container */
+.latest {
+  padding: 60px 40px;
+  background-color: #fdf8f3; /* Soft neutral background */
+  text-align: center;
+}
 
+/* Title */
+#l-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #2d1f12;
+  font-family: 'Playfair Display', serif;
+  margin-bottom: 40px;
+  display: inline-block;
+  border-bottom: 2px solid #bfa37c; /* Subtle underline */
+  padding-bottom: 8px;
+}
+
+/* Flexbox for cards */
+.new-arrivals-slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+/* Each item */
+.new-arrivals {
+  width: 260px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  text-align: center;
+}
+
+.new-arrivals:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+}
+
+.new-arrivals img {
+  width: 65%;
+  height: 200px;
+  object-fit: cover;
+  /* display: block; */
+}
+
+/* Text container */
+.new-arrivals .text {
+  padding: 14px 10px;
+}
+
+/* Name */
+.text .name {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d1f12;
+  margin-bottom: 4px;
+}
+
+/* Category */
+.text .c-s {
+  display: block;
+  font-size: 14px;
+  color: #777;
+  margin-bottom: 8px;
+}
+
+/* Price tag row */
+.price-tag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.price-tag .tag {
+  width: 16px;
+  height: 16px;
+}
+
+.price-tag .price {
+  font-size: 15px;
+  font-weight: 600;
+  color: #d58514;
+}
+
+.text {
+  padding: 12px 14px;
+  text-align: center;
+}
+
+.text .name {
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  color: #2d1f12;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.text .c-s {
+  font-size: 14px;
+  color: #777;
+  display: block;
+  margin-bottom: 10px;
+}
