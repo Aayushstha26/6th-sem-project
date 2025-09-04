@@ -22,7 +22,7 @@ window.addEventListener("DOMContentLoaded", () => {
       };
 
       try {
-        const res = await fetch("http://localhost:3000/user/register", {
+        const res = await fetch("http://localhost:4000/user/register", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

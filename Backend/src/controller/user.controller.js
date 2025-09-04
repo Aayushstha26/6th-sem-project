@@ -1,6 +1,7 @@
 import { User } from "../models/user.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { Apierror } from "../utils/apiError.js";
+import { Apiresponse } from "../utils/apiRespone.js";
 
 const registerUser = asyncHandler(async (req, res) => {
   const { Firstname, Lastname, Phone, Email, Password } = req.body;
@@ -40,27 +41,51 @@ const loginUser = asyncHandler(async (req, res) => {
       .json({ message: "user not found" }, new Apierror(400, "User not found"));
   }
   const isMatch = await user.isPassword(Password);
-  if (!isMatch)
+  if (!isMatch) {
     return res
       .status(400)
       .json(
         { message: "Password doesn't match" },
         new Apierror(400, "Invalid password")
       );
+  }
   const accessToken = user.generateAccessToken();
   const refreshToken = user.generateRefreshToken();
 
   user.refreshToken = refreshToken;
   await user.save({ validateBeforeSave: false });
-      const option = {
-        httpOnly: true,
-        secure: true
-      }
+  const option = {
+    httpOnly: true,
+    secure: true,
+  };
   return res
     .status(200)
-    .cookie("accessToken", accessToken ,option)
-    .cookie("refreshToken", refreshToken ,option)
-    .json({ accessToken, refreshToken, message: "Login successfull" }) ;
+    .cookie("accessToken", accessToken, option)
+    .cookie("refreshToken", refreshToken, option)
+    .json({ accessToken, refreshToken, message: "Login successfull" });
 });
 
-export { registerUser, loginUser };
+const logoutUser = asyncHandler(async (req, res) => {
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        refreshToken: undefined,
+      },
+    },
+    {
+      new: true,
+    }
+  );
+  const option = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  return res
+    .status(200)
+    .clearCookies("accessToken", option)
+    .clearCookies("accessToken", option)
+    .json(200,{}, new Apiresponse(200,"User logout"));
+});
+export { registerUser, loginUser, logoutUser };
