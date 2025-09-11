@@ -9,7 +9,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    // console.log(Firstname);
+    console.log(Firstname);
     if (checkRegisterForm()) {
       console.log(form);
       // form.submit();
@@ -22,7 +22,7 @@ window.addEventListener("DOMContentLoaded", () => {
       };
 
       try {
-        const res = await fetch("http://localhost:3000/user/register", {
+        const res = await fetch("http://localhost:4000/user/register", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -170,3 +170,6 @@ window.addEventListener("DOMContentLoaded", () => {
     })
   }
 });
+
+
+

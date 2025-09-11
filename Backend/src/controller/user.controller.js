@@ -52,15 +52,15 @@ const loginUser = asyncHandler(async (req, res) => {
 
   user.refreshToken = refreshToken;
   await user.save({ validateBeforeSave: false });
-      const option = {
-        httpOnly: true,
-        secure: true
-      }
+  const option = {
+    httpOnly: true,
+    secure: true,
+  };
   return res
     .status(200)
-    .cookie("accessToken", accessToken ,option)
-    .cookie("refreshToken", refreshToken ,option)
-    .json({ accessToken, refreshToken, message: "Login successfull" }) ;
+    .cookie("accessToken", accessToken, option)
+    .cookie("refreshToken", refreshToken, option)
+    .json({ accessToken, refreshToken, message: "Login successfull" });
 });
 
 export { registerUser, loginUser };
