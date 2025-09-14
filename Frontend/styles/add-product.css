@@ -1,0 +1,94 @@
+/* General Page Styling */
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  /* background: linear-gradient(135deg, #030b36, #1a1a40); */
+  color: #fff;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  /* width: 1000px; */
+
+}
+
+/* Container */
+.adding-product {
+  /* background: #ffffff10; */
+  backdrop-filter: blur(12px);
+  border-radius: 15px;
+  padding: 30px 40px;
+  width: 420px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  /* animation: fadeIn 0.8s ease-in-out; */
+}
+
+/* Heading */
+.adding-product h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 1.6rem;
+  color: black;
+  letter-spacing: 1px;
+}
+
+/* Fields */
+.fields {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+/* Labels */
+.fields label {
+  color: black;
+  margin-bottom: 6px;
+  font-weight: 400;
+  font-size: 16px;
+}
+
+/* Inputs & Select & Textarea */
+.fields input,
+.fields select,
+.fields textarea {
+  padding: 13px;
+  border-radius: 6px;
+  outline: none;
+  font-size: 0.95rem;
+  transition: 0.3s;
+  border: 2px solid whitesmoke;
+}
+
+/* Focus Effect */
+.fields input:focus,
+.fields select:focus,
+.fields textarea:focus {
+  background: #ffffff30;
+  border: 1px solid #ffcc70;
+}
+
+/* Button */
+button {
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  /* background: #ffcc70; */
+  color: #030b36;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #ffb347;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 204, 112, 0.4);
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

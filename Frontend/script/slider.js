@@ -25,11 +25,11 @@
 // popup register//
 
   document.addEventListener("DOMContentLoaded", () => {
-  const profile = document.getElementById("profile");
+  const regs = document.getElementById("regs");
   const registerModal = document.getElementById("registerModal");
   const registerContent = document.getElementById("registerContent");
 
-  profile.addEventListener("click", (e) => {
+  regs.addEventListener("click", (e) => {
     e.preventDefault();
 
     fetch("Register.html")
