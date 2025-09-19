@@ -43,6 +43,7 @@ body{
 
 .nav_bar ul li a:hover {
   text-decoration: underline ;
+  color: #d62976;
 }
 
 .logo{
@@ -61,7 +62,39 @@ body{
 .right_part{
     display: flex;
     /* flex-direction: row; */
+    gap: 10px;
 }
+.profile {
+  display: inline-flex;
+  /* background: #030B36; */
+  border-radius: 25px;
+  overflow: hidden;
+  font-family: sans-serif;
+}
+
+.profile a {
+  display: flex;
+  text-decoration: none;
+  color: black;
+}
+
+.profile .log,
+.profile .regs {
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* Add vertical line between buttons */
+.profile .log {
+  border-right: 1px solid black;
+}
+
+.profile .log:hover,
+.profile .regs:hover {
+  color: #d62976;
+}
+
 
 #s_cart{
     width: 30px;

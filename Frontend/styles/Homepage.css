@@ -44,6 +44,7 @@ body{
 
 .nav_bar ul li a:hover {
   text-decoration: underline ;
+  color: #d62976;
 }
 
 .logo{
@@ -474,6 +475,7 @@ body{
 
 .f-links ul li a:hover {
   text-decoration: underline;
+  color: #d62976;
 }
 
 .f-img {
