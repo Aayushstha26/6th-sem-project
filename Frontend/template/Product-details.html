@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <link rel="stylesheet" href="../styles/Products-details.css">
-</head>
-<body>
+    <link rel="stylesheet" href="../styles/Products-details.css" />
+  </head>
+  <body>
     <div class="nav" id="nav">
       <div class="logo" id="logo">
         <a href="">
@@ -40,12 +40,76 @@
       </div>
     </div>
 
-     
+    <!-- Product Details Section -->
+    <section class="product-details">
+      <div class="details-container">
+        <!-- Left Side: Product Image -->
+        <div class="product-image">
+          <img src="../images/e-4.jpg" alt="Product Image" />
+        </div>
 
+        <!-- Right Side: Product Info -->
+        <div class="product-info">
+          <!-- Top Button / Category -->
+          <div class="product-top-action">
+            <a href="categories.html" class="back-btn">← Back to Products</a>
+            <!-- OR you can use a tag instead -->
+            <!-- <span class="category-tag">Necklaces</span> -->
+          </div>
+          <h2 class="product-title">Elegant Gold Necklace</h2>
+          <p class="product-price">Rs. 4,500</p>
+          <p class="product-description">
+            A timeless piece of jewelry crafted with precision. This elegant
+            gold necklace is perfect for weddings, parties, or daily wear.
+            Handcrafted to perfection by Aava Treasures.
+          </p>
 
+          <div class="product-actions">
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" min="1" value="1" />
 
+            <button class="buy-btn">Buy Now</button>
+            <button class="cart-btn">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+    </section>
 
- <section class="footer" id="footer">
+    <!-- Recommended Products Section -->
+    <section class="recommended">
+      <h2>Recommended for You</h2>
+      <div class="recommended-container">
+        <div class="product-card">
+          <img src="../images/e-1.png" alt="Earrings" />
+          <h3>Crystal Drop Earrings</h3>
+          <p class="price">Rs. 1,200</p>
+          <button class="view-btn">View Details</button>
+        </div>
+
+        <div class="product-card">
+          <img src="../images/e-2.png" alt="Bracelet" />
+          <h3>Elegant Bracelet</h3>
+          <p class="price">Rs. 2,800</p>
+          <button class="view-btn">View Details</button>
+        </div>
+
+        <div class="product-card">
+          <img src="../images/e-3.jpg" alt="Necklace" />
+          <h3>Gold Plated Necklace</h3>
+          <p class="price">Rs. 4,000</p>
+          <button class="view-btn">View Details</button>
+        </div>
+
+        <div class="product-card">
+          <img src="../images/e-4.jpg" alt="Ring" />
+          <h3>Diamond Cut Ring</h3>
+          <p class="price">Rs. 3,500</p>
+          <button class="view-btn">View Details</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="footer" id="footer">
       <div class="f-container">
         <div class="f-about">
           <a href=""
@@ -93,6 +157,5 @@
         <p>&copy; 2025 Aava Treasures. All rights reserved.</p>
       </div>
     </section>
-
-</body>
+  </body>
 </html>
