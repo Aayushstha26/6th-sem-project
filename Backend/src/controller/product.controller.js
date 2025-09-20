@@ -1,24 +1,35 @@
-import { Product } from "../models/product.model";
-import asyncHandler from "../utils/asyncHandler";
-import { Apierror } from "../utils/apiError";
+import { Product } from "../models/product.model.js";
+import asyncHandler from "../utils/asyncHandler.js";
+import { Apierror } from "../utils/apiError.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const addProduct = asyncHandler(async (req, res) => {
-      const { product_name, description, price, category, image_url, stock } =
+      const { product_name, description, price, category, stock } =
         req.body;
-
-      if (!product_name || !description || !price || !category || !image_url) {
-              throw new Apierror(400, "All field are required");
-          
+        // console.log(req.body);
+        // console.log(req.file);
+      if (!product_name || !description || !price || !category ) {
+              throw new Apierror(400, "All field are required");    
+      }
+      const productLocalPath = req.file.path;
+      // console.log(productLocalPath);
+      const productImg = await uploadOnCloudinary(productLocalPath);
+      // console.log(productImg);
+      if (!productImg) {
+        throw new Apierror(500, "Error while uploading image");
       }
 
-      const newProduct = new Product({
+      const newProduct = await Product.create({
         product_name,
         description,
         price,
         category,
-        image_url,
-        stock,
+        productImg: productImg.url,
+        stock : stock || 0 ,
       });
+      return res.status(201).json({
+    message: "Product added successfully",
+  });
   
 });
 
