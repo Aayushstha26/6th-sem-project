@@ -32,7 +32,7 @@
   regs.addEventListener("click", (e) => {
     e.preventDefault();
 
-    fetch("Register.html")
+    fetch("/user/signup")
     .then((reg) => reg.text())
     .then((data) => {
       registerContent.innerHTML = data;

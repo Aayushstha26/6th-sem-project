@@ -1,4 +1,5 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Mongoose, Schema } from "mongoose";
+import { ref } from "process";
 
 const productSchema = new Schema({
     product_name:{
@@ -14,10 +15,10 @@ const productSchema = new Schema({
         required: true,
     },
     category:{
-        type: String,
-        required: true,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",     
     },
-     image_url: {
+     productImg: {
         type: String,
         required: true,
     },
