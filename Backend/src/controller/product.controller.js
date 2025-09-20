@@ -32,5 +32,22 @@ const addProduct = asyncHandler(async (req, res) => {
   });
   
 });
-
-export { addProduct };
+const getProducts = asyncHandler(async (req, res) => {
+  const {category , search } = req.query;
+  let filter = {};    
+  if(category){
+    filter.category = category;
+  }
+  if(search){
+    filter.$or = [
+     { product_name : { $regex: search, $options: "i" }},
+     { description : { $regex: search, $options: "i" }}
+    ]
+  } 
+  const products = await Product.find(filter).populate("category").sort({createdAt: -1});
+  return res.status(200).json({
+    results: products.length,
+    products
+  });
+}); 
+export { addProduct , getProducts };
