@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt"
+import { bcryptHash, bcryptHashCompare, generateSalt } from "../utils/customHashingFunction.js";
 
 const userSchema = new Schema(
   {
@@ -27,24 +27,32 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    refreshToken : {
-      type: String
-    }
+    Salt: {
+      type: String,
+    },
+    refreshToken: {
+      type: String,
+    },
   },
   {
     timestamps: true,
   }
 );
-userSchema.pre("save", async function (next){
-  if(!this.isModified("Password")){
-    return next()
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("Password")) {
+    return next();
   }
-  this.Password = await bcrypt.hash(this.Password, 10);
+    const salt = generateSalt();
+  const { hash } = bcryptHash(this.Password, salt, 1000);
+
+  this.Password = hash;
+  this.Salt = salt;
+
   next();
-})
-userSchema.methods.isPassword = async function (password){
-  return await bcrypt.compare(password,this.Password)
-}
+});
+userSchema.methods.isPassword = async function (password) {
+  return await bcryptHashCompare(password, this.Password , this.Salt, 1000);
+};
 userSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
@@ -54,15 +62,14 @@ userSchema.methods.generateAccessToken = function () {
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "1d"
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "1d",
     }
   );
 };
 userSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
     {
-      _id: this._id
-     
+      _id: this._id,
     },
     process.env.REFRESH_TOKEN_SECRET,
     {
