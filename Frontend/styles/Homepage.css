@@ -44,6 +44,7 @@ body{
 
 .nav_bar ul li a:hover {
   text-decoration: underline ;
+  color: #d62976;
 }
 
 .logo{
@@ -62,7 +63,39 @@ body{
 .right_part{
     display: flex;
     /* flex-direction: row; */
+    gap: 10px;
 }
+.profile {
+  display: inline-flex;
+  /* background: #030B36; */
+  border-radius: 25px;
+  overflow: hidden;
+  font-family: sans-serif;
+}
+
+.profile a {
+  display: flex;
+  text-decoration: none;
+  color: black;
+}
+
+.profile .log,
+.profile .regs {
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* Add vertical line between buttons */
+.profile .log {
+  border-right: 1px solid black;
+}
+
+.profile .log:hover,
+.profile .regs:hover {
+  color: #d62976;
+}
+
 
 #s_cart{
     width: 30px;
@@ -442,6 +475,7 @@ body{
 
 .f-links ul li a:hover {
   text-decoration: underline;
+  color: #d62976;
 }
 
 .f-img {
@@ -485,7 +519,7 @@ body{
 .others-media img{
   text-align: center;
   font-size: 13px;
-  color: #777;
+  color: #777777;
   margin-top: 40px;
 }
 
@@ -531,3 +565,23 @@ body{
 }
 
 
+.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 600px;
+  max-width: 95%;
+  overflow-y: auto;
+  max-height: 90vh;
+}

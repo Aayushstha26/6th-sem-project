@@ -21,3 +21,36 @@
 
   setInterval(nextSlide, 5000);
 
+
+// popup register//
+
+  document.addEventListener("DOMContentLoaded", () => {
+  const regs = document.getElementById("regs");
+  const registerModal = document.getElementById("registerModal");
+  const registerContent = document.getElementById("registerContent");
+
+  regs.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    fetch("Register.html")
+    .then((reg) => reg.text())
+    .then((data) => {
+      registerContent.innerHTML = data;
+      registerModal.style.display = "flex";
+
+      const closebtn = registerContent.querySelector("#close-btn");
+      if(closebtn){
+        closebtn.addEventListener("click", () =>{
+          registerModal.style.display = "none";
+      });
+      }
+
+      window.addEventListener("click", (e) => {
+        if(e.target === registerModal){
+          registerModal.style.display = "none";
+        }
+      })
+    })
+  })
+})
+

@@ -9,7 +9,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    // console.log(Firstname);
+    console.log(Firstname);
     if (checkRegisterForm()) {
       console.log(form);
       // form.submit();
@@ -170,3 +170,6 @@ window.addEventListener("DOMContentLoaded", () => {
     })
   }
 });
+
+
+
