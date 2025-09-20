@@ -1,0 +1,143 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+}
+
+/* Main container */
+.add-product-container {
+  max-width: 900px;
+  margin: 50px auto;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Content wrapper */
+.form-content {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* Left & right sections */
+.form-left,
+.form-right {
+  flex: 1 1 50%;
+}
+
+/* Left image */
+.form-img img {
+  position: relative;
+  top: 100px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Right side fields */
+.form-right {
+  padding: 40px;
+}
+
+/* Header */
+.form-header {
+  display: flex;
+  justify-content: center;
+}
+
+.form-header h2 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: #2d1f12;
+}
+
+/* Form fields */
+.form-field {
+  margin-bottom: 20px;
+}
+
+.form-field label {
+  display: flex;
+  margin-bottom: 6px;
+  font-weight: 300;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+/* Error message */
+.errorMsg {
+  color: red;
+  font-size: 13px;
+  margin-top: 5px;
+  display: block;
+}
+
+/* Submit button */
+
+.add-btn{
+  display: flex;
+  justify-content: center;
+}
+.submit-btn {
+  background-color: blue;
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  width: 60%;
+}
+
+.submit-btn:hover {
+  background-color: navy;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 30px;
+  border-radius: 12px;
+  width: 80%;
+  max-width: 65%;
+  text-align: center;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Close buttons */
+#form-close-btn,
+#modal-close-btn {
+  float: right;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+}
