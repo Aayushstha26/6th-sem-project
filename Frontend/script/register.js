@@ -46,14 +46,14 @@ window.addEventListener("DOMContentLoaded", () => {
     checkValid(
       Firstname,
       Firstname.value.trim() !== "" && isName(Firstname.value.trim()),
-      "Firstname msut be atleast 3 character"
+      "Firstname must be atleast 3 character"
     );
   });
   Lastname.addEventListener("input", () => {
     checkValid(
       Lastname,
       Lastname.value.trim() !== "" && isName(Lastname.value.trim()),
-      "Lastname  msut be atleast 3 character"
+      "Lastname  must be atleast 3 character"
     );
   });
   Phone.addEventListener("input", () => {
@@ -125,10 +125,10 @@ window.addEventListener("DOMContentLoaded", () => {
     function Success(input) {
     console.log("Sucess");
     const formContent = input.parentElement;
-    // const icon = formContent.querySelector(".icon");
+    const icon = formContent.querySelector(".icon");
     const errorMsg = formContent.querySelector(".errorMsg");
     formContent.className = "formContent success";
-    // icon.className = "formContent icon fas fa-check-circle";
+    icon.className = "formContent icon fas fa-check-circle";
     if (errorMsg) {
       errorMsg.innerHTML = "";
   }
@@ -136,10 +136,10 @@ window.addEventListener("DOMContentLoaded", () => {
   function setError(input, errormessage) {
     console.log("Error");
     const formContent = input.parentElement;
-    // const icon = formContent.querySelector(".icon");
+    const icon = formContent.querySelector(".icon");
     const errorMsg = formContent.querySelector(".errorMsg");
     formContent.classList = "formContent error";
-    // icon.className = "formContent icon fas fa-times-circle ";
+    icon.className = "formContent icon fas fa-times-circle ";
     if (errorMsg) {
       errorMsg.innerHTML = errormessage;
   }

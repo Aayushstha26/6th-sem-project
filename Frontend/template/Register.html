@@ -8,6 +8,11 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+
     <link rel="stylesheet" href="../styles/register.css" />
   </head>
   <body>
@@ -26,33 +31,63 @@
               <h2>Register</h2>
             </div>
 
-            <div class="form-group">
+            <div class="formContent">
               <label for="Firstname">First Name</label>
-              <input type="text" name="Firstname" id="Firstname" placeholder="Enter you First name"  />
+              <input
+                type="text"
+                name="Firstname"
+                id="Firstname"
+                placeholder="Enter you First name"
+              />
+              <i class="icon"></i>
               <span class="errorMsg"></span>
             </div>
 
-            <div class="form-group">
+            <div class="formContent">
               <label for="Lastname">Last Name</label>
-              <input type="text" name="Lastname" id="Lastname" placeholder="Enter your Last name"  />
+              <input
+                type="text"
+                name="Lastname"
+                id="Lastname"
+                placeholder="Enter your Last name"
+              />
+              <i class="icon"></i>
               <span class="errorMsg"></span>
             </div>
 
-            <div class="form-group">
+            <div class="formContent">
               <label for="Phone">Phone Number</label>
-              <input type="tel" name="Phone" id="Phone" placeholder="Enter your Number"  />
+              <input
+                type="tel"
+                name="Phone"
+                id="Phone"
+                placeholder="Enter your Number"
+              />
+              <i class="icon"></i>
               <span class="errorMsg"></span>
             </div>
 
-            <div class="form-group">
+            <div class="formContent">
               <label for="Email">Email</label>
-              <input type="email" name="Email" id="Email" placeholder="Enter your Email"  />
+              <input
+                type="email"
+                name="Email"
+                id="Email"
+                placeholder="Enter your Email"
+              />
+              <i class="icon"></i>
               <span class="errorMsg"></span>
             </div>
 
-            <div class="form-group">
+            <div class="formContent">
               <label for="Password">Password</label>
-              <input type="password" name="Password" id="Password" placeholder="Set your password "  />
+              <input
+                type="password"
+                name="Password"
+                id="Password"
+                placeholder="Set your password "
+              />
+              <i class="icon"></i>
               <span class="errorMsg"></span>
             </div>
 
@@ -62,7 +97,13 @@
         </div>
       </form>
 
-      <div id="success" class="modal" role="dialog" aria-hidden="true" tabindex="-1">
+      <div
+        id="success"
+        class="modal"
+        role="dialog"
+        aria-hidden="true"
+        tabindex="-1"
+      >
         <div class="modal-content">
           <span id="close-btn">&times;</span>
           <h2>Success!</h2>
