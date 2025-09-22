@@ -163,10 +163,10 @@ document.addEventListener("DOMContentLoaded", () => {
         function Success(input) {
           console.log("Sucess");
           const formContent = input.parentElement;
-          // const icon = formContent.querySelector(".icon");
+          const icon = formContent.querySelector(".icon");
           const errorMsg = formContent.querySelector(".errorMsg");
           formContent.className = "formContent success";
-          // icon.className = "formContent icon fas fa-check-circle";
+          icon.className = "formContent icon fas fa-check-circle";
           if (errorMsg) {
             errorMsg.innerHTML = "";
           }
@@ -174,10 +174,10 @@ document.addEventListener("DOMContentLoaded", () => {
         function setError(input, errormessage) {
           console.log("Error");
           const formContent = input.parentElement;
-          // const icon = formContent.querySelector(".icon");
+          const icon = formContent.querySelector(".icon");
           const errorMsg = formContent.querySelector(".errorMsg");
           formContent.classList = "formContent error";
-          // icon.className = "formContent icon fas fa-times-circle ";
+          icon.className = "formContent icon fas fa-times-circle ";
           if (errorMsg) {
             errorMsg.innerHTML = errormessage;
           }
