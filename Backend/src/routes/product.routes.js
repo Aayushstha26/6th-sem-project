@@ -12,5 +12,9 @@ router.get("/product-page", (req, res) => {
   const productPath = path.resolve("../frontend/template/Products.html");
   res.sendFile(productPath);
 });
+router.route("/add-product").get((req, res) => {
+  const addProductPath = path.resolve("../frontend/template/add-product.html");
+  res.sendFile(addProductPath);
+});
 
 export default router;
