@@ -215,11 +215,20 @@ document.addEventListener("DOMContentLoaded", () => {
           });
         }
 
-        window.addEventListener("click", (e) => {
-          if (e.target === registerModal) {
-            registerModal.style.display = "none";
-          }
-        });
-      });
-  });
+      window.addEventListener("click", (e) => {
+        if(e.target === registerModal){
+          registerModal.style.display = "none";
+        }
+      })
+    })
+  })
 });
+
+
+
+
+
+
+
+
+
