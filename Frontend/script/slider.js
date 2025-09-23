@@ -215,20 +215,37 @@ document.addEventListener("DOMContentLoaded", () => {
           });
         }
 
-      window.addEventListener("click", (e) => {
-        if(e.target === registerModal){
-          registerModal.style.display = "none";
-        }
-      })
-    })
-  })
+        window.addEventListener("click", (e) => {
+          if (e.target === registerModal) {
+            registerModal.style.display = "none";
+          }
+        });
+      });
+  });
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+  let log = document.querySelector(".log");
+  let loginModal = document.getElementById("loginModal");
+  let loginContent = document.getElementById("loginContent");
 
+  log.addEventListener("click", (e) => {
+    e.preventDefault();
 
+    fetch("/user/signin")
+      .then((res) => res.text())
+      .then((data) => {
+        loginContent.innerHTML = data;
+        console.log(data);
+        loginModal.style.display = "flex";
+      });
+  });
 
+  
 
-
-
-
-
+  window.addEventListener("click", (e) => {
+    if (e.target === loginModal) {
+      loginModal.style.display = "none";
+    }
+  });
+});
