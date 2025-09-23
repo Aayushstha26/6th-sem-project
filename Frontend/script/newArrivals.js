@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const container = document.querySelector(".new-arrivals-slots");
 
   try {
-    const res = await fetch("http://localhost:4000/product/products");
+    const res = await fetch("http://localhost:4000/product/new-arrivals");
     if (!res.ok) throw new Error("Network response was not ok");
 
     const data = await res.json();

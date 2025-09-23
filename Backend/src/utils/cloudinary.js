@@ -15,6 +15,9 @@ const uploadOnCloudinary = async (localFilePath) => {
       resource_type: "auto",
     });
     console.log("File uploaded to Cloudinary successfully" + response.url);
+      fs.unlink(localFilePath, (err) => {
+      if (err) console.warn("Failed to delete local file:", err);
+    });
     return response;
   } catch (error) {
     console.error("Cloudinary upload error:", error);

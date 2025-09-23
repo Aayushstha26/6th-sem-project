@@ -1,4 +1,5 @@
 import { Product } from "../models/product.model.js";
+import { Category } from "../models/category.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { Apierror } from "../utils/apiError.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
@@ -50,4 +51,12 @@ const getProducts = asyncHandler(async (req, res) => {
     products
   });
 }); 
-export { addProduct , getProducts };
+const getNewArrivals = asyncHandler(async (req, res) => {
+  const products = await Product.find().populate("category").sort({createdAt: -1}).limit(10);
+  return res.status(200).json({ 
+    results: products.length,
+    products
+  });
+});
+
+export { addProduct , getProducts , getNewArrivals };
