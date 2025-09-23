@@ -3,8 +3,8 @@ import asyncHandler from "../utils/asyncHandler.js";
 import { Apierror } from "../utils/apiError.js";
 import { Apiresponse } from "../utils/apiRespone.js";
 
-export const addCategory = asyncHandler(async (req, res) => {
-  const { name, description } = req.body;
+const addCategory = asyncHandler(async (req, res) => {
+  const { name } = req.body;
 
   if (!name) {
     return res
@@ -19,7 +19,7 @@ export const addCategory = asyncHandler(async (req, res) => {
       .json(new Apierror(400, "Category already exists"));
   }
 
-  const category = await Category.create({ name: name.trim(), description });
+  const category = await Category.create({ name: name.trim()});
 
   return res
     .status(201)
