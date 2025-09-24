@@ -5,8 +5,7 @@ import { Apierror } from "../utils/apiError.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const addProduct = asyncHandler(async (req, res) => {
-      const { product_name, description, price, category, stock } =
-        req.body;
+      const { product_name, description, price, category, stock } = req.body;
         // console.log(req.body);
         // console.log(req.file);
       if (!product_name || !description || !price || !category ) {
