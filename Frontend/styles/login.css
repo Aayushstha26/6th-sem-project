@@ -1,11 +1,12 @@
 body {
   font-family: "Poppins", sans-serif;
   /* background: #030B36; */
-  display: flex;
+  /* display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: center; */
   /* height: 100vh; */
   margin: 0;
+  padding: 0;
 }
 
 /* Wrapper */
@@ -47,8 +48,8 @@ body {
   justify-content: center;
 }
 
-.logo {
-  /* width: 162px; */
+.log-logo {
+  width: 162px;
   /* margin-top: -50px; */
 }
 
@@ -114,3 +115,4 @@ body {
 #png{
   /* width: 300px; */
 }
+
