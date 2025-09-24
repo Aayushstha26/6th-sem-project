@@ -50,9 +50,9 @@ body {
 }
 
 .header h2 {
-  font-size: 28px;
+   font-size: 26px;
   margin-bottom: 20px;
-  color: #2d1f12;
+  color: oklab(70.547% 0.1641 -0.01718);
 }
 
 .formContent {
@@ -71,7 +71,7 @@ body {
   width: 100%;
   height: 50px;
   padding: 10px 12px;
-  border: 2px solid #ccc;
+  border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 16px;
   outline: none;
@@ -95,20 +95,20 @@ body {
 }
 
 .submit-btn {
-  background-color: blue;
-  color: #fff;
+   width: 100%;
+  padding: 14px;
   border: none;
-  padding: 12px 24px;
   border-radius: 10px;
-  cursor: pointer;
+  background: linear-gradient(135deg, #2a5298, #d62976);
+  color: #fff;
   font-size: 16px;
-  font-weight: bold;
-  transition: background-color 0.3s ease;
-  width: 60%;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
 .submit-btn:hover {
-  background-color: navy;
+  transform: scale(1.03);
+  background: linear-gradient(135deg, #d62976, #030B36);
 }
 .success .icon {
   color: #2ecc71;
