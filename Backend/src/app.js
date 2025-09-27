@@ -2,6 +2,7 @@ import express from "express";
 import userRouter from "./routes/user.routes.js"
 import productRouter from "./routes/product.routes.js"
 import categoryRouter from "./routes/category.routes.js"
+import orderRouter from "./routes/order.routes.js"
 import path from "path"
 import cookieParser from "cookie-parser"
 const app = express();
@@ -15,6 +16,7 @@ app.use(express.static(path.resolve("../frontend")));
 app.use("/user", userRouter);
 app.use("/product", productRouter); 
 app.use("/category", categoryRouter);
+app.use("/order", orderRouter);
 // app.use("/admin", adminRouter);
 app.get("/",(req,res)=>{
     const homepagePath = path.resolve("../frontend/template/Homepage.html");
