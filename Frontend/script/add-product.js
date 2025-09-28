@@ -54,7 +54,7 @@ addProductForm.addEventListener("submit", async (e) => {
     formResults.innerHTML = result.message;
 
     if (req.ok) {
-      formResults.style.color = "green";
+      formResults.style.color = "green";    
       addProductForm.reset();
     } else {
       formResults.style.color = "red";
