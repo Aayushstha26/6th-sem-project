@@ -1,33 +1,44 @@
-const form = document.getElementById("loginForm");
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  console.log(email);
-  try {
-    const res = await fetch("http://localhost:4000/user/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ Email: email, Password: password }),
+
+function updateNavbar() {
+  const rightPart = document.querySelector(".right_part");
+  const username = localStorage.getItem("username");
+
+  if (username) {
+    // User is logged in
+    rightPart.innerHTML = `
+      <div class="user-info">
+        <span class="welcome">Welcome, ${username}</span>
+        <button id="logoutBtn" class="logout-btn">Logout</button>
+      </div>
+    `;
+
+    const logoutBtn = document.getElementById("logoutBtn");
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("username");
+      localStorage.removeItem("accessToken");
+      updateNavbar(); // refresh navbar
     });
+  } else {
+    // User not logged in
+    rightPart.innerHTML = `
+      <div class="cart" id="cart">
+        <a href="">
+          <img id="s_cart" src="../images/ShoppingCart.png" alt="AAVA" />
+        </a>
+      </div>
+      <div class="profile" id="profile">
+        <a href="">
+          <div class="log"><span>Login</span></div>
+          <div class="regs" id="regs"><span>Register</span></div>
+        </a>
+      </div>
+    `;
 
-    const data = await res.json();
-
-    if (res.ok) {
-      alert("Login successful!");
-      console.log("Access Token:", data.accessToken);
-      const decoded = parseJwt(data.accessToken);
-      console.log("Decoded Token:", decoded);
-
-      // Example: access user's name
-      console.log("User Name:", decoded.username);
-    } else {
-      alert(data.message || "Login failed");
-    }
-  } catch (err) {
-    alert("Error: " + err.message);
+    // Reattach popup event listeners
+    attachLoginRegisterHandlers();
   }
-});
+}
+
 function parseJwt(token) {
   try {
     const base64Url = token.split(".")[1];
@@ -44,7 +55,6 @@ function parseJwt(token) {
     return null;
   }
 }
-
 
 window.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("loginForm");
@@ -71,10 +81,27 @@ window.addEventListener("DOMContentLoaded", () => {
         });
 
         const result = await res.json();
+          if (res.ok) {
+            message.innerHTML = result.message;
+            showSucess();
+            form.reset();
+      // alert("Login successful!");
+      console.log("Access Token:", data.accessToken);
+      const decoded = parseJwt(data.accessToken);
+      console.log("Decoded Token:", decoded);
+
+      // Save username in localStorage
+      localStorage.setItem("username", decoded.username);
+
+      // Redirect to homepage
+      window.location.href = "/";
+
+      // Example: access user's name
+      console.log("User Name:", decoded.username);
+    } else {
+      alert(data.message || "Login failed");
+    }
         // alert(result.message);
-        message.innerHTML = result.message;
-        showSucess();
-        form.reset();
       } catch (err) {
         // alert("Registration failed. See console.");
         message.innerHTML = "Error!! Something went wrong";
@@ -100,10 +127,10 @@ window.addEventListener("DOMContentLoaded", () => {
   function checkLoginForm() {
     let isValid = true;
     checkValid(
-       Email,
-       Email.value.trim() !== "" && isEmail(Email.value.trim()),
-       "Not a valid email"
-     );
+      Email,
+      Email.value.trim() !== "" && isEmail(Email.value.trim()),
+      "Not a valid email"
+    );
     checkValid(
       Password,
       Password.value.trim().length >= 8,
@@ -111,13 +138,11 @@ window.addEventListener("DOMContentLoaded", () => {
     );
     // checkValid(checkbox, checkbox.checked, "You must agree to the terms.");
 
-    document
-      .querySelectorAll("#loginForm .formContent")
-      .forEach((control) => {
-        if (control.classList.contains("error")) {
-          isValid = false;
-        }
-      });
+    document.querySelectorAll("#loginForm .formContent").forEach((control) => {
+      if (control.classList.contains("error")) {
+        isValid = false;
+      }
+    });
     return isValid;
   }
   function checkValid(input, condition, errormessage) {
@@ -127,7 +152,7 @@ window.addEventListener("DOMContentLoaded", () => {
       setError(input, errormessage);
     }
   }
-    function Success(input) {
+  function Success(input) {
     console.log("Sucess");
     const formContent = input.parentElement;
     const icon = formContent.querySelector(".icon");
@@ -136,7 +161,7 @@ window.addEventListener("DOMContentLoaded", () => {
     icon.className = "formContent icon fas fa-check-circle";
     if (errorMsg) {
       errorMsg.innerHTML = "";
-  }
+    }
   }
   function setError(input, errormessage) {
     console.log("Error");
@@ -147,27 +172,23 @@ window.addEventListener("DOMContentLoaded", () => {
     icon.className = "formContent icon fas fa-times-circle ";
     if (errorMsg) {
       errorMsg.innerHTML = errormessage;
-  }
+    }
   }
   function isEmail(email) {
     // return /^[a-zA-Z._-]+@[a-zA-Z]+\.[a-zA-Z]{2,6}$/.test(email);
     return /^[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z]+\.[a-zA-Z]{2,}$/.test(email);
   }
 
-    function showSucess() {
+  function showSucess() {
     const modal = document.getElementById("success");
     modal.style.display = "block";
-    
+
     closeBtn = document.getElementById("close-btn");
-    closeBtn.addEventListener("click",()=>{
+    closeBtn.addEventListener("click", () => {
       modal.style.display = "none";
-    })
-    window.addEventListener("click",(e)=>{
-      if(e.target === modal)
-      modal.style.display = "none";
-
-    })
+    });
+    window.addEventListener("click", (e) => {
+      if (e.target === modal) modal.style.display = "none";
+    });
   }
-
 });
-

@@ -239,8 +239,6 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log(data);
         loginModal.style.display = "flex";
 
-
-
         const form = document.getElementById("loginForm");
         form.addEventListener("submit", async (e) => {
           e.preventDefault();
@@ -263,6 +261,10 @@ document.addEventListener("DOMContentLoaded", () => {
               console.log("Decoded Token:", decoded);
 
               // Example: access user's name
+              localStorage.setItem("username", decoded.username);
+              localStorage.setItem("accessToken", data.accessToken);
+              updateNavbar();
+              loginModal.style.display = "none";
               console.log("User Name:", decoded.username);
             } else {
               alert(data.message || "Login failed");
@@ -298,3 +300,52 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+function updateNavbar() {
+  const rightPart = document.querySelector(".right_part");
+  const username = localStorage.getItem("username");
+
+  if (username) {
+    // User is logged in
+    rightPart.innerHTML = `
+      <div class="user-info">
+        <span class="welcome">Welcome, ${username}</span>
+        <button id="logoutBtn" class="logout-btn">Logout</button>
+      </div>
+    `;
+
+    const logoutBtn = document.getElementById("logoutBtn");
+    logoutBtn.addEventListener("click", async () => {
+      const token = localStorage.getItem("accessToken");
+
+       await fetch("http://localhost:4000/user/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include", // ensures cookies are sent
+      });
+      localStorage.removeItem("username");
+      localStorage.removeItem("accessToken");
+      updateNavbar(); // refresh navbar
+    });
+  } else {
+    // User not logged in
+    rightPart.innerHTML = `
+      <div class="cart" id="cart">
+        <a href="">
+          <img id="s_cart" src="../images/ShoppingCart.png" alt="AAVA" />
+        </a>
+      </div>
+      <div class="profile" id="profile">
+        <a href="">
+          <div class="log"><span>Login</span></div>
+          <div class="regs" id="regs"><span>Register</span></div>
+        </a>
+      </div>
+    `;
+
+    // Reattach popup event listeners
+    attachLoginRegisterHandlers();
+  }
+}
