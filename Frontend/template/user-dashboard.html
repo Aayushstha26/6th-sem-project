@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Dashboard | Aava Treasures</title>
+    <link rel="stylesheet" href="../styles/user-dashboard.css" />
+    <link rel="icon" href="../images/logo.png" />
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="logo">
+          <img src="../images/logo.png" alt="Aava Treasures Logo" />
+          <h2>Aava Treasures</h2>
+        </div>
+        <ul class="menu">
+          <li class="active">🏠 Dashboard</li>
+          <li>🛍️ My Orders</li>
+          <li>💖 Wishlist</li>
+          <li>⚙️ Profile Settings</li>
+          <li>💳 Payment History</li>
+        </ul>
+        <button class="logout-btn">🚪 Logout</button>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="header">
+          <h1>Welcome back, <span id="username">Rohan</span> 👋</h1>
+          <div class="profile">
+            <img src="../images/user.jpg" alt="User" />
+          </div>
+        </header>
+
+        <!-- Dynamic content loads here -->
+        <div id="content-area" class="fade"></div>
+      </main>
+    </div>
+
+    <script src="../script/user-dashboard.js"></script>
+  </body>
+</html>
