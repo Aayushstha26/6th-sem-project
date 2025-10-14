@@ -36,7 +36,11 @@ const getProducts = asyncHandler(async (req, res) => {
   const {category , search } = req.query;
   let filter = {};    
   if(category){
-    filter.category = category;
+    const cat = await Category.findOne({
+     name: { $regex: new RegExp("^" + category.trim() + "$", "i") }
+    }
+    );
+    filter.category = cat?._id;
   }
   if(search){
     filter.$or = [
@@ -44,7 +48,7 @@ const getProducts = asyncHandler(async (req, res) => {
      { description : { $regex: search, $options: "i" }}
     ]
   } 
-  const products = await Product.find(filter).populate("category").sort({createdAt: -1});
+  const products = await Product.find(filter).populate("category", "name").sort({createdAt: -1});
   return res.status(200).json({
     results: products.length,
     products
