@@ -3,8 +3,10 @@ import userRouter from "./routes/user.routes.js"
 import productRouter from "./routes/product.routes.js"
 import categoryRouter from "./routes/category.routes.js"
 import orderRouter from "./routes/order.routes.js"
+import cartRouter from "./routes/cart.routes.js"
 import path from "path"
 import cookieParser from "cookie-parser"
+import { get } from "http";
 const app = express();
  
 app.use(express.json());
@@ -22,6 +24,7 @@ app.get("/",(req,res)=>{
     const homepagePath = path.resolve("../frontend/template/Homepage.html");
     res.sendFile(homepagePath);
 })
+app.post("/cart", cartRouter);
 
 export default app;
 
