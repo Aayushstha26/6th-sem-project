@@ -1,16 +1,16 @@
-import moongoose from "mongoose";
+import mongoose from "mongoose";
 
-const cartSchema = new moongoose.Schema(
+const cartSchema = new mongoose.Schema(
   {
     userId: {
-      type: moongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
     products: [
       {
         productId: {
-          type: moongoose.Schema.Types.ObjectId,
+          type: mongoose.Schema.Types.ObjectId,
           ref: "Product",
           required: true,
         },
@@ -29,4 +29,4 @@ const cartSchema = new moongoose.Schema(
   { timestamps: true }
 );
 
-export const Cart = moongoose.model("Cart", cartSchema);
+export const Cart = mongoose.model("Cart", cartSchema);
