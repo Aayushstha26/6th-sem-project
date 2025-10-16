@@ -152,18 +152,58 @@ document.addEventListener("DOMContentLoaded", () => {
 
       case "💳 payment history":
         html = `
-          <section class="payment-history">
-            <h2>Payment History</h2>
-            <table>
-              <thead>
-                <tr><th>Date</th><th>Transaction ID</th><th>Amount</th><th>Method</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>Oct 8, 2025</td><td>TXN1025</td><td>Rs. 2,500</td><td>eSewa</td></tr>
-                <tr><td>Oct 10, 2025</td><td>TXN1028</td><td>Rs. 1,200</td><td>Khalti</td></tr>
-              </tbody>
-            </table>
-          </section>`;
+         <section class="payment-history">
+  <h2>Payment History</h2>
+  <div class="payment-timeline">
+
+    <div class="timeline-item success">
+      <div class="timeline-date">Oct 12, 2025 — 2:45 PM</div>
+      <div class="timeline-content">
+        <h4>Payment #PAY1023</h4>
+        <p><strong>Order ID:</strong> #ORD2023</p>
+                <p><strong>Item:</strong> Earring</p>
+
+        <p><strong>Amount:</strong> $320</p>
+        <p><strong>Method:</strong> eSewa</p>
+        <p><strong>Transaction Ref:</strong> TXN94853212</p>
+        <p><strong>Status:</strong> <span class="status success">Successful</span></p>
+        <button class="receipt-btn">Download Receipt</button>
+      </div>
+    </div>
+
+    <div class="timeline-item pending">
+      <div class="timeline-date">Oct 03, 2025 — 5:20 PM</div>
+      <div class="timeline-content">
+        <h4>Payment #PAY1022</h4>
+        <p><strong>Order ID:</strong> #ORD2022</p>
+                <p><strong>Item:</strong> Earring</p>
+
+        <p><strong>Amount:</strong> $85</p>
+        <p><strong>Method:</strong> Cash on Delivery</p>
+        <p><strong>Transaction Ref:</strong> TXN93248422</p>
+        <p><strong>Status:</strong> <span class="status pending">Pending</span></p>
+        <button class="receipt-btn disabled">Receipt Unavailable</button>
+      </div>
+    </div>
+
+    <div class="timeline-item failed">
+      <div class="timeline-date">Sep 28, 2025 — 8:10 PM</div>
+      <div class="timeline-content">
+        <h4>Payment #PAY1021</h4>
+        <p><strong>Order ID:</strong> #ORD2021</p>
+        <p><strong>Item:</strong> Earring</p>
+        <p><strong>Amount:</strong> $150</p>
+        <p><strong>Method:</strong> Khalti</p>
+        <p><strong>Transaction Ref:</strong> TXN92484102</p>
+        <p><strong>Status:</strong> <span class="status failed">Failed</span></p>
+        <button class="receipt-btn disabled">Retry Payment</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+`;
         break;
 
       default:

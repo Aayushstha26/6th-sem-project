@@ -44,4 +44,54 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Error fetching products:", error);
     container.innerHTML = `<p style="color:red;">Error loading products: ${error.message}</p>`;
   }
+
+  // Handle category filtering
+
+ const urlParams = new URLSearchParams(window.location.search);
+  const category = urlParams.get("category") || "All";
+
+  cTitle.textContent = category;
+
+  try {
+    const res = await fetch("http://localhost:4000/product/products");
+    if (!res.ok) throw new Error("Network response was not ok");
+
+    const data = await res.json();
+
+    // Filter products by category if not "All"
+    const products = category === "All"
+      ? data.products
+      : data.products.filter(p => p.category?.name === category);
+      console.log(products);
+
+    if (!products || products.length === 0) {
+      container.innerHTML = `<p>No products found for "${category}"</p>`;
+      return;
+    }
+
+    // Build HTML string
+    let html = "";
+    products.forEach(p => {
+      html += `
+        <div class="product-card">
+          <img src="${p.productImg || '../images/default.jpg'}" alt="${p.product_name}" />
+          <div class="product-info">
+            <span class="product-name">${p.product_name}</span>
+            <span class="product-category">${p.category?.name || "Uncategorized"}</span>
+            <div class="product-price-tag">
+              <img class="price-icon" src="../images/price-tag.png" alt="Price Tag" />
+              <span class="product-price">RS.${p.price}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+
+  } catch (err) {
+    console.error("Error loading products:", err);
+    container.innerHTML = "<p style='color:red;'>⚠️ Failed to load products.</p>";
+  }
 });
+
