@@ -20,8 +20,10 @@ const addToCart = asyncHandler(async (req, res) => {
   if (!product) {
     throw new Apierror(404, "Product not found");
   }
-
-  const cart = await Cart.findOne({ userId });
+  if(quantity <=0){
+    throw new Apierror(400, "Quantity must be at least 1");
+  }
+  let cart = await Cart.findOne({ userId });
   if (!cart) {
     cart = new Cart({ userId, products: [], totalAmount: 0 });
   }
@@ -56,4 +58,23 @@ const getCart = asyncHandler(async (req, res) => {
     cart,
   });
 });
-export { addToCart, getCart };
+const removeFromCart = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const { productid } = req.body;
+  const cart = await Cart.findOne({ userId });
+  if (!cart) {
+    throw new Apierror(404, "Cart not found");
+  }
+   cart.products = cart.products.filter(
+    (item) => item.productId.toString() !== productid
+  );  
+  cart.totalAmount = await calculateTotalAmount(cart);
+  await cart.save();
+  return res.status(200).json({
+    success: true,
+    message: "Product removed from cart",
+    cart,
+  });
+});
+
+export { addToCart, getCart , removeFromCart };
