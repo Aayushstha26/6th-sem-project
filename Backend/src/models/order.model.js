@@ -13,9 +13,14 @@ const orderSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
-    status: {
+    orderStatus: {
         type: String,
         enum: ["Pending", "Shipped", "Delivered", "Cancelled"],     
+        default: "Pending",
+    },
+    paymentStatus: {
+        type: String,
+        enum: ["Pending", "Paid", "Failed"],     
         default: "Pending",
     },
     items: [
@@ -30,7 +35,18 @@ const orderSchema = new mongoose.Schema({
                 min: 1,
                 default: 1,
             },
+            price: {
+                type: Number,
+                required: true,
+            },
         }
-    ]
+    ],
+    transactionId  : {
+        type: String,
+    },
+    date: {
+        type: Date,
+        default: Date.now,
+    },
 });
 export const Order = mongoose.model("Order", orderSchema);
