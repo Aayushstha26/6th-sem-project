@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { addToCart, getCart } from "../controller/cart.controller.js";
+import { addToCart, getCart, removeFromCart } from "../controller/cart.controller.js";
 import { verifyJwt } from "../middleware/auth.midlleware.js";
 
 
