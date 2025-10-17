@@ -1,4 +1,3 @@
-
 function updateNavbar() {
   const rightPart = document.querySelector(".right_part");
   const username = localStorage.getItem("username");
@@ -7,6 +6,11 @@ function updateNavbar() {
     // User is logged in
     rightPart.innerHTML = `
       <div class="user-info">
+          <div class="cart" id="cart">
+              <a href="">
+                <img id="s_cart" src="../images/ShoppingCart.png" alt="AAVA" />
+              </a>
+            </div>
         <span class="welcome">Welcome, ${username}</span>
         <button id="logoutBtn" class="logout-btn">Logout</button>
       </div>
@@ -81,26 +85,26 @@ window.addEventListener("DOMContentLoaded", () => {
         });
 
         const result = await res.json();
-          if (res.ok) {
-            message.innerHTML = result.message;
-            showSucess();
-            form.reset();
-      // alert("Login successful!");
-      console.log("Access Token:", data.accessToken);
-      const decoded = parseJwt(data.accessToken);
-      console.log("Decoded Token:", decoded);
+        if (res.ok) {
+          message.innerHTML = result.message;
+          showSucess();
+          form.reset();
+          // alert("Login successful!");
+          console.log("Access Token:", data.accessToken);
+          const decoded = parseJwt(data.accessToken);
+          console.log("Decoded Token:", decoded);
 
-      // Save username in localStorage
-      localStorage.setItem("username", decoded.username);
+          // Save username in localStorage
+          localStorage.setItem("username", decoded.username);
 
-      // Redirect to homepage
-      window.location.href = "/";
+          // Redirect to homepage
+          window.location.href = "/";
 
-      // Example: access user's name
-      console.log("User Name:", decoded.username);
-    } else {
-      alert(data.message || "Login failed");
-    }
+          // Example: access user's name
+          console.log("User Name:", decoded.username);
+        } else {
+          alert(data.message || "Login failed");
+        }
         // alert(result.message);
       } catch (err) {
         // alert("Registration failed. See console.");
