@@ -23,10 +23,10 @@ router.get("/signin", (req, res) => {
   const registerPath = path.resolve("../frontend/template/login.html");
   res.sendFile(registerPath);
 })
-router.get("/dashboard", verifyJwt, (req, res) => {
+router.get("/dashboard", (req, res) => {
   res.sendFile(path.resolve("../frontend/template/user-dashboard.html"));
 });
-router.get("/cart", verifyJwt,  (req, res) => {
+router.get("/cart",   (req, res) => {
   res.sendFile(path.resolve("../frontend/template/Add-to-cart.html"));
 });
 router.get("/product-details", (req, res) => {

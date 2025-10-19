@@ -308,16 +308,23 @@ function updateNavbar() {
     // User is logged in
     rightPart.innerHTML = `
       <div class="user-info">
+      <div class="cart" id="cart">
+                <a href="/cart">
+                <img id="s_cart" src="../images/ShoppingCart.png" alt="AAVA" />
+                </a>
+            </div>
         <span class="welcome">Welcome, ${username}</span>
         <button id="logoutBtn" class="logout-btn">Logout</button>
       </div>
     `;
 
+
+  
     const logoutBtn = document.getElementById("logoutBtn");
     logoutBtn.addEventListener("click", async () => {
       const token = localStorage.getItem("accessToken");
 
-       await fetch("http://localhost:4000/user/logout", {
+      await fetch("http://localhost:4000/user/logout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -349,3 +356,6 @@ function updateNavbar() {
     attachLoginRegisterHandlers();
   }
 }
+
+
+  

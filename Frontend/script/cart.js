@@ -1,50 +1,18 @@
 
-//   document.addEventListener("DOMContentLoaded", () => {
-//     const cartIcon = document.getElementById("cart");
-//     const loginModal = document.getElementById("loginModal");
-//     const loginContent = document.getElementById("loginContent");
+  document.addEventListener("DOMContentLoaded",  async() => {
 
-//     cartIcon.addEventListener("click", async (e) => {
-//       e.preventDefault();
-
-//       const token = localStorage.getItem("token");
-
-//       if (token) {
-//         // ✅ Redirect to the cart page
-//         window.location.href = "http://localhost:4000/cart";
-//       } else {
-//         // ⚠️ Not logged in — open login modal dynamically
-//         loginModal.style.display = "flex";
-
-//         // If your login form is loaded from another file (for example login.html)
-//         try {
-//           const res = await fetch("../template/login.html");
-//           const html = await res.text();
-//           loginContent.innerHTML = html;
-//         } catch (err) {
-//           console.error("Error loading login form:", err);
-//           loginContent.innerHTML = "<p>Failed to load login form.</p>";
-//         }
-//       }
-//     });
-
-//     // Optional: close modal when clicking outside
-//     window.addEventListener("click", (e) => {
-//       if (e.target === loginModal) {
-//         loginModal.style.display = "none";
-//       }
-//     });
-//   });
-
-
-
-
-document.addEventListener("DOMContentLoaded", async () => {
-  const cartContainer = document.querySelector(".cart-items");
+    const token = localStorage.getItem("accessToken");
+    if(!token){
+      // window.location.href = "/signin";
+      alert("Please login to access the cart.");
+      return;
+    }
+    else{
+      const cartContainer = document.querySelector(".cart-items");
   const subtotalElem = document.querySelector(".summary-row span:last-child");
   const totalElem = document.querySelector(".summary-total span:last-child");
 
-  const token = localStorage.getItem("token"); // assuming you saved JWT after login
+  const token = localStorage.getItem("accessToken"); // assuming you saved JWT after login
 
   if (!token) {
     cartContainer.innerHTML = `<p style="text-align:center;">Please login to view your cart.</p>`;
@@ -52,7 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   try {
-    const res = await fetch("http://localhost:4000/cart", {
+    const res = await fetch("http://localhost:4000/cart/getCart", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -146,4 +114,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     subtotalElem.textContent = `Rs. ${total}`;
     totalElem.textContent = `Rs. ${total}`;
   }
-});
+      updateNavbar();
+    }
+  });
