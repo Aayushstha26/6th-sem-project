@@ -4,6 +4,7 @@ import productRouter from "./routes/product.routes.js"
 import categoryRouter from "./routes/category.routes.js"
 import orderRouter from "./routes/order.routes.js"
 import cartRouter from "./routes/cart.routes.js"
+import pageRouter from "./routes/page.routes.js"
 import path from "path"
 import cookieParser from "cookie-parser"
 import { get } from "http";
@@ -19,11 +20,12 @@ app.use("/user", userRouter);
 app.use("/product", productRouter); 
 app.use("/category", categoryRouter);
 app.use("/order", orderRouter);
+app.use("/", pageRouter);
 // app.use("/admin", adminRouter);
-app.get("/",(req,res)=>{
-    const homepagePath = path.resolve("../frontend/template/Homepage.html");
-    res.sendFile(homepagePath);
-})
+// app.get("/",(req,res)=>{
+//     const homepagePath = path.resolve("../frontend/template/Homepage.html");
+//     res.sendFile(homepagePath);
+// })
 app.post("/cart", cartRouter);
 
 export default app;

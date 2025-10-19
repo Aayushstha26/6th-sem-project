@@ -9,13 +9,13 @@ const router = Router();
 router.route("/add").post(upload.single("productImg"), addProduct);
 router.route("/products").get(getProducts);
 router.route("/new-arrivals").get(getNewArrivals); 
-router.get("/product-page", (req, res) => {
-  const productPath = path.resolve("../frontend/template/Products.html");
-  res.sendFile(productPath);
-});
-router.route("/add-product").get((req, res) => {
-  const addProductPath = path.resolve("../frontend/template/add-product.html");
-  res.sendFile(addProductPath);
-});
+// router.get("/product-page", (req, res) => {
+//   const productPath = path.resolve("../frontend/template/Products.html");
+//   res.sendFile(productPath);
+// });
+// router.route("/add-product").get((req, res) => {
+//   const addProductPath = path.resolve("../frontend/template/add-product.html");
+//   res.sendFile(addProductPath);
+// });
 
 export default router;

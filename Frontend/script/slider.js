@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
   regs.addEventListener("click", (e) => {
     e.preventDefault();
 
-    fetch("/user/signup")
+    fetch("/signup")
       .then((reg) => reg.text())
       .then((data) => {
         registerContent.innerHTML = data;
@@ -232,7 +232,7 @@ document.addEventListener("DOMContentLoaded", () => {
   log.addEventListener("click", (e) => {
     e.preventDefault();
 
-    fetch("/user/signin")
+    fetch("/signin")
       .then((res) => res.text())
       .then((data) => {
         loginContent.innerHTML = data;
