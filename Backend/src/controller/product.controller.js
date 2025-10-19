@@ -61,5 +61,16 @@ const getNewArrivals = asyncHandler(async (req, res) => {
     products
   });
 });
+const getProductById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const product = await Product.findById(id).populate("category", "name");  
+  if (!product) {
+    throw new Apierror(404, "Product not found");
+  } 
+  return res.status(200).json({
+    success: true,
+    product
+  });
+});
 
-export { addProduct , getProducts , getNewArrivals };
+export { addProduct , getProducts , getNewArrivals , getProductById};
