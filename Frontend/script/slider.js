@@ -23,6 +23,10 @@ setInterval(nextSlide, 5000);
 // popup register//
 
 document.addEventListener("DOMContentLoaded", () => {
+  const token = localStorage.getItem("accessToken");
+  if (token) {
+    updateNavbar();
+  }
   const regs = document.getElementById("regs");
   const registerModal = document.getElementById("registerModal");
   const registerContent = document.getElementById("registerContent");
@@ -228,10 +232,17 @@ document.addEventListener("DOMContentLoaded", () => {
   let log = document.querySelector(".log");
   let loginModal = document.getElementById("loginModal");
   let loginContent = document.getElementById("loginContent");
+  let cart = document.getElementById("cart");
 
   log.addEventListener("click", (e) => {
     e.preventDefault();
-
+    loadLoginForm();
+  });
+  cart.addEventListener("click", (e) => {
+    e.preventDefault();
+    loadLoginForm();
+  });
+  function loadLoginForm() {
     fetch("/signin")
       .then((res) => res.text())
       .then((data) => {
@@ -291,15 +302,16 @@ document.addEventListener("DOMContentLoaded", () => {
             return null;
           }
         }
-      });
-  });
 
-  window.addEventListener("click", (e) => {
-    if (e.target === loginModal) {
-      loginModal.style.display = "none";
-    }
-  });
+        window.addEventListener("click", (e) => {
+          if (e.target === loginModal) {
+            loginModal.style.display = "none";
+          }
+        });
+      });
+  }
 });
+
 function updateNavbar() {
   const rightPart = document.querySelector(".right_part");
   const username = localStorage.getItem("username");
@@ -318,8 +330,6 @@ function updateNavbar() {
       </div>
     `;
 
-
-  
     const logoutBtn = document.getElementById("logoutBtn");
     logoutBtn.addEventListener("click", async () => {
       const token = localStorage.getItem("accessToken");
@@ -353,9 +363,6 @@ function updateNavbar() {
     `;
 
     // Reattach popup event listeners
-    attachLoginRegisterHandlers();
+    // attachLoginRegisterHandlers();
   }
 }
-
-
-  

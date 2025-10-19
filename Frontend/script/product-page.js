@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           <img src="${p.productImg || "../images/default.jpg"}" alt="${
         p.product_name
       }" />
-          <div class="product-info">
+          <div class="product-info" data-product-id="${p._id}">
             <span class="product-name">${p.product_name}</span>
             <span class="product-category">${
               p.category?.name || "Uncategorized"
