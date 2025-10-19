@@ -1,6 +1,7 @@
 // routes/page.routes.js
 import { Router } from "express";
 import path from "path";
+import { verifyJwt } from "../middleware/auth.midlleware.js";
 const router = Router();
 
 router.get("/", (req, res) => {
@@ -21,6 +22,16 @@ router.get("/signup", (req, res) => {
 router.get("/signin", (req, res) => {
   const registerPath = path.resolve("../frontend/template/login.html");
   res.sendFile(registerPath);
+})
+router.get("/dashboard", verifyJwt, (req, res) => {
+  res.sendFile(path.resolve("../frontend/template/user-dashboard.html"));
 });
+router.get("/cart", verifyJwt,  (req, res) => {
+  res.sendFile(path.resolve("../frontend/template/Add-to-cart.html"));
+});
+router.get("/product-details", (req, res) => {
+  res.sendFile(path.resolve("../frontend/template/Product-details.html"));
+});
+
 
 export default router;
