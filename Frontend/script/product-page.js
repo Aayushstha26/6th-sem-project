@@ -106,4 +106,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     container.innerHTML =
       "<p style='color:red;'>⚠️ Failed to load products.</p>";
   }
+
+
+  
+  const card = document.querySelectorAll(".product-card");
+  console.log(card);
+  card.forEach((card) => {
+    card.addEventListener("click", () => {
+      const productId = card.querySelector(".product-info").getAttribute("data-product-id");
+      window.location.href = `product-details?id=${productId}`;
+      console.log(productId);
+    }); 
+  });
 });
+
+

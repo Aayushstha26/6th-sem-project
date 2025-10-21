@@ -216,6 +216,12 @@ body{
   background: #a67c52;
 }
 
+.category{
+  font-size: 14px;
+  color: #777;
+  display: block;
+  margin-bottom: 10px;
+}
 
 .recommended {
   padding: 50px 10%;

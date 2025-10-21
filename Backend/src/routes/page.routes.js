@@ -8,7 +8,7 @@ router.get("/", (req, res) => {
   res.sendFile(path.resolve("../frontend/template/Homepage.html"));
 });
 
-router.get("/products", (req, res) => {
+router.get("/product-page", (req, res) => {
   res.sendFile(path.resolve("../frontend/template/Products.html"));
 });
 
