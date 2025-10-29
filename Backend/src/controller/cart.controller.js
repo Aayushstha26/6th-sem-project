@@ -15,8 +15,8 @@ const calculateTotalAmount = async (cart) => {
 
 const addToCart = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  const { productid, quantity } = req.body;
-  const product = await Product.findById(productid);
+  const { productId, quantity } = req.body;
+  const product = await Product.findById(productId);
   if (!product) {
     throw new Apierror(404, "Product not found");
   }
@@ -29,12 +29,12 @@ const addToCart = asyncHandler(async (req, res) => {
   }
 
   const productIndex = cart.products.findIndex(
-    (item) => item.productId.toString() === productid
+    (item) => item.productId.toString() === productId
   );
   if (productIndex > -1) {
     cart.products[productIndex].quantity += quantity || 1;
   } else {
-    cart.products.push({ productId: productid, quantity: quantity || 1 });
+    cart.products.push({ productId: productId, quantity: quantity || 1 });
   }
   cart.totalAmount = await calculateTotalAmount(cart);
   await cart.save();
@@ -49,7 +49,7 @@ const getCart = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const cart = await Cart.findOne({ userId }).populate(
     "products.productId",
-    "product_name price "
+    "product_name price productImg "
   );
   if (!cart) {
     throw new Apierror(404, "Cart not found");
@@ -60,13 +60,13 @@ const getCart = asyncHandler(async (req, res) => {
 });
 const removeFromCart = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  const { productid } = req.body;
+  const { productId } = req.body;
   const cart = await Cart.findOne({ userId });
   if (!cart) {
     throw new Apierror(404, "Cart not found");
   }
    cart.products = cart.products.filter(
-    (item) => item.productId.toString() !== productid
+    (item) => item.productId.toString() !== productId
   );  
   cart.totalAmount = await calculateTotalAmount(cart);
   await cart.save();

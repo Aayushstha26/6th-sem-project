@@ -26,7 +26,7 @@ app.use("/", pageRouter);
 //     const homepagePath = path.resolve("../frontend/template/Homepage.html");
 //     res.sendFile(homepagePath);
 // })
-app.post("/cart", cartRouter);
+app.use("/cart", cartRouter);
 
 export default app;
 

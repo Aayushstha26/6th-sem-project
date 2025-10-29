@@ -49,7 +49,7 @@
       const cartItem = document.createElement("div");
       cartItem.classList.add("cart-item");
       cartItem.innerHTML = `
-        <img src="${product.image || "../images/default.jpg"}" alt="${product.product_name}" />
+        <img src="${product.productImg || "../images/"}" alt="${product.product_name}" />
         <div class="item-info">
           <h2>${product.product_name}</h2>
           <p class="item-price">Rs. ${product.price}</p>
