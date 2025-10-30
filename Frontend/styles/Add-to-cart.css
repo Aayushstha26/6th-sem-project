@@ -19,6 +19,7 @@ body {
   top: 0;
   z-index: 100;
   transition: all 0.3s ease;
+  height: 100px;
 }
 
 .logo img {
@@ -57,6 +58,7 @@ body {
 }
 
 #s_cart {
+  display: none;
   width: 36px;
   cursor: pointer;
   transition: transform 0.3s ease;
@@ -64,6 +66,12 @@ body {
 
 #s_cart:hover {
   transform: scale(1.15);
+}
+.user-info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
 }
 
 .profile a {
@@ -92,6 +100,25 @@ body {
   transform: scale(1.05);
 }
 
+.logout-btn {
+  background: none;
+  border: none;
+  color: black;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: inherit;
+  font-size: 16px;
+  transition: color 0.3s ease;
+}
+
+.logout-btn:hover {
+  color: #d62976;
+}
+.welcome{
+  color: #c83e7c;
+  font-size: large;
+}
 /* --- Cart Page --- */
 .cart-page {
   max-width: 1250px;
@@ -306,7 +333,7 @@ body {
 }
 
 .checkout-btn:hover {
-  background: linear-gradient(135deg, #d62976, #030B36);
+  background: linear-gradient(135deg, #d62976, #030b36);
   transform: translateY(-3px) scale(1.02);
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.3);
 }
@@ -348,11 +375,10 @@ body {
   }
 }
 
-
 .footer {
   background-color: #fdf8f3;
   padding: 60px 20px 30px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   color: #2d1f12;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
@@ -390,7 +416,6 @@ body {
   position: relative;
   top: 22px;
   left: 62px;
-  
 }
 
 .f-links h4 {
@@ -446,24 +471,30 @@ body {
 }
 
 .instagram-gradient {
-  background: linear-gradient(to right, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
+  background: linear-gradient(
+    to right,
+    #feda75,
+    #fa7e1e,
+    #d62976,
+    #962fbf,
+    #4f5bd5
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: 600;
   font-size: 14px;
 }
 
-.others-media{
+.others-media {
   display: flex;
   justify-content: center;
   gap: 20px;
 }
 
-.others-media img{
+.others-media img {
   padding-top: 20px;
   width: 40px;
 }
-
 
 /* Bottom copyright */
 .f-bottom {
@@ -500,14 +531,14 @@ body {
 }
 
 .about-text h2 {
-  font-family: 'Playfair Display', serif;
+  font-family: "Playfair Display", serif;
   font-size: 32px;
   color: #2d1f12;
   margin-bottom: 16px;
 }
 
 .about-text p {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 16px;
   line-height: 1.7;
   color: #5a4a3b;

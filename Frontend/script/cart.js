@@ -1,3 +1,4 @@
+import { updateNavbar } from "./slider.js";
 
   document.addEventListener("DOMContentLoaded",  async() => {
 
@@ -8,6 +9,7 @@
       return;
     }
     else{
+      updateNavbar();
       const cartContainer = document.querySelector(".cart-items");
   const subtotalElem = document.querySelector(".summary-row span:last-child");
   const totalElem = document.querySelector(".summary-total span:last-child");
@@ -43,8 +45,9 @@
   // --- Functions ---
   function renderCart(items) {
     cartContainer.innerHTML = "";
-
+    
     items.forEach((item) => {
+      
       const product = item.productId;
       const cartItem = document.createElement("div");
       cartItem.classList.add("cart-item");
@@ -70,19 +73,25 @@
       const decBtn = cartItem.querySelector(".decrease");
       const incBtn = cartItem.querySelector(".increase");
       const removeBtn = cartItem.querySelector(".remove-btn");
-
+console.log(item.productId._id);
       decBtn.addEventListener("click", () => updateQuantity(item.productId._id, qtyInput, -1));
-      incBtn.addEventListener("click", () => updateQuantity(item.productId._id, qtyInput, 1));
+      incBtn.addEventListener("click", () => updateQuantity(item.productId._id, qtyInput, +1));
       qtyInput.addEventListener("change", () => updateQuantity(item.productId._id, qtyInput, 0, true));
       removeBtn.addEventListener("click", () => removeItem(item.productId._id));
     });
   }
 
-  async function updateQuantity(productId, input, change, direct = false) {
-    let newQty = direct ? parseInt(input.value) : parseInt(input.value) + change;
-    if (newQty < 1) newQty = 1;
-    input.value = newQty;
+  async function updateQuantity(productId, input, change = 0, direct = false) {
+    console.log("updateQuantity called", { productId, change, direct });
+     let currentQty = parseInt(input.value) || 1;
+  let newQty = direct ? currentQty : currentQty + change;
 
+  if (newQty < 1) newQty = 1;
+
+ 
+  input.value = newQty;
+  console.log(newQty);
+  
     try {
       await fetch("http://localhost:4000/cart/add", {
         method: "POST",
@@ -90,7 +99,7 @@
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ productid: productId, quantity: newQty }),
+        body: JSON.stringify({ productId: productId, quantity: newQty }),
       });
       location.reload(); // reload to update summary + display
     } catch (err) {
@@ -100,9 +109,12 @@
 
   async function removeItem(productId) {
     try {
-      await fetch(`http://localhost:4000/cart/remove/${productId}`, {
+      await fetch(`http://localhost:4000/cart/remove`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+       },
+        body: JSON.stringify({ productId : productId})
       });
       location.reload();
     } catch (err) {

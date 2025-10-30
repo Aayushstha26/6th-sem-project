@@ -65,6 +65,14 @@ body{
     /* flex-direction: row; */
     gap: 10px;
 }
+
+.user-info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
 .profile {
   display: inline-flex;
   /* background: #030B36; */

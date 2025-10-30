@@ -32,7 +32,7 @@ const addToCart = asyncHandler(async (req, res) => {
     (item) => item.productId.toString() === productId
   );
   if (productIndex > -1) {
-    cart.products[productIndex].quantity += quantity || 1;
+    cart.products[productIndex].quantity = quantity || 1;
   } else {
     cart.products.push({ productId: productId, quantity: quantity || 1 });
   }
