@@ -5,6 +5,7 @@ import categoryRouter from "./routes/category.routes.js"
 import orderRouter from "./routes/order.routes.js"
 import cartRouter from "./routes/cart.routes.js"
 import pageRouter from "./routes/page.routes.js"
+import otpRouter from "./routes/otp.routes.js"
 import path from "path"
 import cookieParser from "cookie-parser"
 import { get } from "http";
@@ -27,6 +28,7 @@ app.use("/", pageRouter);
 //     res.sendFile(homepagePath);
 // })
 app.use("/cart", cartRouter);
+app.use("/auth", otpRouter);
 
 export default app;
 
