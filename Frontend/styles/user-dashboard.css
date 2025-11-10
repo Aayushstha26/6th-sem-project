@@ -16,8 +16,8 @@ body {
 /* Sidebar */
 .sidebar {
   width: 250px;
-  background-color: #030b36;
-  color: white;
+  background-color: #fff3e0;
+  /* color: black; */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
