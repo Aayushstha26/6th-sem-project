@@ -32,6 +32,9 @@ router.get("/cart",   (req, res) => {
 router.get("/product-details", (req, res) => {
   res.sendFile(path.resolve("../frontend/template/Product-details.html"));
 });
+router.get("/address", (req, res) => {
+  res.sendFile(path.resolve("../frontend/template/Address.html"));
+});
 
 
 export default router;
