@@ -4,6 +4,7 @@ import {
   loginUser,
   logoutUser,
   refreshAccessToken,
+  getAllUsers,
 } from "../controller/user.controller.js";
 import path from "path";
 import { verifyJwt } from "../middleware/auth.midlleware.js";
@@ -29,4 +30,5 @@ router.route("/login").post(loginUser);
 //secured route
 router.route("/logout").post(verifyJwt, logoutUser);
 router.route("/refresh-token").post(refreshAccessToken);
+router.route("/getUser").get(getAllUsers);
 export default router;
