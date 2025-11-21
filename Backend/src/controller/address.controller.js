@@ -3,15 +3,18 @@ import { Apierror } from "../utils/apiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { Apiresponse } from "../utils/apiRespone.js";
 const addAddress = asyncHandler(async (req, res) => {
-  const { fullName, phoneNumber, address, city, postalCode } = req.body;
-    if (!fullName || !phoneNumber || !address || !city || !postalCode) {
+    const { fullName, phoneNumber, address, city, postalCode, email } = req.body;
+    console.log(req.body);
+    if (!fullName || !phoneNumber || !address || !city || !postalCode || !email) {
         throw new Apierror(400, "All fields are required");
     }
+    
     const newAddress = await Address.create({
         fullName,
         phoneNumber,
         address,
         city,
+        email,
         postalCode,
     });
     return res.status(200).json(
