@@ -27,8 +27,8 @@ body{
 .nav_bar ul {
   display: flex;
   list-style: none;
-  padding: 0;
-  gap: 30px;
+  gap: 50px;
+
 }
 
 .nav_bar ul li {
@@ -64,6 +64,35 @@ body{
     display: flex;
     /* flex-direction: row; */
     gap: 10px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 25px;
+  overflow: hidden;
+  background-color: #fff;
+}
+.search-box input {
+  border: none;
+  padding: 8px 12px;
+  outline: none;
+  font-size: 14px;
+  width: 200px;
+}
+.search-box button {
+  background-color: #d62976;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.search-box button img {
+  width: 16px;
+  height: 16px;
 }
 
 .user-info {
