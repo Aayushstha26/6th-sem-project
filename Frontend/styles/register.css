@@ -6,8 +6,10 @@
 
 body {
   /* background: #faf7f0; */
-  font-family: "Inter", sans-serif;
-}
+font-family: "Public Sans", sans-serif;
+  font-optical-sizing: auto;
+  /* font-weight: <weight>; */
+  font-style: normal;}
 
 .form-container {
   max-width: 900px;

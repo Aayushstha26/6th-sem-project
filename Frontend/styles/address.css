@@ -1,7 +1,9 @@
 body {
   margin: 0;
-  font-family: "Poppins", sans-serif;
-    background: #FAF7F0;
+font-family: "Public Sans", sans-serif;
+  font-optical-sizing: auto;
+  /* font-weight: <weight>; */
+  font-style: normal;    background: #FAF7F0;
   color: #fff;
 }
 
