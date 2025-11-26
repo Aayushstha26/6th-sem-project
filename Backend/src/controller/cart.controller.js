@@ -20,9 +20,11 @@ const addToCart = asyncHandler(async (req, res) => {
   if (!product) {
     throw new Apierror(404, "Product not found");
   }
-  if(quantity <=0){
-    throw new Apierror(400, "Quantity must be at least 1");
-  }
+  // if(quantity <=1){
+  //   throw new Apierror(400, "Quantity must be at least 1");
+  // }
+  console.log(quantity);
+  
   let cart = await Cart.findOne({ userId });
   if (!cart) {
     cart = new Cart({ userId, products: [], totalAmount: 0 });
@@ -32,7 +34,7 @@ const addToCart = asyncHandler(async (req, res) => {
     (item) => item.productId.toString() === productId
   );
   if (productIndex > -1) {
-    cart.products[productIndex].quantity = quantity || 1;
+    cart.products[productIndex].quantity += quantity || 1;
   } else {
     cart.products.push({ productId: productId, quantity: quantity || 1 });
   }

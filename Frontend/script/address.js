@@ -4,7 +4,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   let phoneNumber = document.getElementById("phone");
   let postalCode = document.getElementById("zipcode");
   let address = document.getElementById("address");
-    let email = document.getElementById("email");
+  let email = document.getElementById("email");
   let city = document.getElementById("city");
 
   form.addEventListener("submit", async (e) => {
@@ -40,6 +40,41 @@ window.addEventListener("DOMContentLoaded", async () => {
 
       if (res.ok) {
         alert(result.message);
+
+        //payment redirection
+        let paybtn = document.querySelector("continue-btn");
+        paybtn.addEventListener("click", async function () {
+          let product_code = document.getElementById("product_code").value;
+          let total_amount = document.getElementById("total").value;
+          let transaction_uuid = "TXN" + Date.now().toString();
+
+          const response = await fetch(
+            "http://localhost:4000/payment/generate-signature",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                total_amount: total_amount,
+                transaction_uuid: transaction_uuid,
+                product_code: product_code,
+              }),
+            }
+          );
+          if (response.ok) {
+            const data = await response.json();
+            console.log(data);
+            handlePaymentRedirect(
+              total_amount,
+              transaction_uuid,
+              product_code,
+              data.signature
+            );
+          }
+        });
+
         form.reset();
       } else {
         alert(result.message || "Failed to save address");
@@ -49,7 +84,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  
   let orderItemsDiv = document.getElementById("order-summary");
 
   const token = localStorage.getItem("accessToken");
@@ -81,9 +115,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     let qty = item.quantity;
     let price = product.price;
 
- 
-
- 
     //   subtotalValue += price * qty;
 
     orderItemsDiv.innerHTML += `
@@ -99,7 +130,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     
   `;
   });
-   let shippingValue = 100;
+  let shippingValue = 100;
   orderItemsDiv.innerHTML += `
   <div class="order-totals"> 
     <div class="line"> 
@@ -115,8 +146,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         <span id="total">Rs. ${data.cart.totalAmount + shippingValue}
         </span> 
         </div>
-         </div>`
+         </div>`;
 
   // UPDATE TOTALS
-
 });

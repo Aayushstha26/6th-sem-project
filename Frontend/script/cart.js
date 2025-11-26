@@ -1,3 +1,4 @@
+
 import { updateNavbar } from "./slider.js";
 
   document.addEventListener("DOMContentLoaded",  async() => {
@@ -60,7 +61,7 @@ import { updateNavbar } from "./slider.js";
         <div class="item-actions">
           <div class="qty-box">
             <button class="decrease">-</button>
-            <input type="number" value="${item.quantity}" min="1" />
+            <input type="text" value="${item.quantity}" min="1" disabled />
             <button class="increase">+</button>
           </div>
           <span class="remove-btn">Remove</span>
@@ -75,37 +76,43 @@ import { updateNavbar } from "./slider.js";
       const removeBtn = cartItem.querySelector(".remove-btn");
 console.log(item.productId._id);
       decBtn.addEventListener("click", () => updateQuantity(item.productId._id, qtyInput, -1));
-      incBtn.addEventListener("click", () => updateQuantity(item.productId._id, qtyInput, +1));
+      incBtn.addEventListener("click", () => updateQuantity(item.productId._id, qtyInput, 1));
       qtyInput.addEventListener("change", () => updateQuantity(item.productId._id, qtyInput, 0, true));
       removeBtn.addEventListener("click", () => removeItem(item.productId._id));
     });
   }
 
   async function updateQuantity(productId, input, change = 0, direct = false) {
-    console.log("updateQuantity called", { productId, change, direct });
-     let currentQty = parseInt(input.value) || 1;
-  let newQty = direct ? currentQty : currentQty + change;
+  let oldQty = parseInt(input.value) || 1;        // original UI value
 
+  let newQty = direct ? oldQty : oldQty + change;
   if (newQty < 1) newQty = 1;
 
- 
-  input.value = newQty;
-  console.log(newQty);
+  const diff = newQty - oldQty; 
   
-    try {
-      await fetch("http://localhost:4000/cart/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ productId: productId, quantity: newQty }),
-      });
-      location.reload(); // reload to update summary + display
-    } catch (err) {
-      console.error("Failed to update quantity", err);
-    }
+      // difference to send to backend
+console.log("Diff:", diff);
+  if (diff === 0) return;           // no change, no API call
+
+  input.value = newQty;
+
+  try {
+    await fetch("http://localhost:4000/cart/add", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ productId, quantity: diff }),
+    });
+      location.reload();
+
+  
+  } catch (err) {
+    console.error("Failed to update quantity", err);
   }
+}
+
 
   async function removeItem(productId) {
     try {
