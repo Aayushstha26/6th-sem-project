@@ -42,7 +42,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         alert(result.message);
 
         //payment redirection
-        let paybtn = document.querySelector("continue-btn");
+        let paybtn = document.querySelector(".continue-btn");
         paybtn.addEventListener("click", async function () {
           let product_code = document.getElementById("product_code").value;
           let total_amount = document.getElementById("total").value;
