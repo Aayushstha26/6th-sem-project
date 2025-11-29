@@ -10,7 +10,7 @@ import adminRouter from "./routes/admin.routes.js"
 import addressRouter from "./routes/address.routes.js"
 import path from "path"
 import cookieParser from "cookie-parser"
-import { get } from "http";
+import paymentRouter from "./routes/payment.routes.js";
 const app = express();
  
 app.use(express.json());
@@ -26,6 +26,7 @@ app.use("/order", orderRouter);
 app.use("/", pageRouter);
 app.use("/address", addressRouter);
 app.use("/admin", adminRouter);
+app.use("/payment", paymentRouter);
 // app.get("/",(req,res)=>{
 //     const homepagePath = path.resolve("../frontend/template/Homepage.html");
 //     res.sendFile(homepagePath);
