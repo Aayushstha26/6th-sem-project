@@ -1,6 +1,14 @@
+import { updateNavbar } from "./slider.js";
+
 document.addEventListener("DOMContentLoaded", async () => {
   const container = document.querySelector(".product-slots");
   const cTitle = document.querySelector("#product-title");
+
+   const token = localStorage.getItem("accessToken");
+   console.log(token);
+  if (token) {
+    updateNavbar();
+  }
 
   container.innerHTML = `<p>Loading products...</p>`; // temporary message
 

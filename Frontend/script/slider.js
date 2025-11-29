@@ -312,42 +312,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-function updateNavbar() {
+function updateNavbar(showSearchBox = true) {
   const rightPart = document.querySelector(".right_part");
   const username = localStorage.getItem("username");
 
-  if (username) {
-    // User is logged in
-    rightPart.innerHTML = `
-      <div class="user-info">
-      <div class="cart" id="cart">
-                <a href="/cart">
-                <img id="s_cart" src="../images/ShoppingCart.png" alt="AAVA" />
-                </a>
-            </div>
-        <span class="welcome">Welcome, ${username}</span>
-        <button id="logoutBtn" class="logout-btn">Logout</button>
-      </div>
-    `;
-
-    const logoutBtn = document.getElementById("logoutBtn");
-    logoutBtn.addEventListener("click", async () => {
-      const token = localStorage.getItem("accessToken");
-
-      await fetch("http://localhost:4000/user/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: "include", // ensures cookies are sent
-      });
-      localStorage.removeItem("username");
-      localStorage.removeItem("accessToken");
-      updateNavbar(); // refresh navbar
-    });
-  } else {
-    // User not logged in
+  // If user is NOT logged in
+  if (!username) {
     rightPart.innerHTML = `
       <div class="cart" id="cart">
         <a href="">
@@ -361,10 +331,51 @@ function updateNavbar() {
         </a>
       </div>
     `;
-
-    // Reattach popup event listeners
-    // attachLoginRegisterHandlers();
+    return;
   }
+
+  // If user IS logged in
+  rightPart.innerHTML = `
+    <div class="user-info">
+
+      ${showSearchBox ? `
+        <div class="search-box">
+          <input type="text" id="searchBox" placeholder="Search for products..." />
+          <button id="searchBtn">
+            <img src="../images/search.png" alt="Search" />
+          </button>
+        </div>
+      ` : ""}
+
+      <div class="cart" id="cart">
+        <a href="/cart">
+          <img id="s_cart" src="../images/ShoppingCart.png" alt="AAVA" />
+        </a>
+      </div>
+
+      <span class="welcome">Welcome, ${username}</span>
+      <button id="logoutBtn" class="logout-btn">Logout</button>
+    </div>
+  `;
+
+  // Add logout handler
+  const logoutBtn = document.getElementById("logoutBtn");
+  logoutBtn.addEventListener("click", async () => {
+    const token = localStorage.getItem("accessToken");
+
+    await fetch("http://localhost:4000/user/logout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: "include",
+    });
+
+    localStorage.removeItem("username");
+    localStorage.removeItem("accessToken");
+    updateNavbar(); // refresh
+  });
 }
 
-export { updateNavbar};  
+export { updateNavbar };

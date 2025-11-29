@@ -121,6 +121,15 @@ font-family: "Public Sans", sans-serif;
   color: #c83e7c;
   font-size: large;
 }
+
+#s_cart{
+    width: 30px;
+}
+
+#www{
+    width: 100%;
+    /* height: 500px; */
+}
 /* --- Cart Page --- */
 .cart-page {
   max-width: 1250px;

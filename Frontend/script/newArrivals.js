@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     data.products.forEach(p => {
       html += `
          <div class="new-arrivals">
+         <div class="product-info" data-product-id="${p._id}">
           <img src="${p.productImg}" alt="${p.product_name}" />
           <div class="text">
             <span class="name">${p.product_name}</span>
@@ -22,6 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             </div>
           </div>
         </div>
+        </div>
       `;
     });
 
@@ -30,4 +32,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Error loading new arrivals:", err);
     container.innerHTML = "<p>⚠️ Failed to load new arrivals.</p>";
   }
+
+
+  const card = document.querySelectorAll(".new-arrivals");
+  console.log(card);
+  card.forEach((card) => {
+    card.addEventListener("click", () => {
+      const productId = card.querySelector(".product-info").getAttribute("data-product-id");
+      window.location.href = `product-details?id=${productId}`;
+      console.log(productId);
+    }); 
+  });
 });
