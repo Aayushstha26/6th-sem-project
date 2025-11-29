@@ -9,10 +9,6 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     required: true
     },
-    date: {
-        type: Date,
-        default: Date.now,
-    },
     orderStatus: {
         type: String,
         enum: ["Pending", "Shipped", "Delivered", "Cancelled"],     
@@ -44,7 +40,7 @@ const orderSchema = new mongoose.Schema({
     transactionId  : {
         type: String,
     },
-    date: {
+    createdAt: {
         type: Date,
         default: Date.now,
     },
