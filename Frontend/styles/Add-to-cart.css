@@ -15,7 +15,7 @@ font-family: "Public Sans", sans-serif;
   justify-content: space-between;
   align-items: center;
   padding: 0px 40px;
-  background-color: #fffaf3;
+  background-color: #ffffff;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   position: sticky;
   top: 0;
@@ -24,33 +24,47 @@ font-family: "Public Sans", sans-serif;
   height: 100px;
 }
 
-.logo img {
-  width: 140px;
-  height: auto;
-  transition: transform 0.3s ease;
-}
 
-.logo img:hover {
-  transform: scale(1.05);
+
+
+.nav_bar {
+  display: flex;
+  justify-content: center;
+  margin-left: 200px;
 }
 
 .nav_bar ul {
   display: flex;
   list-style: none;
-  gap: 30px;
+  gap: 50px;
 }
 
 .nav_bar ul li a {
   text-decoration: none;
   color: #2d1f12;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 500;
-  transition: all 0.3s ease;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.nav_bar ul li a::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #e966a1, #d62976);
+  transition: width 0.3s ease;
 }
 
 .nav_bar ul li a:hover {
   color: #d62976;
-  text-decoration: underline;
+}
+
+.nav_bar ul li a:hover::after {
+  width: 100%;
 }
 
 .right_part {
@@ -76,6 +90,15 @@ font-family: "Public Sans", sans-serif;
   gap: 10px;
 }
 
+.logo img {
+  width: 140px;
+  height: auto;
+  transition: transform 0.3s ease;
+}
+
+.logo img:hover {
+  transform: scale(1.05);
+}
 .profile a {
   display: flex;
   text-decoration: none;
