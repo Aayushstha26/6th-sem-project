@@ -35,6 +35,11 @@ router.get("/product-details", (req, res) => {
 router.get("/address", (req, res) => {
   res.sendFile(path.resolve("../frontend/template/Address.html"));
 });
-
+router.get("/payment-success", (req, res) => {
+  res.sendFile(path.resolve("../frontend/template/payment-success.html"));
+});
+router.get("/payment-failure",verifyJwt, (req, res) => {  
+  res.sendFile(path.resolve("../frontend/template/payment-failure.html"));
+});
 
 export default router;
