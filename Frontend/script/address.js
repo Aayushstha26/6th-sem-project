@@ -1,3 +1,5 @@
+import { updateNavbar } from "./slider.js"; 
+
 window.addEventListener("DOMContentLoaded", async () => {
   let form = document.getElementById("address-form");
   let fullName = document.getElementById("fullname");
@@ -6,7 +8,12 @@ window.addEventListener("DOMContentLoaded", async () => {
   let address = document.getElementById("address");
   let email = document.getElementById("email");
   let city = document.getElementById("city");
-
+  const token = localStorage.getItem("accessToken");
+      if (!token) {
+        alert("Please login to add your address.");
+        return;
+      }
+      updateNavbar(false);
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -21,12 +28,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     console.log(formData);
 
     try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        alert("Please login to add your address.");
-        return;
-      }
-
+      
       const res = await fetch("http://localhost:4000/address/add", {
         method: "POST",
         headers: {
@@ -86,11 +88,11 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   let orderItemsDiv = document.getElementById("order-summary");
 
-  const token = localStorage.getItem("accessToken");
-  if (!token) {
-    alert("Please login to view your cart.");
-    return;
-  }
+  // const token = localStorage.getItem("accessToken");
+  // if (!token) {
+  //   alert("Please login to view your cart.");
+  //   return;
+  // }
 
   const cartItems = await fetch("http://localhost:4000/cart/getCart", {
     method: "GET",
