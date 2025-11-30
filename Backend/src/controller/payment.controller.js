@@ -5,6 +5,7 @@ import { Order } from "../models/order.model.js";
 import { Cart } from "../models/cart.model.js";
 const createSignature = asyncHandler(async (req, res) => {
     const { total_amount, transaction_uuid, product_code } = req.body;
+    console.log("Generating signature for:", { total_amount, transaction_uuid, product_code });
     if (!total_amount || !transaction_uuid || !product_code) {
         throw new Apierror(400, "Missing required fields");
     }

@@ -1,4 +1,4 @@
-import { updateNavbar } from "./slider.js"; 
+import { updateNavbar } from "./slider.js";
 function showToast(message) {
   const toast = document.createElement("div");
   toast.className = "toast";
@@ -17,14 +17,12 @@ window.addEventListener("DOMContentLoaded", async () => {
   let email = document.getElementById("email");
   let city = document.getElementById("city");
   const token = localStorage.getItem("accessToken");
-      if (!token) {
-  showToast("Please login to add your address.");
-  return;
-}
+  if (!token) {
+    showToast("Please login to add your address.");
+    return;
+  }
 
-
-
-      updateNavbar(false);
+  updateNavbar(false);
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -39,7 +37,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     console.log(formData);
 
     try {
-      
       const res = await fetch("http://localhost:4000/address/add", {
         method: "POST",
         headers: {
@@ -54,39 +51,38 @@ window.addEventListener("DOMContentLoaded", async () => {
       if (res.ok) {
         alert(result.message);
 
-        //payment redirection
-        let paybtn = document.querySelector(".continue-btn");
-        paybtn.addEventListener("click", async function () {
-          let product_code = document.getElementById("product_code").value;
-          let total_amount = document.getElementById("total").value;
-          let transaction_uuid = "TXN" + Date.now().toString();
+        let product_code = "EPAYTEST";
+        let total_amount = document
+          .getElementById("total")
+          .innerText.replace("Rs. ", "")
+          .trim();
+        let transaction_uuid = "TXN" + Date.now().toString();
 
-          const response = await fetch(
-            "http://localhost:4000/payment/generate-signature",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({
-                total_amount: total_amount,
-                transaction_uuid: transaction_uuid,
-                product_code: product_code,
-              }),
-            }
-          );
-          if (response.ok) {
-            const data = await response.json();
-            console.log(data);
-            handlePaymentRedirect(
-              total_amount,
-              transaction_uuid,
-              product_code,
-              data.signature
-            );
+        const response = await fetch(
+          "http://localhost:4000/payment/generate-signature",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              total_amount: total_amount,
+              transaction_uuid: transaction_uuid,
+              product_code: product_code,
+            }),
           }
-        });
+        );
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data);
+          handlePaymentRedirect(
+            total_amount,
+            transaction_uuid,
+            product_code,
+            data.signature
+          );
+        }
 
         form.reset();
       } else {
@@ -163,3 +159,40 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   // UPDATE TOTALS
 });
+const handlePaymentRedirect = (
+  total_amount,
+  transaction_uuid,
+  product_code,
+  signature
+) => {
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = "https://rc-epay.esewa.com.np/api/epay/main/v2/form";
+  form.style.display = "none";
+
+  const params = {
+    amount: total_amount,
+    tax_amount: "0",
+    product_service_charge: "0",
+    product_delivery_charge: "0",
+    total_amount: total_amount,
+    transaction_uuid: transaction_uuid,
+    product_code: product_code,
+    signature: signature,
+    success_url: "http://localhost:4000/payment/success",
+    failure_url: "http://localhost:4000/payment/failure",
+    signed_field_names: "total_amount,transaction_uuid,product_code",
+  };
+
+  console.log(params);
+  for (const key in params) {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = key;
+    input.value = params[key];
+    form.appendChild(input);
+  }
+
+  document.body.appendChild(form);
+  form.submit();
+};
