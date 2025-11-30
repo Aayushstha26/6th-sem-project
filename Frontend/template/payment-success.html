@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Payment Successful!</h1>
+    <p>Thank you for your purchase. Your payment has been processed successfully.</p>
+    <script >
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const encodedPayload = urlParams.get('data');
+       const decoded = atob(encodedPayload);
+        const payload = JSON.parse(decoded);
+        console.log(payload);
+// console.log(JSON.parse(decoded));
+        // if (status === 'success') {
+        //     alert('Payment was successful! Thank you for your purchase.');
+        // } else {
+        //     alert('Payment failed or was cancelled. Please try again.');
+        // }   
+
+    </script>
+</body>
+
+    
+</html>

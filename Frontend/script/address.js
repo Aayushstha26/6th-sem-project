@@ -179,8 +179,8 @@ const handlePaymentRedirect = (
     transaction_uuid: transaction_uuid,
     product_code: product_code,
     signature: signature,
-    success_url: "http://localhost:4000/payment/success",
-    failure_url: "http://localhost:4000/payment/failure",
+    success_url: "http://localhost:4000/payment-success",
+    failure_url: "http://localhost:4000/payment-failure",
     signed_field_names: "total_amount,transaction_uuid,product_code",
   };
 
