@@ -1,5 +1,13 @@
 import { updateNavbar } from "./slider.js"; 
+function showToast(message) {
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.innerText = message;
 
+  document.body.appendChild(toast);
+
+  setTimeout(() => toast.remove(), 4000);
+}
 window.addEventListener("DOMContentLoaded", async () => {
   let form = document.getElementById("address-form");
   let fullName = document.getElementById("fullname");
@@ -10,9 +18,12 @@ window.addEventListener("DOMContentLoaded", async () => {
   let city = document.getElementById("city");
   const token = localStorage.getItem("accessToken");
       if (!token) {
-        alert("Please login to add your address.");
-        return;
-      }
+  showToast("Please login to add your address.");
+  return;
+}
+
+
+
       updateNavbar(false);
   form.addEventListener("submit", async (e) => {
     e.preventDefault();

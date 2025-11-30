@@ -266,7 +266,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await res.json();
 
             if (res.ok) {
-              alert("Login successful!");
+              // alert("Login successful!");
+              showToast("Login successful!");
               console.log("Access Token:", data.accessToken);
               const decoded = parseJwt(data.accessToken);
               console.log("Decoded Token:", decoded);
@@ -376,6 +377,22 @@ function updateNavbar(showSearchBox = true) {
     localStorage.removeItem("accessToken");
     updateNavbar(); // refresh
   });
+  
 }
+function showToast(message) {
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.innerHTML = `
+    <img src="../images/check.png" class="toast-icon" alt="Success" />
+    <span class="toast-message">${message}</span>
+  `;
+
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 3500);
+}
+
 
 export { updateNavbar };
