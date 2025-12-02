@@ -78,6 +78,26 @@ font-family: "Public Sans", sans-serif;
   font-size: 16px;
   outline: none;
 }
+
+
+.submit-btn {
+   width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #2a5298, #d62976);
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.submit-btn:hover {
+  transform: scale(1.03);
+  background: linear-gradient(135deg, #d62976, #030B36);
+}
+
+
 .formContent .icon {
   position: absolute;
   right: 10px;
@@ -96,22 +116,6 @@ font-family: "Public Sans", sans-serif;
   text-align: left ;
 }
 
-.submit-btn {
-   width: 100%;
-  padding: 14px;
-  border: none;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #2a5298, #d62976);
-  color: #fff;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.submit-btn:hover {
-  transform: scale(1.03);
-  background: linear-gradient(135deg, #d62976, #030B36);
-}
 .success .icon {
   color: #2ecc71;
   top: 65%;

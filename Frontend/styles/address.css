@@ -524,3 +524,44 @@ footer {
   color: #777777;
   margin-top: 40px;
 }
+
+
+.input_group .icon {
+  position: absolute;
+  right: 10px;
+  top: 47%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: #ccc;
+  pointer-events: none;
+}
+
+.errorMsg {
+  color: red;
+  font-size: 13px;
+  margin-top: 5px;
+  display: block;
+  text-align: left ;
+}
+
+.success .icon {
+  color: #2ecc71;
+  top: 65%;
+}
+.success #checkbox{
+  position: absolute;
+}
+.success input,
+.success textarea {
+  border-color: #2ecc71;
+}
+.error input,
+.error textarea {
+  border-color: #e74c3c;
+}
+.error .icon,
+.error input::placeholder,
+.error textarea::placeholder {
+  color: #e74c3c;
+  top: 50% ;
+}

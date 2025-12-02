@@ -1,4 +1,5 @@
 import { updateNavbar } from "./slider.js";
+
 function showToast(message) {
   const toast = document.createElement("div");
   toast.className = "toast";
@@ -8,6 +9,7 @@ function showToast(message) {
 
   setTimeout(() => toast.remove(), 4000);
 }
+
 window.addEventListener("DOMContentLoaded", async () => {
   let form = document.getElementById("address-form");
   let fullName = document.getElementById("fullname");
@@ -16,6 +18,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   let address = document.getElementById("address");
   let email = document.getElementById("email");
   let city = document.getElementById("city");
+
   const token = localStorage.getItem("accessToken");
   if (!token) {
     showToast("Please login to add your address.");
@@ -23,9 +26,155 @@ window.addEventListener("DOMContentLoaded", async () => {
   }
 
   updateNavbar(false);
+
+  // ✅ FIXED: Event listeners OUTSIDE submit handler
+  fullName.addEventListener("input", () => {
+    checkvalid(
+      fullName,
+      fullName.value.trim() !== "" && isName(fullName.value.trim()),
+      "Full name must be at least 3 characters"
+    );
+  });
+
+  phoneNumber.addEventListener("input", () => {
+    checkvalid(
+      phoneNumber,
+      phoneNumber.value.trim() !== "" && isPhone(phoneNumber.value.trim()),
+      "Phone must be 10 digits"
+    );
+  });
+
+  postalCode.addEventListener("input", () => {
+    checkvalid(
+      postalCode,
+      postalCode.value.trim() !== "" && isPostalCode(postalCode.value.trim()),
+      "Postal code must be 5 digits"
+    );
+  });
+
+  address.addEventListener("input", () => {
+    checkvalid(
+      address,
+      address.value.trim().length >= 5,
+      "Address must be at least 5 characters"
+    );
+  });
+
+  email.addEventListener("input", () => {
+    checkvalid(
+      email,
+      email.value.trim() !== "" && isEmail(email.value.trim()),
+      "Not a valid email"
+    );
+  });
+
+  city.addEventListener("input", () => {
+    checkvalid(
+      city,
+      city.value.trim() !== "" && isName(city.value.trim()),
+      "City must be at least 3 characters"
+    );
+  });
+
+  // Validation functions
+  function isEmail(email) {
+    return /^[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z]+\.[a-zA-Z]{2,}$/.test(email);
+  }
+
+  function isName(name) {
+    return /^[a-zA-Z\s]{3,}$/.test(name);
+  }
+
+  function isPhone(phone) {
+    return /^\d{10}$/.test(phone);
+  }
+
+  function isPostalCode(code) {
+    return /^\d{5}$/.test(code);
+  }
+
+  function checkAddressform() {
+    let isValid = true;
+
+    checkvalid(
+      fullName,
+      fullName.value.trim() !== "" && isName(fullName.value.trim()),
+      "Full name can't be blank"
+    );
+    checkvalid(
+      phoneNumber,
+      phoneNumber.value.trim() !== "" && isPhone(phoneNumber.value.trim()),
+      "Phone must be 10 digits"
+    );
+    checkvalid(
+      postalCode,
+      postalCode.value.trim() !== "" && isPostalCode(postalCode.value.trim()),
+      "Postal code must be 5 digits"
+    );
+    checkvalid(
+      address,
+      address.value.trim().length >= 5,
+      "Address must be at least 5 characters"
+    );
+    checkvalid(
+      email,
+      email.value.trim() !== "" && isEmail(email.value.trim()),
+      "Not a valid email"
+    );
+    checkvalid(
+      city,
+      city.value.trim() !== "" && isName(city.value.trim()),
+      "City can't be blank"
+    );
+
+    document
+      .querySelectorAll("#address-form .input-group")
+      .forEach((control) => {
+        if (control.classList.contains("error")) {
+          isValid = false;
+        }
+      });
+
+    // ✅ FIXED: Return statement outside forEach
+    return isValid;
+  }
+
+  function checkvalid(input, condition, errormsg) {
+    if (condition) {
+      setSuccess(input);
+    } else {
+      setError(input, errormsg);
+    }
+  }
+
+  function setSuccess(input) {
+    let input_group = input.parentElement;
+    let icon = input_group.querySelector(".icon");
+    let errorMessage = input_group.querySelector(".errorMsg");
+    errorMessage.innerHTML = "";
+    input_group.className = "input-group success";
+    icon.className = "icon fas fa-check-circle";
+  }
+
+  function setError(input, errormsg) {
+    let input_group = input.parentElement;
+    let icon = input_group.querySelector(".icon");
+    let errorMessage = input_group.querySelector(".errorMsg");
+    errorMessage.innerHTML = errormsg;
+    input_group.className = "input-group error";
+    icon.className = "icon fas fa-times-circle";
+  }
+
+  
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    // Check if form is valid
+    if (!checkAddressform()) {
+      return; // Stop if validation fails
+    }
+
+    // Collect form data
     const formData = {
       fullName: fullName.value,
       phoneNumber: phoneNumber.value,
@@ -34,9 +183,9 @@ window.addEventListener("DOMContentLoaded", async () => {
       email: email.value,
       city: city.value,
     };
-    console.log(formData);
 
     try {
+      // Send address to server
       const res = await fetch("http://localhost:4000/address/add", {
         method: "POST",
         headers: {
@@ -51,6 +200,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       if (res.ok) {
         alert(result.message);
 
+        // Prepare payment
         let product_code = "EPAYTEST";
         let total_amount = document
           .getElementById("total")
@@ -58,6 +208,7 @@ window.addEventListener("DOMContentLoaded", async () => {
           .trim();
         let transaction_uuid = "TXN" + Date.now().toString();
 
+        // Get payment signature
         const response = await fetch(
           "http://localhost:4000/payment/generate-signature",
           {
@@ -73,9 +224,9 @@ window.addEventListener("DOMContentLoaded", async () => {
             }),
           }
         );
+
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
           handlePaymentRedirect(
             total_amount,
             transaction_uuid,
@@ -90,16 +241,12 @@ window.addEventListener("DOMContentLoaded", async () => {
       }
     } catch (err) {
       console.error("Failed to save address", err);
+      alert("Error saving address. Please try again.");
     }
   });
 
+  // Load cart items
   let orderItemsDiv = document.getElementById("order-summary");
-
-  // const token = localStorage.getItem("accessToken");
-  // if (!token) {
-  //   alert("Please login to view your cart.");
-  //   return;
-  // }
 
   const cartItems = await fetch("http://localhost:4000/cart/getCart", {
     method: "GET",
@@ -108,23 +255,22 @@ window.addEventListener("DOMContentLoaded", async () => {
       Authorization: `Bearer ${token}`,
     },
   });
+
   if (!cartItems.ok) {
     alert("Failed to fetch cart items.");
     return;
   }
+
   const data = await cartItems.json();
   console.log(data);
   let items = data.cart.products;
 
-  // Assuming there are at least two items in the cart
   items.forEach((item) => {
     const product = item.productId;
     let image = product.productImg || "../images/default.jpg";
     let name = product.product_name;
     let qty = item.quantity;
     let price = product.price;
-
-    //   subtotalValue += price * qty;
 
     orderItemsDiv.innerHTML += `
     <div class="item">
@@ -135,10 +281,9 @@ window.addEventListener("DOMContentLoaded", async () => {
       </div>
       <p class="item-price">Rs. ${price}</p>
     </div>
-
-    
   `;
   });
+
   let shippingValue = 100;
   orderItemsDiv.innerHTML += `
   <div class="order-totals"> 
@@ -156,9 +301,8 @@ window.addEventListener("DOMContentLoaded", async () => {
         </span> 
         </div>
          </div>`;
-
-  // UPDATE TOTALS
 });
+
 const handlePaymentRedirect = (
   total_amount,
   transaction_uuid,
