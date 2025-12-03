@@ -51,4 +51,5 @@ const logoutAdmin = asyncHandler(async (req, res) => {
     .json({ message: "Admin logged out successfully" });
 });
 
+
 export { loginAdmin , logoutAdmin };
