@@ -13,16 +13,43 @@ const loginAdmin = asyncHandler(async (req, res) => {
     throw new Apierror("Invalid password", 401);
   }
   const accessToken = admin.generateAccessToken();
+  const refreshToken = admin.generateRefreshToken();
+  admin.refreshToken = refreshToken;
+  await admin.save({ validateBeforeSave: false });
   const Option = {
     httpOnly: true,
     secure: true,
   };
   res.status(200)
-  .setCookie("accessToken", accessToken, Option)
+  .cookie("accessToken", accessToken, Option)
+  .cookie("refreshToken", refreshToken, Option)
   .json({
     message: "Admin logged in successfully",
     accessToken,
   });
 });
 
-export { loginAdmin };
+const logoutAdmin = asyncHandler(async (req, res) => {
+  await Admin.findByIdAndUpdate(
+    req.admin._id,
+    {
+      $set: {
+        refreshToken: "",
+      },
+    },
+    { new: true }
+  );
+  const option = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  return res
+    .status(200)
+   .clearCookie("accessToken", option)
+   .clearCookie("refreshToken", option)
+    .json({ message: "Admin logged out successfully" });
+});
+
+
+export { loginAdmin , logoutAdmin };

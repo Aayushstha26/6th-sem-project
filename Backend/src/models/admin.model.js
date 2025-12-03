@@ -12,6 +12,12 @@ const adminSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    refreshToken: {
+      type: String,
+    },
+    salt: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
@@ -21,7 +27,7 @@ adminSchema.pre("save", async function (next) {
     return next();
   }
     const salt = generateSalt();
-    const { hash } = bcryptHash(this.password, salt, 1000);
+    const { hash } = await bcryptHash(this.password, salt, 1000);
 
     this.password = hash;
     this.salt = salt;   
@@ -39,6 +45,16 @@ adminSchema.methods.generateAccessToken = function () {
         },
         process.env.JWT_SECRET,
         { expiresIn: "1d" }
+    );
+};
+adminSchema.methods.generateRefreshToken = function () {
+    return jwt.sign(
+        {
+            _id: this._id,
+            username: this.username,
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        { expiresIn: "7d" }
     );
 };
 
