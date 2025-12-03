@@ -4,99 +4,141 @@ import { generateHash } from "../utils/crypto.js";
 import { Order } from "../models/order.model.js";
 import { Cart } from "../models/cart.model.js";
 const createSignature = asyncHandler(async (req, res) => {
-    const { total_amount, transaction_uuid, product_code } = req.body;
-    console.log("Generating signature for:", { total_amount, transaction_uuid, product_code });
-    if (!total_amount || !transaction_uuid || !product_code) {
-        throw new Apierror(400, "Missing required fields");
-    }
-    const signature = generateHash(transaction_uuid, total_amount, product_code);
-    if (!signature) {
-        throw new Apierror(500, "Failed to generate signature");
-    }
-    return res.status(200).json({
-        success: true,
-        signature,
-    });
+  const { total_amount, transaction_uuid, product_code } = req.body;
+  console.log("Generating signature for:", {
+    total_amount,
+    transaction_uuid,
+    product_code,
+  });
+  if (!total_amount || !transaction_uuid || !product_code) {
+    throw new Apierror(400, "Missing required fields");
+  }
+  const signature = generateHash(transaction_uuid, total_amount, product_code);
+  if (!signature) {
+    throw new Apierror(500, "Failed to generate signature");
+  }
+  return res.status(200).json({
+    success: true,
+    signature,
+  });
 });
 
 const verifyPayment = asyncHandler(async (req, res) => {
-    const { total_amount, transaction_uuid, product_code, received_signature } = req.body;
-    if (!total_amount || !transaction_uuid || !product_code || !received_signature) {
-        throw new Apierror(400, "Missing required fields");
-    }
-    const userId = req.user._id;
-    const expected_signature = generateHash(transaction_uuid, total_amount, product_code);
-    if (expected_signature !== received_signature) {
-        throw new Apierror(400, "Invalid signature");
-    }
-    const verifyUrl = "https://rc-epay.esewa.com.np/api/epay/transaction/status/";
-    const payload = {
-        amount : total_amount,
-        transactionId : transaction_uuid,
-        productCode : product_code,
-    };
-   const response = await fetch(verifyUrl, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+  const { total_amount, transaction_uuid, product_code, signature } = req.body;
+  console.log("Payment verification request:", req.body);
+
+  if (!total_amount || !transaction_uuid || !product_code) {
+    throw new Apierror(400, "Missing required fields");
+  }
+
+  const userId = req.user._id;
+
+  // eSewa verification URL - using GET method as per eSewa docs
+  const verifyUrl = `https://rc.esewa.com.np/api/epay/transaction/status/?product_code=${product_code}&total_amount=${total_amount}&transaction_uuid=${transaction_uuid}`;
+
+  try {
+    // eSewa expects a GET request, not POST
+    const response = await fetch(verifyUrl, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
+
+    // Log response status for debugging
+    console.log("eSewa API Response Status:", response.status);
+
+    // Get response text first to debug
+    const responseText = await response.text();
+    console.log("eSewa API Response:", responseText);
+
     if (!response.ok) {
-        throw new Apierror(400, "Payment verification failed");
+      throw new Apierror(400, `Payment verification failed: ${responseText}`);
     }
-    const data = await response.json();
-    console.log("esewa verification :"+data);
+
+    // Parse JSON
+    const data = JSON.parse(responseText);
+    console.log("eSewa verification data:", data);
+
+    // Check payment status
     if (data.status !== "COMPLETE") {
-        throw new Apierror(400, "Payment not successful");
+      throw new Apierror(400, `Payment not successful. Status: ${data.status}`);
     }
 
-    const cart = await Cart.findOne({ userId }).populate(
-        "products.productId",
-        "product_name price "
-    );;
-    if (!cart || cart.products.length === 0) {
-       throw new Apierror(400, "Cart is empty");
+    // Verify amounts match
+    if (parseFloat(data.total_amount) !== parseFloat(total_amount)) {
+      throw new Apierror(400, "Amount mismatch with eSewa response");
     }
-    let amount = 0;
-    cart.products.forEach((item) => {
-        amount += item.productId.price * item.quantity;
-    });
-    if (amount != total_amount) {
-        throw new Apierror(400, "Amount mismatch");
+  } catch (error) {
+    console.error("eSewa verification error:", error);
+    if (error instanceof Apierror) {
+      throw error;
     }
+    throw new Apierror(500, `Payment verification failed: ${error.message}`);
+  }
 
-    const order = await Order.create({
-        user: userId,
-        items: cart.products.map((item) => ({
-            product: item.productId._id,
-            quantity: item.quantity,
-            price: item.productId.price,    
-        })),
-        amount: amount,
-        orderStatus: "Pending",
-        paymentStatus: "Paid",
-        transactionId: transaction_uuid,
-    }); 
-    if (!order) {
-        throw new Apierror(500, "Failed to create order");
-    }
+  // Get user's cart
+  const cart = await Cart.findOne({ userId }).populate(
+    "products.productId",
+    "product_name price stock"
+  );
 
-    for(let item of cart.products){
-        const product = item.productId;
-        product.stock -= item.quantity;
-        await product.save();
-    }
-    cart.products = [];
-    cart.totalAmount = 0;
-    await cart.save();
+  if (!cart || cart.products.length === 0) {
+    throw new Apierror(400, "Cart is empty");
+  }
 
-    return res.status(200).json({
-        success: true,
-        message: "Payment verified and order created successfully",
-        order,
-    });
+  // Calculate total amount
+  let calculatedAmount = 0;
+  cart.products.forEach((item) => {
+    calculatedAmount += item.productId.price * item.quantity;
+  });
+
+  // Compare amounts (using parseFloat for decimal comparison)
+  if (
+    parseFloat(calculatedAmount).toFixed(2) !==
+    parseFloat(total_amount).toFixed(2)
+  ) {
+    throw new Apierror(
+      400,
+      `Amount mismatch. Expected: ${calculatedAmount}, Received: ${total_amount}`
+    );
+  }
+
+  // Create order
+  const order = await Order.create({
+    user: userId,
+    items: cart.products.map((item) => ({
+      product: item.productId._id,
+      quantity: item.quantity,
+      price: item.productId.price,
+    })),
+    amount: calculatedAmount,
+    orderStatus: "Pending",
+    paymentStatus: "Paid",
+    transactionId: transaction_uuid,
+  });
+
+  if (!order) {
+    throw new Apierror(500, "Failed to create order");
+  }
+
+  // Update product stock
+  for (let item of cart.products) {
+    const product = item.productId;
+    product.stock -= item.quantity;
+    await product.save();
+  }
+
+  // Clear cart
+  cart.products = [];
+  cart.totalAmount = 0;
+  await cart.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "Payment verified and order created successfully",
+    order,
+  });
 });
 
-
-export { createSignature  , verifyPayment };
+export { createSignature, verifyPayment };

@@ -47,6 +47,8 @@
     </div>
     <script >
 
+        const token = localStorage.getItem('accessToken');
+
         const urlParams = new URLSearchParams(window.location.search);
         const encodedPayload = urlParams.get('data');
        const decoded = atob(encodedPayload);
@@ -75,13 +77,14 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
                     transaction_uuid,
                     product_code,
                     transaction_code,
                     signature,
-                    signed_field_names
+                    total_amount
                 }),
             })
         } catch (error) {

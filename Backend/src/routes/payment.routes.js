@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { createSignature , verifyPayment } from "../controller/payment.controller.js";
+import {verifyJwt} from"../middleware/auth.midlleware.js"
 const paymentRouter = Router();
 
 paymentRouter.route("/generate-signature").post(createSignature);
-paymentRouter.route("/verify-payment").post(verifyPayment);
+paymentRouter.route("/verify-payment").post(verifyJwt,verifyPayment);
 export default paymentRouter;

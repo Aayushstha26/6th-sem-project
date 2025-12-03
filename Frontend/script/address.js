@@ -284,7 +284,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   `;
   });
 
-  let shippingValue = 100;
+  
   orderItemsDiv.innerHTML += `
   <div class="order-totals"> 
     <div class="line"> 
@@ -292,12 +292,10 @@ window.addEventListener("DOMContentLoaded", async () => {
     <span id="sub-total">Rs. ${data.cart.totalAmount}</span> 
     </div>
      <div class="line">
-      <span>Shipping Fee</span>
-       <span id="Shipping-fee">Rs. ${shippingValue}</span> 
        </div> <div class="line total">
         <span>Total
        </span>
-        <span id="total">Rs. ${data.cart.totalAmount + shippingValue}
+        <span id="total">Rs. ${data.cart.totalAmount }
         </span> 
         </div>
          </div>`;
