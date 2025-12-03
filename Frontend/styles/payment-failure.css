@@ -1,0 +1,296 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #faf7f0;
+  padding: 20px;
+}
+
+.failure-container {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  max-width: 480px;
+  width: 100%;
+  padding: 48px 40px;
+  text-align: center;
+  animation: slideUp 0.6s ease-out, fadeIn 0.6s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.error-icon-wrapper {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #ef4444;
+  margin: 0 auto 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.2s both;
+  position: relative;
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.error-icon {
+  position: relative;
+  width: 40px;
+  height: 40px;
+}
+
+.error-icon::before,
+.error-icon::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 40px;
+  background: #ffffff;
+  border-radius: 2px;
+}
+
+.error-icon::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+  animation: drawLine 0.4s ease-out 0.5s both;
+}
+
+.error-icon::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+  animation: drawLine 0.4s ease-out 0.7s both;
+}
+
+@keyframes drawLine {
+  0% {
+    height: 0;
+  }
+  100% {
+    height: 40px;
+  }
+}
+
+h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #6b7280;
+  margin-bottom: 40px;
+  line-height: 1.5;
+}
+
+.error-details {
+  background: #fef2f2;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 32px;
+  text-align: left;
+  border-left: 4px solid #ef4444;
+}
+
+.error-code {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.error-code-label {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.error-code-value {
+  font-size: 14px;
+  color: #ef4444;
+  font-weight: 700;
+  font-family: "Courier New", monospace;
+}
+
+.error-message {
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.common-reasons {
+  margin-top: 16px;
+}
+
+.common-reasons h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 10px;
+}
+
+.reasons-list {
+  list-style: none;
+  padding: 0;
+}
+
+.reasons-list li {
+  font-size: 13px;
+  color: #6b7280;
+  padding: 6px 0 6px 20px;
+  position: relative;
+}
+
+.reasons-list li::before {
+  content: "•";
+  position: absolute;
+  left: 8px;
+  color: #ef4444;
+  font-weight: bold;
+}
+
+.button-group {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.btn {
+  flex: 1;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+}
+
+.btn-secondary:hover {
+  background: #f7fafc;
+  transform: translateY(-2px);
+}
+
+.support-link {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.support-link a {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.support-link a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .failure-container {
+    padding: 36px 24px;
+  }
+
+  h1 {
+    font-size: 26px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+  }
+
+  .error-icon-wrapper {
+    width: 70px;
+    height: 70px;
+  }
+
+  .error-icon {
+    width: 35px;
+    height: 35px;
+  }
+
+  .error-icon::before,
+  .error-icon::after {
+    height: 35px;
+  }
+
+  .error-details {
+    padding: 20px 16px;
+  }
+}
+
+@media (max-width: 360px) {
+  .failure-container {
+    padding: 28px 20px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  .btn {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+}

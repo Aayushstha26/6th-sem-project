@@ -3,11 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Payment Successful</title>
+    <link rel="stylesheet" href="../styles/payment-success.css">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>Payment Successful!</h1>
-    <p>Thank you for your purchase. Your payment has been processed successfully.</p>
+     <div class="container">
+        <div class="success-icon"></div>
+        
+        <h1>Payment Successful!</h1>
+        <p class="subtitle">Your transaction has been completed successfully</p>
+
+        <div class="amount">NPR 2,450.00</div>
+
+        <div class="transaction-details">
+            <div class="detail-row">
+                <span class="detail-label">Payment Method</span>
+                <span class="detail-value">eSewa Wallet</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Date & Time</span>
+                <span class="detail-value">Dec 03, 2025 - 02:45 PM</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Merchant</span>
+                <span class="detail-value">Online Store Nepal</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Status</span>
+                <span class="detail-value" style="color: #38ef7d;">Completed</span>
+            </div>
+        </div>
+
+        <div class="transaction-id">
+            Transaction ID: TXN20251203024512345
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-primary" ">Go to Home</button>
+            <button class="btn btn-secondary" ">Download Receipt</button>
+        </div>
+
+        <p class="footer-text">
+            A confirmation email has been sent to your registered email address
+        </p>
+    </div>
     <script >
 
         const urlParams = new URLSearchParams(window.location.search);

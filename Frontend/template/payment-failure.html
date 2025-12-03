@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Failed</title>
+    <link rel="stylesheet" href="../styles/payment-failure.css">
+     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+     <div class="failure-container">
+        <div class="error-icon-wrapper">
+            <div class="error-icon"></div>
+        </div>
+
+        <h1>Payment Failed</h1>
+        <p class="subtitle">We couldn't process your payment. Please review the details below and try again.</p>
+
+        <div class="error-details">
+            <div class="error-code">
+                <span class="error-code-label">Error Code:</span>
+                <span class="error-code-value">PAYMENT_DECLINED_001</span>
+            </div>
+            <p class="error-message">
+                Your payment was declined by your bank or card provider. No charges were made to your account.
+            </p>
+
+            <div class="common-reasons">
+                <h3>Common Reasons:</h3>
+                <ul class="reasons-list">
+                    <li>Insufficient funds in your account</li>
+                    <li>Incorrect card details or expired card</li>
+                    <li>Card limit exceeded</li>
+                    <li>Security restrictions by your bank</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-primary" ">Try Again</button>
+            <button class="btn btn-secondary" ">Go to Home</button>
+        </div>
+
+        <p class="support-link">
+            Need help? <a href="/support">Contact Support</a>
+        </p>
+    </div>
+</body>
+</html>

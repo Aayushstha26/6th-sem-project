@@ -341,11 +341,19 @@ function updateNavbar(showSearchBox = true) {
 
       ${showSearchBox ? `
         <div class="search-box">
-          <input type="text" id="searchBox" placeholder="Search for products..." />
-          <button id="searchBtn">
-            <img src="../images/search.png" alt="Search" />
-          </button>
-        </div>
+      <input
+        type="search"
+        id="searchBox"
+        placeholder="Search for products..."
+        aria-label="Search for products"
+      />
+      <button id="searchBtn" type="button" aria-label="Search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+      </button>
+    </div>
       ` : ""}
 
       <div class="cart" id="cart">
