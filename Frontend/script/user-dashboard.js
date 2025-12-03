@@ -1,6 +1,15 @@
 // dashboard.js
 
 document.addEventListener("DOMContentLoaded", () => {
+  let token = localStorage.getItem("accessToken");
+  let username = localStorage.getItem("username");
+  console.log("Username from storage:", username);
+  if (!token) {
+    showToast("Please login to access your dashboard.");
+    return;
+  }
+  let user = document.getElementById("username");
+  user.textContent = username || "User";
   const menuItems = document.querySelectorAll(".menu li");
   const contentArea = document.getElementById("content-area");
 
@@ -26,7 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
         html = `
           <section class="overview">
             <div class="card"><h3>Total Orders</h3><p>12</p></div>
-            <div class="card"><h3>Wishlist Items</h3><p>5</p></div>
             <div class="card"><h3>Delivered</h3><p>9</p></div>
             <div class="card"><h3>Pending</h3><p>3</p></div>
           </section>
@@ -103,25 +111,6 @@ document.addEventListener("DOMContentLoaded", () => {
   </div>
 </div>
 `;
-        break;
-
-      case "💖 wishlist":
-        html = `
-          <section class="wishlist">
-            <h2>My Wishlist</h2>
-            <div class="wishlist-grid">
-              <div class="wishlist-item">
-                <img src="../images/earring.jpg" alt="Earring" />
-                <p>Golden Earring</p>
-                <button class="view-btn">View</button>
-              </div>
-              <div class="wishlist-item">
-                <img src="../images/bracelet.jpg" alt="Bracelet" />
-                <p>Diamond Bracelet</p>
-                <button class="view-btn">View</button>
-              </div>
-            </div>
-          </section>`;
         break;
 
       case "⚙️ profile settings":
