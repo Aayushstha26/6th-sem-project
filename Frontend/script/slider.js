@@ -275,6 +275,7 @@ document.addEventListener("DOMContentLoaded", () => {
               // Example: access user's name
               localStorage.setItem("username", decoded.username);
               localStorage.setItem("accessToken", data.accessToken);
+              localStorage.setItem("email", decoded.email);
               updateNavbar();
               loginModal.style.display = "none";
               console.log("User Name:", decoded.username);

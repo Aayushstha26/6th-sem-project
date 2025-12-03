@@ -41,5 +41,11 @@ router.get("/payment-success", (req, res) => {
 router.get("/payment-failure",verifyJwt, (req, res) => {  
   res.sendFile(path.resolve("../frontend/template/payment-failure.html"));
 });
+router.get("/otp-verification", (req, res) => {
+  res.sendFile(path.resolve("../frontend/template/otp-field.html"));
+});
+router.get("/change-password", (req, res) => {
+  res.sendFile(path.resolve("../frontend/template/change-password.html"));
+});
 
 export default router;

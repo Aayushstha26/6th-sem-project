@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="../styles/otp-field.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <div class="icon-container">
+          <div class="icon">
+            <svg viewBox="0 0 24 24">
+              <rect x="5" y="11" width="14" height="10" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
+        </div>
+
+        <div class="title">
+          <h1>OTP Verification</h1>
+          <h4>We have sent your OTP to <span id="email">wwww@gmail.com</span></h4>
+          <p>Enter the 6-digit code to verify your identity</p>
+        </div>
+
+        <div class="otp-inputs">
+          <input
+            type="text"
+            class="otp-input"
+            maxlength="1"
+            inputmode="numeric"
+          />
+          <input
+            type="text"
+            class="otp-input"
+            maxlength="1"
+            inputmode="numeric"
+          />
+          <input
+            type="text"
+            class="otp-input"
+            maxlength="1"
+            inputmode="numeric"
+          />
+          <input
+            type="text"
+            class="otp-input"
+            maxlength="1"
+            inputmode="numeric"
+          />
+          <input
+            type="text"
+            class="otp-input"
+            maxlength="1"
+            inputmode="numeric"
+          />
+          <input
+            type="text"
+            class="otp-input"
+            maxlength="1"
+            inputmode="numeric"
+          />
+        </div>
+
+        <button class="verify-btn" id="verifyBtn" >Verify OTP</button>
+
+        <div class="resend-container">
+          <button class="resend-btn" id="resendBtn">Resend Code</button>
+        </div>
+      </div>
+
+      <p class="footer-text">Didn't receive the code? Check your spam folder</p>
+    </div>
+
+    <script src="../script/otp.js"></script>
+  </body>
+</html>
