@@ -14,7 +14,7 @@
         <h1>Payment Successful!</h1>
         <p class="subtitle">Your transaction has been completed successfully</p>
 
-        <div class="amount">NPR 2,450.00</div>
+        <div class="amount"></div>
 
         <div class="transaction-details">
             <div class="detail-row">
@@ -25,10 +25,7 @@
                 <span class="detail-label">Date & Time</span>
                 <span class="detail-value">Dec 03, 2025 - 02:45 PM</span>
             </div>
-            <div class="detail-row">
-                <span class="detail-label">Merchant</span>
-                <span class="detail-value">Online Store Nepal</span>
-            </div>
+            
             <div class="detail-row">
                 <span class="detail-label">Status</span>
                 <span class="detail-value" style="color: #38ef7d;">Completed</span>
@@ -36,11 +33,11 @@
         </div>
 
         <div class="transaction-id">
-            Transaction ID: TXN20251203024512345
+           
         </div>
 
         <div class="button-group">
-            <button class="btn btn-primary" ">Go to Home</button>
+          <a href="/"><button class="btn btn-primary" ">Go to Home</button></a>  
             <button class="btn btn-secondary" ">Download Receipt</button>
         </div>
 
@@ -55,6 +52,42 @@
        const decoded = atob(encodedPayload);
         const payload = JSON.parse(decoded);
         console.log(payload);
+
+        try { 
+            const { status, total_amount,transaction_uuid, product_code, transaction_code, signature, signed_field_names} = payload;
+            const amountElement = document.querySelector('.amount');
+            amountElement.textContent = `NPR ${total_amount}`;
+            let statusMessage = '';
+            if (status === 'success') {
+                statusMessage = 'Payment Successful!';
+            } else {
+                statusMessage = 'Payment Failed';
+            }
+            let transactionIdElement = document.querySelector('.transaction-id');
+            transactionIdElement.textContent = `Transaction ID: ${transaction_uuid}`;
+
+            let d = new Date();
+            let date = d.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: '2-digit' });
+            let time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+            const dateTimeElement = document.querySelector('.detail-row:nth-child(2) .detail-value');
+            dateTimeElement.textContent = `${date} - ${time}`;
+            const res = fetch('/payment/verify-payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    transaction_uuid,
+                    product_code,
+                    transaction_code,
+                    signature,
+                    signed_field_names
+                }),
+            })
+        } catch (error) {
+            
+        }
+
 // console.log(JSON.parse(decoded));
         // if (status === 'success') {
         //     alert('Payment was successful! Thank you for your purchase.');
