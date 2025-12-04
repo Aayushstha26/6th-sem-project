@@ -5,9 +5,12 @@ import {
   logoutUser,
   refreshAccessToken,
   getAllUsers,
+  changePassword,
+  deleteUser,
 } from "../controller/user.controller.js";
 import path from "path";
 import { verifyJwt } from "../middleware/auth.midlleware.js";
+import {verifyAdminJwt} from "../middleware/admin_auth.middleware.js";  
 
 const router = Router();
 
@@ -31,4 +34,6 @@ router.route("/login").post(loginUser);
 router.route("/logout").post(verifyJwt, logoutUser);
 router.route("/refresh-token").post(refreshAccessToken);
 router.route("/getUser").get(getAllUsers);
+router.route("/change-password").post(verifyJwt, changePassword);
+router.route("/delete-user/:id").delete(verifyAdminJwt, deleteUser);
 export default router;

@@ -86,7 +86,7 @@ const logoutUser = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .clearCookie("accessToken", option)
-    .clearCookie("refreshToekn", option)
+    .clearCookie("refreshTokenn", option)
     .json(200, {}, new Apiresponse(200, "User logout"));
 });
 const refreshAccessToken = asyncHandler(async (req, res) => {
@@ -136,4 +136,42 @@ const getAllUsers = asyncHandler(async (req, res) => {
     .status(200)
     .json(new Apiresponse(200, "Users fetched successfully", users));
 });
-export { registerUser, loginUser, logoutUser , refreshAccessToken , getAllUsers};
+const changePassword = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const { oldPassword, newPassword } = req.body;
+
+  if (!oldPassword || !newPassword) {
+    throw new Apierror(400, "Old password and new password are required");
+  } 
+  if (oldPassword === newPassword) {
+    throw new Apierror(400, "New password must be different from old password");
+  }
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new Apierror(404, "User not found");
+  }
+  const isMatch = await user.isPassword(oldPassword);
+  if (!isMatch) {
+    throw new Apierror(400, "Old password is incorrect");
+  }
+  user.Password = newPassword;
+  user.refreshToken = undefined;
+  await user.save({
+    validateBeforeSave: true,
+  });
+  return res
+    .status(200)
+    .json(new Apiresponse(200, "Password changed successfully"));
+});
+const deleteUser = asyncHandler(async (req, res) => {
+  const userId = req.params.id;
+  const user = await User.findByIdAndDelete(userId);
+  if (!user) {
+    throw new Apierror(404, "User not found");
+  }
+  return res
+    .status(200)
+    .json(new Apiresponse(200, "User deleted successfully"));
+});
+
+export { registerUser, loginUser, logoutUser , refreshAccessToken , getAllUsers , changePassword , deleteUser };
