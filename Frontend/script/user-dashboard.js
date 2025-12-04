@@ -128,8 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
     <label>Phone</label>
     <input type="text" placeholder="+977-98XXXXXXX" />
 
-    <label>Password</label>
-    <input type="password" placeholder="********" />
+    <a href="/change-password" class="change-password-link">Change Password</a>
 
         <div class = "btn">
         <button type="submit">Save Changes</button>
@@ -204,3 +203,19 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => contentArea.classList.add("fade"), 50);
   }
 });
+
+
+function showToast(message) {
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.innerHTML = `
+    <img src="../images/check.png" class="toast-icon" alt="Success" />
+    <span class="toast-message">${message}</span>
+  `;
+
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 3500);
+}

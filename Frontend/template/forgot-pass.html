@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password</title>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #faf7f0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 480px;
+            width: 100%;
+            animation: slideIn 0.5s ease-out;
+            border-top: 4px solid #d62976;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .icon-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .lock-circle {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #d62976 0%, #fa7e1e 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 4px 15px rgba(214, 41, 118, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 4px 15px rgba(214, 41, 118, 0.3);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 6px 20px rgba(214, 41, 118, 0.4);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #2d1f12;
+            font-family: 'Public Sans', sans-serif;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #5a4a3b;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            color: #2d1f12;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .email-icon {
+            position: absolute;
+            left: 15px;
+            color: #bfa37c;
+            font-size: 18px;
+            pointer-events: none;
+        }
+
+        input[type="email"] {
+            width: 100%;
+            padding: 14px 45px;
+            border: 2px solid #e4d2bd;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: #fffaf3;
+            color: #2d1f12;
+            font-family: 'Inter', sans-serif;
+        }
+
+        input::placeholder {
+            color: #999;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #d62976;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(214, 41, 118, 0.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #d62976 0%, #fa7e1e 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(214, 41, 118, 0.3);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #c21760 0%, #e06d0f 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(214, 41, 118, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .back-to-login {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .back-to-login a {
+            color: #d62976;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .back-to-login a:hover {
+            color: #c21760;
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 13px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .error-message.active {
+            display: block;
+        }
+
+        .success-message {
+            background: #fffaf3;
+            border: 2px solid #d58514;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        .success-message.active {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-message h3 {
+            color: #2d1f12;
+            font-size: 18px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .success-message p {
+            color: #5a4a3b;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .info-box {
+            background: #fffaf3;
+            border-left: 4px solid #bfa37c;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #5a4a3b;
+        }
+
+        .info-box strong {
+            color: #2d1f12;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .lock-circle {
+                width: 70px;
+                height: 70px;
+                font-size: 35px;
+            }
+
+            input[type="email"] {
+                padding: 12px 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon-wrapper">
+            <div class="lock-circle">🔓</div>
+        </div>
+
+        <div class="header">
+            <h1>Forgot Password?</h1>
+            <p>No worries! Enter your email address and we'll send you a link to reset your password.</p>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            <h3>
+                <span>✉️</span>
+                Check Your Email
+            </h3>
+            <p>We've sent a password reset link to your email address. Please check your inbox and follow the instructions to reset your password.</p>
+        </div>
+
+        <form id="forgotPasswordForm">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <div class="input-wrapper">
+                    <span class="email-icon">📧</span>
+                    <input type="email" id="email" placeholder="Enter your registered email" required>
+                </div>
+                <div class="error-message" id="emailError">Please enter a valid email address</div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">Send Reset Link</button>
+
+            <div class="info-box">
+                <strong>Note:</strong> If you don't receive an email within a few minutes, please check your spam folder or try again.
+            </div>
+        </form>
+
+        <div class="back-to-login">
+            <a href="#" onclick="goBackToLogin(event)">← Back to Login</a>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('forgotPasswordForm');
+        const emailInput = document.getElementById('email');
+        const submitBtn = document.getElementById('submitBtn');
+        const emailError = document.getElementById('emailError');
+        const successMessage = document.getElementById('successMessage');
+
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = emailInput.value.trim();
+            emailError.classList.remove('active');
+            
+            if (!validateEmail(email)) {
+                emailError.classList.add('active');
+                return;
+            }
+
+            // Simulate sending email
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+
+            window.location.href = '/otp-verification?email=' + email;
+            
+           
+        });
+
+        function goBackToLogin(e) {
+            e.preventDefault();
+            // In a real application, this would navigate to the login page
+            alert('Redirecting to login page...');
+        }
+
+        // Real-time email validation
+        emailInput.addEventListener('input', function() {
+            if (emailError.classList.contains('active')) {
+                if (validateEmail(this.value.trim())) {
+                    emailError.classList.remove('active');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

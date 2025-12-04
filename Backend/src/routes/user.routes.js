@@ -34,6 +34,6 @@ router.route("/login").post(loginUser);
 router.route("/logout").post(verifyJwt, logoutUser);
 router.route("/refresh-token").post(refreshAccessToken);
 router.route("/getUser").get(getAllUsers);
-router.route("/change-password").post(verifyJwt, changePassword);
+router.route("/change-password").post( changePassword);
 router.route("/delete-user/:id").delete(verifyAdminJwt, deleteUser);
 export default router;

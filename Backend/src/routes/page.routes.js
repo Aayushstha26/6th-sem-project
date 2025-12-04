@@ -44,6 +44,12 @@ router.get("/payment-failure",verifyJwt, (req, res) => {
 router.get("/otp-verification", (req, res) => {
   res.sendFile(path.resolve("../frontend/template/otp-field.html"));
 });
+router.get("/forget-password", (req, res) => {
+  res.sendFile(path.resolve("../frontend/template/forgot-pass.html"));
+});
+router.get("/reset-password", (req, res) => {
+  res.sendFile(path.resolve("../frontend/template/reset-password.html"));
+});
 router.get("/change-password", (req, res) => {
   res.sendFile(path.resolve("../frontend/template/change-password.html"));
 });

@@ -137,31 +137,20 @@ const getAllUsers = asyncHandler(async (req, res) => {
     .json(new Apiresponse(200, "Users fetched successfully", users));
 });
 const changePassword = asyncHandler(async (req, res) => {
-  const userId = req.user._id;
-  const { oldPassword, newPassword } = req.body;
+  const { password , email} = req.body;
 
-  if (!oldPassword || !newPassword) {
-    throw new Apierror(400, "Old password and new password are required");
+  if (!password) {
+    throw new Apierror(400, "Password is required");
   } 
-  if (oldPassword === newPassword) {
-    throw new Apierror(400, "New password must be different from old password");
-  }
-  const user = await User.findById(userId);
+  const user =  await User.findOne({ Email: email });
   if (!user) {
     throw new Apierror(404, "User not found");
   }
-  const isMatch = await user.isPassword(oldPassword);
-  if (!isMatch) {
-    throw new Apierror(400, "Old password is incorrect");
-  }
-  user.Password = newPassword;
-  user.refreshToken = undefined;
-  await user.save({
-    validateBeforeSave: true,
-  });
+  user.Password = password;
+  await user.save();
   return res
     .status(200)
-    .json(new Apiresponse(200, "Password changed successfully"));
+    .json(new Apiresponse(200, "Password changed successfully")); 
 });
 const deleteUser = asyncHandler(async (req, res) => {
   const userId = req.params.id;

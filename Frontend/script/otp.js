@@ -1,14 +1,15 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const token = localStorage.getItem("accessToken");
     const emailSpan = document.getElementById("email");
-    const email = localStorage.getItem("email");
+    const urlParams = new URLSearchParams(window.location.search);
+    const email = urlParams.get('email');
     if(emailSpan && email) {
         emailSpan.textContent = email;
     }
-  if (!token) {
-    showtoast("Please login to verify OTP.");
-    return;
-  }
+  // if (!token) {
+  //   showtoast("Please login to verify OTP.");
+  //   return;
+  // }
   try {
     const response = await fetch("http://localhost:4000/auth/send", {
       method: "POST",
@@ -72,7 +73,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (response.ok) {
         showToast("OTP verified successfully!");
         inputs.forEach((input) => (input.value = ""));
-        window.location.href = "/change-password";
+        setTimeout(() => {
+        window.location.href = "/change-password?email="+email;
+        }, 1500);
       } else {
         showToast(data.message || "OTP verification failed.");
       }
