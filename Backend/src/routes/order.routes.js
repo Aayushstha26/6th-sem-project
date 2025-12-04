@@ -1,13 +1,16 @@
 import { Router } from "express";
-import { createOrder, getAllOrders, getUserOrders , deleteOrder } from "../controller/order.controller.js";    
+import { createOrder, getAllOrders, getUserOrders , deleteOrder , updateOrderStatus, getOrderByStatus , getOrderById } from "../controller/order.controller.js";    
 import { verifyJwt } from "../middleware/auth.midlleware.js";
 
-const router = Router();
+const orderRouter = Router();
 
-router.route("/create").post( createOrder);
+orderRouter.route("/create").post( createOrder);
 
-router.route("/orders").get( verifyJwt, getUserOrders);
-router.route("/all-orders").get( verifyJwt, getAllOrders);
-router.route("/delete-order/:id").delete( verifyJwt, deleteOrder);
+orderRouter.route("/orders").get( verifyJwt, getUserOrders);
+orderRouter.route("/all-orders").get( verifyJwt, getAllOrders);
+orderRouter.route("/delete-order/:id").delete( verifyJwt, deleteOrder);
+orderRouter.route("/status/:status").get( verifyJwt, getOrderByStatus);
+orderRouter.route("/:id").get( verifyJwt, getOrderById);
+orderRouter.route("/update-status/:id").put( verifyJwt, updateOrderStatus);
 
-export default router;
+export default orderRouter;
