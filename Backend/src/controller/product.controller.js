@@ -2,6 +2,7 @@ import { Product } from "../models/product.model.js";
 import { Category } from "../models/category.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { Apierror } from "../utils/apiError.js";
+import { Apiresponse } from "../utils/apiRespone.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const addProduct = asyncHandler(async (req, res) => {
@@ -73,4 +74,15 @@ const getProductById = asyncHandler(async (req, res) => {
   });
 });
 
-export { addProduct , getProducts , getNewArrivals , getProductById};
+const deleteProduct = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const product = await Product.findByIdAndDelete(id);
+  if (!product) {
+    throw new Apierror(404, "Product not found");
+  }
+  return res.status(200).json(
+    new Apiresponse(200, "Product deleted successfully")
+  );
+});
+
+export { addProduct , getProducts , getNewArrivals , getProductById , deleteProduct };
