@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("Username from storage:", username);
   if (!token) {
     showToast("Please login to access your dashboard.");
+    window.location.href = "/#loginContent";
     return;
   }
   let user = document.getElementById("username");
@@ -325,6 +326,26 @@ document.addEventListener("DOMContentLoaded", () => {
     contentArea.innerHTML = html;
     setTimeout(() => contentArea.classList.add("fade"), 50);
   }
+
+  let logoutBtn = document.querySelector(".logout-btn");
+  logoutBtn.addEventListener("click", async () => {
+    try{
+      fetch("/user/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("username");
+      localStorage.removeItem("email");
+      window.location.href = "/";
+    }catch(err){  
+      console.error("Logout failed:", err);
+      showToast("Logout failed. Please try again.");
+    }
+  });
 });
 
 function showToast(message) {
