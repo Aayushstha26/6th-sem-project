@@ -27,92 +27,177 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  function loadSection(name) {
+  async function loadSection(name) {
     let html = "";
 
     switch (name) {
       case "🏠 dashboard":
+        // Initialize variables before try block
+        let totalOrders = 0;
+        let deliveredOrders = 0;
+        let pendingOrders = 0;
+        let ordersHTML = "";
+
+        try {
+          const res = await fetch("/order/orders", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          const data = await res.json();
+          console.log("API Response:", data);
+
+          if (!res.ok) {
+            throw new Error(data.message || "Failed to fetch orders");
+          }
+
+          const orders = data.data || [];
+          console.log("Orders array:", orders);
+
+          totalOrders = orders.length;
+
+          // Calculate delivered and pending orders
+          deliveredOrders = orders.filter(
+            (order) => order.orderStatus === "Delivered"
+          ).length;
+          pendingOrders = orders.filter(
+            (order) => order.orderStatus === "Pending"
+          ).length;
+
+          console.log("Total Orders:", totalOrders);
+          console.log("Delivered:", deliveredOrders);
+          console.log("Pending:", pendingOrders);
+
+          // Generate orders HTML dynamically
+          if (orders.length > 0) {
+            ordersHTML = orders
+              .map(
+                (order) => `
+        <div class="order-card">
+          <div class="order-header">
+            <h3>Order #${order._id.slice(-6)}</h3>
+            <span class="order-date">${new Date(
+              order.createdAt
+            ).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}</span>
+          </div>
+          
+          <div class="order-details">
+            <p><strong>Items:</strong> ${order.items
+              .map((item) => item.product.product_name)
+              .join(", ")}</p>
+            <p><strong>Total:</strong> $${order.amount}</p>
+            <p><strong>Payment:</strong> ${order.paymentMethod}</p>
+            <p><strong>Payment:</strong> ${order.paymentStatus}</p>
+            <p><strong>Status:</strong> <span class="status ${
+              order.orderStatus
+            }">${order.orderStatus}</span></p>
+          </div>
+          
+          <button class="view-btn" onclick="viewOrderDetails('${
+            order._id
+          }')">View Details</button>
+        </div>
+      `
+              )
+              .join("");
+          } else {
+            ordersHTML =
+              '<p class="no-orders">No orders found. Start shopping now!</p>';
+          }
+        } catch (error) {
+          console.error("Error fetching orders:", error);
+          showToast("Failed to load orders. Please try again.");
+          ordersHTML =
+            '<p class="error-message">Unable to load orders. Please refresh the page.</p>';
+        }
+
+        // Set HTML after try-catch so it always renders
         html = `
-          <section class="overview">
-            <div class="card"><h3>Total Orders</h3><p>12</p></div>
-            <div class="card"><h3>Delivered</h3><p>9</p></div>
-            <div class="card"><h3>Pending</h3><p>3</p></div>
-          </section>
-          <div class="orders-container">
-  <div class="order-card">
-    <div class="order-header">
-      <h3>Order #1023</h3>
-      <span class="order-date">Oct 12, 2025</span>
+    <section class="overview">
+      <div class="card"><h3>Total Orders</h3><p>${totalOrders}</p></div>
+      <div class="card"><h3>Delivered</h3><p>${deliveredOrders}</p></div>
+      <div class="card"><h3>Pending</h3><p>${pendingOrders}</p></div>
+    </section>
+    <div class="orders-container">
+      ${ordersHTML}
     </div>
-
-    <div class="order-details">
-      <p><strong>Items:</strong> Gold Necklace, Diamond Ring</p>
-      <p><strong>Total:</strong> $320</p>
-      <p><strong>Payment:</strong> eSewa</p>
-      <p><strong>Status:</strong> <span class="status delivered">Delivered</span></p>
-    </div>
-
-    <button class="view-btn">View Details</button>
-  </div>
-
-  <!-- another order -->
-  <div class="order-card">
-    <div class="order-header">
-      <h3>Order #1022</h3>
-      <span class="order-date">Sep 30, 2025</span>
-    </div>
-
-    <div class="order-details">
-      <p><strong>Items:</strong> Silver Bracelet</p>
-      <p><strong>Total:</strong> $70</p>
-      <p><strong>Payment:</strong> Cash on Delivery</p>
-      <p><strong>Status:</strong> <span class="status pending">Pending</span></p>
-    </div>
-
-    <button class="view-btn">View Details</button>
-  </div>
-</div>`;
+  `;
         break;
-
       case "🛍️ my orders":
-        html = `
-          <div class="orders-container">
-  <div class="order-card">
-    <div class="order-header">
-      <h3>Order #1023</h3>
-      <span class="order-date">Oct 12, 2025</span>
-    </div>
+        let myOrdersHTML = "";
 
-    <div class="order-details">
-      <p><strong>Items:</strong> Gold Necklace, Diamond Ring</p>
-      <p><strong>Total:</strong> $320</p>
-      <p><strong>Payment:</strong> eSewa</p>
-      <p><strong>Status:</strong> <span class="status delivered">Delivered</span></p>
-    </div>
+        try {
+          const res = await fetch("/order/orders", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
 
-    <button class="view-btn">View Details</button>
-  </div>
+          const data = await res.json();
 
-  <!-- another order -->
-  <div class="order-card">
-    <div class="order-header">
-      <h3>Order #1022</h3>
-      <span class="order-date">Sep 30, 2025</span>
-    </div>
+          if (!res.ok) {
+            throw new Error(data.message || "Failed to fetch orders");
+          }
 
-    <div class="order-details">
-      <p><strong>Items:</strong> Silver Bracelet</p>
-      <p><strong>Total:</strong> $70</p>
-      <p><strong>Payment:</strong> Cash on Delivery</p>
-      <p><strong>Status:</strong> <span class="status pending">Pending</span></p>
-    </div>
+          const orders = data.data || [];
 
-    <button class="view-btn">View Details</button>
-  </div>
-</div>
-`;
+          if (orders.length > 0) {
+            myOrdersHTML = orders
+              .map(
+                (order) => `
+        <div class="order-card">
+          <div class="order-header">
+            <h3>Order #${order._id.slice(-6)}</h3>
+            <span class="order-date">${new Date(
+              order.createdAt
+            ).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}</span>
+          </div>
+          
+          <div class="order-details">
+            <p><strong>Items:</strong> ${order.items
+              .map((item) => item.product.product_name)
+              .join(", ")}</p>
+            <p><strong>Total:</strong> $${order.amount}</p>
+            <p><strong>Payment:</strong> ${order.paymentMethod}</p>
+            <p><strong>Payment:</strong> ${order.paymentStatus}</p>
+            <p><strong>Status:</strong> <span class="status ${
+              order.orderStatus
+            }">${order.orderStatus}</span></p>
+          </div>
+          
+          <button class="view-btn" onclick="viewOrderDetails('${
+            order._id
+          }')">View Details</button>
+        </div>
+      `
+              )
+              .join("");
+          } else {
+            ordersHTML =
+              '<p class="no-orders">No orders found. Start shopping now!</p>';
+          }
+        } catch (error) {
+          console.error("Error fetching orders:", error);
+          showToast("Failed to load orders. Please try again.");
+          myOrdersHTML =
+            '<p class="error-message">Unable to load orders. Please refresh the page.</p>';
+        }
+
+        html = `<div class="orders-container">${myOrdersHTML}</div>`;
         break;
-
       case "⚙️ profile settings":
         html = `
           <section class="profile-settings">
@@ -203,7 +288,6 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => contentArea.classList.add("fade"), 50);
   }
 });
-
 
 function showToast(message) {
   const toast = document.createElement("div");

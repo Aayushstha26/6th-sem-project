@@ -361,9 +361,9 @@ body {
   font-weight: 600;
 }
 
-.status.success { color: #2e7d32; }
-.status.pending { color: #e65100; }
-.status.failed { color: #c62828; }
+.status.Delivered { color: #2e7d32; }
+.status.Pending { color: #e65100; }
+.status.Cancelled { color: #c62828; }
 
 .receipt-btn {
   margin-top: 10px;

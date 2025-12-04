@@ -55,7 +55,11 @@ const getAllOrders = asyncHandler(async (req, res) => {
 
 const getUserOrders = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  const orders = await Order.find({ user: userId });
+  const orders = await Order.find({ user: userId }).populate("items.product", "product_name price productImg");
+  if (!orders) {
+    throw new Apierror(404, "No orders found for this user");
+  }
+  console.log(orders);
   return res
     .status(200)
     .json(new Apiresponse(200, "User orders fetched successfully", orders));
