@@ -46,4 +46,69 @@ const createOrder = asyncHandler(async (req, res) => {
     .json(new Apiresponse(201, "Order created successfully", order));
 });
 
-export { createOrder };
+const getAllOrders = asyncHandler(async (req, res) => {
+  const orders = await Order.find().populate("user", "name email");
+  return res
+    .status(200)
+    .json(new Apiresponse(200, "Orders fetched successfully", orders));
+});
+
+const getUserOrders = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const orders = await Order.find({ user: userId });
+  return res
+    .status(200)
+    .json(new Apiresponse(200, "User orders fetched successfully", orders));
+});
+const deleteOrder = asyncHandler(async (req, res) => {
+  const orderId = req.params.id;
+  const order = await Order.findByIdAndDelete(orderId);
+  if (!order) {
+    throw new Apierror(404, "Order not found");
+  } 
+  return res
+    .status(200)
+    .json(new Apiresponse(200, "Order deleted successfully", null));
+});
+
+const updateOrderStatus = asyncHandler(async (req, res) => {
+  const orderId = req.params.id;
+  const { status } = req.body;
+  const validStatuses = ["Pending", "Delivered", "Cancelled"];
+  if (!validStatuses.includes(status)) {
+    throw new Apierror(400, "Invalid order status");
+  }
+  const order = await Order.findById(orderId);
+  if (!order) {
+    throw new Apierror(404, "Order not found");
+  }
+  order.orderStatus = status;
+  await order.save();
+  return res
+    .status(200)
+    .json(new Apiresponse(200, "Order status updated successfully", order));
+});
+ const getOrderByStatus = asyncHandler(async (req, res) => {
+  const { status } = req.params;
+  const validStatuses = ["Pending", "Delivered", "Cancelled"];
+  if (!validStatuses.includes(status)) {
+    throw new Apierror(400, "Invalid order status");
+  }
+  const orders = await Order.find({ orderStatus: status });
+  return res
+    .status(200)
+    .json(new Apiresponse(200, "Orders fetched successfully", orders));
+});
+ const getOrderById = asyncHandler(async (req, res) => {
+  const orderId = req.params.id;
+  const order = await Order.findById(orderId).populate("user", "name email");
+  if (!order) {
+    throw new Apierror(404, "Order not found");
+  }
+  return res
+    .status(200)
+    .json(new Apiresponse(200, "Order fetched successfully", order));
+});
+
+
+export { createOrder, getAllOrders, getUserOrders , deleteOrder , updateOrderStatus , getOrderByStatus , getOrderById}; 
