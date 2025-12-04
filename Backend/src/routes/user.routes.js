@@ -7,6 +7,9 @@ import {
   getAllUsers,
   changePassword,
   deleteUser,
+  updateUserInfo
+  , getUserById,
+  resetPassword,
 } from "../controller/user.controller.js";
 import path from "path";
 import { verifyJwt } from "../middleware/auth.midlleware.js";
@@ -36,4 +39,7 @@ router.route("/refresh-token").post(refreshAccessToken);
 router.route("/getUser").get(getAllUsers);
 router.route("/change-password").post( changePassword);
 router.route("/delete-user/:id").delete(verifyAdminJwt, deleteUser);
+router.route("/update-user").put(verifyJwt, updateUserInfo);
+router.route("/get").get( verifyJwt,getUserById);
+router.route("/reset-password").post(verifyJwt,resetPassword);
 export default router;

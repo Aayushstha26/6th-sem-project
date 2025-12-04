@@ -162,5 +162,60 @@ const deleteUser = asyncHandler(async (req, res) => {
     .status(200)
     .json(new Apiresponse(200, "User deleted successfully"));
 });
+const updateUserInfo = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const { Firstname, Lastname, Phone , Email } = req.body;
+  const user = await User.findByIdAndUpdate(
+    userId,
+    {
+      Firstname,
+      Lastname,
+      Phone,
+      Email
+    },
+    { new: true }
+  );
+  if (!user) {
+    throw new Apierror(404, "User not found");
+  } 
+  return res
+    .status(200)
+    .json(new Apiresponse(200, "User info updated successfully", user));
+});
 
-export { registerUser, loginUser, logoutUser , refreshAccessToken , getAllUsers , changePassword , deleteUser };
+const getUserById = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new Apierror(404, "User not found");
+  }
+  return res
+    .status(200)
+    .json(new Apiresponse(200, "User fetched successfully", user));
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  const userId = req.user._id;
+  if (!oldPassword || !newPassword) {
+    throw new Apierror(400, "Old password and new password are required");
+  }
+  if (oldPassword === newPassword) {
+    throw new Apierror(400, "New password must be different from old password");
+  }
+  const user = await User.findOne({ _id: userId });
+
+  if (!user) {
+    throw new Apierror(404, "User not found");
+  }
+  const isMatch = await user.isPassword(oldPassword);
+  if (!isMatch) {
+    throw new Apierror(400, "Old password is incorrect");
+  }
+  user.Password = newPassword;
+  await user.save();
+  return res
+    .status(200)
+    .json(new Apiresponse(200, "Password reset successfully"));
+});
+export { registerUser, loginUser, logoutUser , refreshAccessToken , getAllUsers , changePassword, resetPassword , deleteUser , updateUserInfo , getUserById};

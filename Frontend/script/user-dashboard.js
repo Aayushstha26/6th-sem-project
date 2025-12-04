@@ -198,30 +198,68 @@ document.addEventListener("DOMContentLoaded", () => {
 
         html = `<div class="orders-container">${myOrdersHTML}</div>`;
         break;
-      case "⚙️ profile settings":
-        html = `
-          <section class="profile-settings">
-  <form class="profile-form">
-    <h2>Profile Settings</h2>
+    case "⚙️ profile settings":
+  // Fetch current user profile data
+  let profileData = {};
+  
+  try {
+    const res = await fetch("/user/get", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-    <label>Full Name</label>
-    <input type="text" placeholder="Rohan Shrestha" />
+    const data = await res.json();
+    
+    if (res.ok) {
+      profileData = data.data || {};
+      console.log("Profile data:", profileData);
+    }
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    showToast("Failed to load profile data");
+  }
 
-    <label>Email</label>
-    <input type="email" placeholder="rohan@example.com" />
+  html = `
+    <section class="profile-settings">
+      <form class="profile-form" id="profileForm">
+        <h2>Profile Settings</h2>
 
-    <label>Phone</label>
-    <input type="text" placeholder="+977-98XXXXXXX" />
+        <label>Full Name</label>
+        <input type="text" id="fullName" name="fullName" placeholder="" value="${profileData.Firstname || ''}" required />
 
-    <a href="/change-password" class="change-password-link">Change Password</a>
+        <label>Full Name</label>
+        <input type="text" id="fullName" name="fullName" placeholder="" value="${profileData.Lastname || ''}" required />
 
-        <div class = "btn">
-        <button type="submit">Save Changes</button>
+        <label>Email</label>
+        <input type="email" id="email" name="email" placeholder="rohan@example.com" value="${profileData.Email || ''}" required />
+
+        <label>Phone</label>
+        <input type="text" id="phone" name="phone" placeholder="+977-98XXXXXXX" value="${profileData.Phone || ''}" />
+
+        <label>Address</label>
+        <input type="text" id="address" name="address" placeholder="Enter your address" value="${profileData.address || ''}" />
+
+        <a href="/reset-password" class="change-password-link" onclick="loadChangePassword(event)">Change Password</a>
+
+        <div class="btn">
+          <button type="submit">Save Changes</button>
         </div>
-  </form>
-</section>
-`;
-        break;
+      </form>
+    </section>
+  `;
+  
+  // Add event listener after HTML is rendered
+  setTimeout(() => {
+    const profileForm = document.getElementById("profileForm");
+    if (profileForm) {
+      profileForm.addEventListener("submit", handleProfileUpdate);
+    }
+  }, 100);
+  
+  break;
 
       case "💳 payment history":
         html = `
@@ -302,4 +340,48 @@ function showToast(message) {
   setTimeout(() => {
     toast.remove();
   }, 3500);
+}
+async function handleProfileUpdate(e) {
+  e.preventDefault();
+  
+  const token = localStorage.getItem("accessToken");
+  
+  const formData = {
+    fullName: document.getElementById("fullName").value,
+    email: document.getElementById("email").value,
+    phone: document.getElementById("phone").value,
+    address: document.getElementById("address").value,
+  };
+
+  console.log("Updating profile with:", formData);
+
+  try {
+    const res = await fetch("/user/update-profile", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await res.json();
+    console.log("Update response:", data);
+
+    if (!res.ok) {
+      throw new Error(data.message || "Failed to update profile");
+    }
+
+    // Update username in localStorage if it changed
+    if (formData.fullName) {
+      localStorage.setItem("username", formData.fullName);
+      document.getElementById("username").textContent = formData.fullName;
+    }
+
+    showToast("Profile updated successfully!");
+    
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    showToast(error.message || "Failed to update profile");
+  }
 }
