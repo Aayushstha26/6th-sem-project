@@ -34,7 +34,7 @@ const addProduct = asyncHandler(async (req, res) => {
   });
 });
 const getProducts = asyncHandler(async (req, res) => {
-  const { category, search } = req.query;
+  const { category } = req.query;
   let filter = {};
   if (category) {
     const cat = await Category.findOne({
@@ -45,19 +45,40 @@ const getProducts = asyncHandler(async (req, res) => {
   const products = await Product.find(filter)
     .populate("category", "name")
     .sort({ createdAt: -1 });
-  if (search && search.trim()) {
-    const searchTerm = search.trim().toLowerCase();
+  // if (search && search.trim()) {
+  //   const searchTerm = search.trim().toLowerCase();
 
-    products = products.filter((product) => {
-      const productName = (product.product_name || "").toLowerCase();
-      const description = (product.description || "").toLowerCase();
+  //   products = products.filter((product) => {
+  //     const productName = (product.product_name || "").toLowerCase();
+  //     const description = (product.description || "").toLowerCase();
 
-      return (
-        customSearchFunction(productName, searchTerm) ||
-        customSearchFunction(description, searchTerm)
-      );
-    });
+  //     return (
+  //       customSearchFunction(productName, searchTerm) ||
+  //       customSearchFunction(description, searchTerm)
+  //     );
+  //   });
+  // }
+  return res.status(200).json({
+    results: products.length,
+    products,
+  });
+});
+const searchProducts = asyncHandler(async (req, res) => {
+  const { search } = req.body;
+  if (!search || !search.trim()) {
+    throw new Apierror(400, "Search term is required");
   }
+  const searchTerm = search.trim().toLowerCase();
+  let products = await Product.find().populate("category", "name");
+
+  products = products.filter((product) => {
+    const productName = (product.product_name || "").toLowerCase();
+    const description = (product.description || "").toLowerCase();
+    return (
+      customSearchFunction(productName, searchTerm) ||
+      customSearchFunction(description, searchTerm)
+    );
+  });
   return res.status(200).json({
     results: products.length,
     products,
@@ -102,4 +123,5 @@ export {
   getNewArrivals,
   getProductById,
   deleteProduct,
+  searchProducts,
 };

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { registerUser } from "../controller/user.controller.js";
-import { addProduct, getProducts, getNewArrivals, getProductById , deleteProduct } from "../controller/product.controller.js";
+import { addProduct, getProducts, getNewArrivals, getProductById , deleteProduct ,searchProducts } from "../controller/product.controller.js";
 import { upload } from "../middleware/multer.middleware.js";
 import path from "path";
 
@@ -11,6 +11,7 @@ router.route("/products").get(getProducts);
 router.route("/new-arrivals").get(getNewArrivals); 
 router.route("/:id").get(getProductById);
 router.route("/delete/:id").delete(deleteProduct);
+router.route("/search").get(searchProducts);
 // router.get("/product-page", (req, res) => {
 //   const productPath = path.resolve("../frontend/template/Products.html");
 //   res.sendFile(productPath);
