@@ -65,12 +65,18 @@ const getProducts = asyncHandler(async (req, res) => {
 });
 const searchProducts = asyncHandler(async (req, res) => {
   const { search } = req.body;
+  console.log(search);
   if (!search || !search.trim()) {
     throw new Apierror(400, "Search term is required");
   }
   const searchTerm = search.trim().toLowerCase();
   let products = await Product.find().populate("category", "name");
-
+  if (!products || products.length === 0) {
+    return res.status(200).json({
+      results: 0,
+      products: [],
+    });
+  }
   products = products.filter((product) => {
     const productName = (product.product_name || "").toLowerCase();
     const description = (product.description || "").toLowerCase();
@@ -79,6 +85,9 @@ const searchProducts = asyncHandler(async (req, res) => {
       customSearchFunction(description, searchTerm)
     );
   });
+  console.log("Filtered products:", products);
+
+
   return res.status(200).json({
     results: products.length,
     products,

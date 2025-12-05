@@ -233,6 +233,45 @@ document.addEventListener("DOMContentLoaded", () => {
   let loginModal = document.getElementById("loginModal");
   let loginContent = document.getElementById("loginContent");
   let cart = document.getElementById("cart");
+  let searchBox = document.getElementById("searchBox");
+  let searchBtn = document.getElementById("searchBtn");
+
+  searchBox.addEventListener("input", (e) => {
+    const searchTerm = e.target.value.trim();
+    search(searchTerm);
+  });
+
+  searchBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+      if (searchTerm.length === 0) {
+      alert("Please enter a search term.");
+      return;
+    }
+    const searchTerm = searchBox.value.trim();
+    search(searchTerm);
+  } );
+
+async function search(searchTerm) {
+  try {
+    const res = await fetch(`http://localhost:4000/product/search`, {
+      method: "POST",
+      headers: {  
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ search: searchTerm }),
+    } );
+
+    if (!res.ok) throw new Error("Network response was not ok");
+
+    const data = await res.json();
+    console.log("Search results:", data);
+
+  } catch (error) {
+    console.error("Error during search:", error);
+  }
+}
+
+
 
   log.addEventListener("click", (e) => {
     e.preventDefault();
@@ -402,6 +441,5 @@ function showToast(message) {
     toast.remove();
   }, 3500);
 }
-
 
 export { updateNavbar };
