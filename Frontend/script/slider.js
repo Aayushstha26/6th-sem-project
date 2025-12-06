@@ -364,8 +364,9 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
 
       // Add click event to navigate to detail page
+      const productId = item.id || item._id;
       resultItem.addEventListener("click", () => {
-        window.location.href = `/product-details/${item.id || item._id}`;
+        window.location.href = `/product-details?id=${productId}`;
       });
 
       resultsList.appendChild(resultItem);
