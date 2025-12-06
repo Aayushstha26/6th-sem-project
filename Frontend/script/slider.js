@@ -562,6 +562,11 @@ function updateNavbar(showSearchBox = true) {
 
       <span class="welcome">Welcome, ${username}</span>
       <button id="logoutBtn" class="logout-btn">Logout</button>
+      <a href="/dashboard">
+        <div class="dash" id="dash">
+          <img src="../images/user.png" alt="Profile" />
+        </div>
+      </a>
     </div>
   `;
 
