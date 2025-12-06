@@ -233,45 +233,186 @@ document.addEventListener("DOMContentLoaded", () => {
   let loginModal = document.getElementById("loginModal");
   let loginContent = document.getElementById("loginContent");
   let cart = document.getElementById("cart");
-  let searchBox = document.getElementById("searchBox");
-  let searchBtn = document.getElementById("searchBtn");
+  // Get elements
+  const searchBox = document.getElementById("searchBox");
+  const searchBtn = document.getElementById("searchBtn");
 
+  // Search event listeners
   searchBox.addEventListener("input", (e) => {
     const searchTerm = e.target.value.trim();
-    search(searchTerm);
+    if (searchTerm.length > 0) {
+      search(searchTerm);
+    } else {
+      clearResults();
+    }
   });
 
   searchBtn.addEventListener("click", (e) => {
     e.preventDefault();
-      if (searchTerm.length === 0) {
+    const searchTerm = searchBox.value.trim();
+    if (searchTerm.length === 0) {
       alert("Please enter a search term.");
       return;
     }
-    const searchTerm = searchBox.value.trim();
     search(searchTerm);
-  } );
+  });
 
-async function search(searchTerm) {
-  try {
-    const res = await fetch(`http://localhost:4000/product/search`, {
-      method: "POST",
-      headers: {  
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ search: searchTerm }),
-    } );
+  async function search(searchTerm) {
+    const resultsContainer = document.getElementById("results-container");
 
-    if (!res.ok) throw new Error("Network response was not ok");
+    // Show loading state
+    resultsContainer.innerHTML =
+      '<div class="results-loading">Searching...</div>';
 
-    const data = await res.json();
-    console.log("Search results:", data);
+    try {
+      const res = await fetch(`http://localhost:4000/product/search`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ search: searchTerm }),
+      });
 
-  } catch (error) {
-    console.error("Error during search:", error);
+      if (!res.ok) throw new Error("Network response was not ok");
+
+      const data = await res.json();
+      console.log("Search results:", data);
+
+      // Check if data is wrapped in an object (common API pattern)
+      let results = data;
+
+      // Handle different API response formats
+      if (data.products) {
+        results = data.products;
+      } else if (data.data) {
+        results = data.data;
+      } else if (data.results) {
+        results = data.results;
+      } else if (!Array.isArray(data)) {
+        // If it's a single object, wrap it in an array
+        results = [data];
+      }
+
+      displayResults(results, searchTerm);
+    } catch (error) {
+      console.error("Error during search:", error);
+      displayError("Failed to fetch search results. Please try again.");
+    }
   }
-}
 
+  function displayResults(data, searchTerm) {
+    const resultsContainer = document.getElementById("results-container");
 
+    // Clear previous results
+    resultsContainer.innerHTML = "";
+
+    // Ensure data is an array
+    if (!Array.isArray(data)) {
+      console.error("Data is not an array:", data);
+      displayError("Invalid search results format.");
+      return;
+    }
+
+    // Check if there are results
+    if (data.length === 0) {
+      resultsContainer.innerHTML = `
+            <div class="no-results">
+                <p>No results found for "${searchTerm}"</p>
+            </div>
+        `;
+      return;
+    }
+
+    // Create results list
+    const resultsList = document.createElement("div");
+    resultsList.className = "results-list";
+
+    data.forEach((item) => {
+      const resultItem = document.createElement("div");
+      resultItem.className = "result-item";
+
+      resultItem.innerHTML = `
+            <img src="${item.productImg || item.image || "placeholder.jpg"}" 
+                 alt="${item.product_name || item.name}" 
+                 class="result-thumbnail"
+                 onerror="this.src='placeholder.jpg'">
+            <div class="result-details">
+                <h3 class="result-title">${
+                  item.product_name || item.name || "Unnamed Product"
+                }</h3>
+                <p class="result-subtitle">${
+                  item.description || item.subtitle || ""
+                }</p>
+                <div class="result-meta">
+                    ${
+                      item.price
+                        ? `<span class="result-price">$${item.price}</span>`
+                        : ""
+                    }
+                    ${
+                      item.category
+                        ? `<span class="result-type">${item.category?.name}</span>`
+                        : ""
+                    }
+                    ${
+                      item.stock
+                        ? `<span class="result-stock">${item.stock} in stock</span>`
+                        : ""
+                    }
+                </div>
+            </div>
+        `;
+
+      // Add click event to navigate to detail page
+      resultItem.addEventListener("click", () => {
+        window.location.href = `/product-details/${item.id || item._id}`;
+      });
+
+      resultsList.appendChild(resultItem);
+    });
+
+    // Add "View all results" button
+    const viewAllBtn = document.createElement("button");
+    viewAllBtn.className = "view-all-btn";
+    viewAllBtn.innerHTML = "View all results <span>→</span>";
+    viewAllBtn.addEventListener("click", () => {
+      window.location.href = `/product-page?q=${encodeURIComponent(
+        searchTerm
+      )}`;
+    });
+
+    resultsContainer.appendChild(resultsList);
+    resultsContainer.appendChild(viewAllBtn);
+  }
+
+  function displayError(message) {
+    const resultsContainer = document.getElementById("results-container");
+    resultsContainer.innerHTML = `
+        <div class="error-message">
+            <p>${message}</p>
+        </div>
+    `;
+  }
+
+  function clearResults() {
+    const resultsContainer = document.getElementById("results-container");
+    resultsContainer.innerHTML = "";
+  }
+
+  // Close results when clicking outside
+  document.addEventListener("click", (e) => {
+    const resultsContainer = document.getElementById("results-container");
+    const searchBox = document.querySelector(".search-box");
+
+    if (
+      searchBox &&
+      resultsContainer &&
+      !searchBox.contains(e.target) &&
+      !resultsContainer.contains(e.target)
+    ) {
+      clearResults();
+    }
+  });
 
   log.addEventListener("click", (e) => {
     e.preventDefault();
@@ -379,22 +520,39 @@ function updateNavbar(showSearchBox = true) {
   rightPart.innerHTML = `
     <div class="user-info">
 
-      ${showSearchBox ? `
+      ${
+        showSearchBox
+          ? `
         <div class="search-box">
-      <input
-        type="search"
-        id="searchBox"
-        placeholder="Search for products..."
-        aria-label="Search for products"
-      />
-      <button id="searchBtn" type="button" aria-label="Search">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"></circle>
-          <path d="m21 21-4.35-4.35"></path>
-        </svg>
-      </button>
-    </div>
-      ` : ""}
+              <input
+                type="search"
+                id="searchBox"
+                placeholder="Search for products..."
+                aria-label="Search for products"
+              />
+              <button id="searchBtn" type="button" aria-label="Search">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.35-4.35"></path>
+                </svg>
+              </button>
+            </div>
+            <div id="c" style="display: flex; justify-content: center; align-items: center; position: absolute; top: 60px; right: 745px;">
+
+              <div id="results-container"></div>
+            </div>
+      `
+          : ""
+      }
 
       <div class="cart" id="cart">
         <a href="/cart">
@@ -425,7 +583,6 @@ function updateNavbar(showSearchBox = true) {
     localStorage.removeItem("accessToken");
     updateNavbar(); // refresh
   });
-  
 }
 function showToast(message) {
   const toast = document.createElement("div");
