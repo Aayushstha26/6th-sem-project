@@ -23,6 +23,7 @@ const addToCart = asyncHandler(async (req, res) => {
   // if(quantity <=1){
   //   throw new Apierror(400, "Quantity must be at least 1");
   // }
+ 
   console.log(quantity);
   
   let cart = await Cart.findOne({ userId });
@@ -34,8 +35,18 @@ const addToCart = asyncHandler(async (req, res) => {
     (item) => item.productId.toString() === productId
   );
   if (productIndex > -1) {
-    cart.products[productIndex].quantity += quantity || 1;
+      const newQuantity =
+      cart.products[productIndex].quantity + quantity;
+
+    if (newQuantity > product.stock) {
+      throw new Apierror(400, `Only ${product.stock} items in stock`);
+    }
+
+    cart.products[productIndex].quantity = newQuantity;
   } else {
+    if (quantity > product.stock) {
+      throw new Apierror(400, `Only ${product.stock} items in stock`);
+    }
     cart.products.push({ productId: productId, quantity: quantity || 1 });
   }
   cart.totalAmount = await calculateTotalAmount(cart);
