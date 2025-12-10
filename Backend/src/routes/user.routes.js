@@ -40,6 +40,6 @@ router.route("/getUser").get(getAllUsers);
 router.route("/change-password").post( changePassword);
 router.route("/delete-user/:id").delete(verifyAdminJwt, deleteUser);
 router.route("/update-user").put(verifyJwt, updateUserInfo);
-router.route("/get").get( verifyJwt,getUserById);
+router.route("/get").get( verifyAdminJwt,getUserById);
 router.route("/reset-password").post(verifyJwt,resetPassword);
 export default router;

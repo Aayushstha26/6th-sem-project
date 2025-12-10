@@ -57,5 +57,8 @@ router.get("/change-password", (req, res) => {
 router.get("/admin-login", (req, res) => {
   res.sendFile(path.resolve("../frontend/template/Admin-login.html"));
 });
+router.get("/admin-dashboard", (req, res) => {
+  res.sendFile(path.resolve("../frontend/template/Admin-dashboard.html"));
+});
 
 export default router;

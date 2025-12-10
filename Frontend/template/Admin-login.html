@@ -57,7 +57,7 @@
 
           if (response.ok) {
            
-            localStorage.setItem("adminToken", data.token);
+            localStorage.setItem("adminToken", data.accessToken);
             // Redirect to admin dashboard
             window.location.href = "/Admin-dashboard";
           } else {
