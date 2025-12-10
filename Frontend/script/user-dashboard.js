@@ -228,10 +228,10 @@ document.addEventListener("DOMContentLoaded", () => {
       <form class="profile-form" id="profileForm">
         <h2>Profile Settings</h2>
 
-        <label>Full Name</label>
+        <label>First Name</label>
         <input type="text" id="fullName" name="fullName" placeholder="" value="${profileData.Firstname || ''}" required />
 
-        <label>Full Name</label>
+        <label>Last Name</label>
         <input type="text" id="fullName" name="fullName" placeholder="" value="${profileData.Lastname || ''}" required />
 
         <label>Email</label>
@@ -240,13 +240,12 @@ document.addEventListener("DOMContentLoaded", () => {
         <label>Phone</label>
         <input type="text" id="phone" name="phone" placeholder="+977-98XXXXXXX" value="${profileData.Phone || ''}" />
 
-        <label>Address</label>
-        <input type="text" id="address" name="address" placeholder="Enter your address" value="${profileData.address || ''}" />
+      
 
         <a href="/reset-password" class="change-password-link" onclick="loadChangePassword(event)">Change Password</a>
 
         <div class="btn">
-          <button type="submit">Save Changes</button>
+          <button id="submit-btn" type="submit">Save Changes</button>
         </div>
       </form>
     </section>
@@ -327,6 +326,10 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => contentArea.classList.add("fade"), 50);
   }
 
+const submit_btn = document.getElementById("submit-btn");
+  if (submit_btn) {
+    submit_btn.addEventListener("click", handleProfileUpdate);
+  }
   let logoutBtn = document.querySelector(".logout-btn");
   logoutBtn.addEventListener("click", async () => {
     try{
@@ -368,16 +371,17 @@ async function handleProfileUpdate(e) {
   const token = localStorage.getItem("accessToken");
   
   const formData = {
-    fullName: document.getElementById("fullName").value,
-    email: document.getElementById("email").value,
-    phone: document.getElementById("phone").value,
-    address: document.getElementById("address").value,
+    Firstname: document.getElementById("fullName").value,
+    Lastname: document.getElementById("fullName").value,
+    Email: document.getElementById("email").value,
+    Phone: document.getElementById("phone").value,
+  
   };
 
   console.log("Updating profile with:", formData);
 
   try {
-    const res = await fetch("/user/update-profile", {
+    const res = await fetch("/user/update-user", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

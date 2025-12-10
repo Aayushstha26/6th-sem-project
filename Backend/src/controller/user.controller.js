@@ -165,6 +165,9 @@ const deleteUser = asyncHandler(async (req, res) => {
 const updateUserInfo = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const { Firstname, Lastname, Phone , Email } = req.body;
+  if (!Firstname || !Lastname || !Phone || !Email ) {
+    throw new Apierror(400, "All fields are required");
+  }
   const user = await User.findByIdAndUpdate(
     userId,
     {
