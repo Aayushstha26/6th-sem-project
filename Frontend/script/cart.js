@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   } else {
     updateNavbar(false);
-    
+
     const cartContainer = document.querySelector(".cart-items");
     const subtotalElem = document.querySelector(".summary-row span:last-child");
     const totalElem = document.querySelector(".summary-total span:last-child");
@@ -35,6 +35,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       renderCart(data.cart.products);
+         
       updateSummary(data.cart.totalAmount);
     } catch (error) {
       console.error("Error loading cart:", error);
@@ -66,7 +67,18 @@ document.addEventListener("DOMContentLoaded", async () => {
           <span class="remove-btn">Remove</span>
         </div>
       `;
+
         cartContainer.appendChild(cartItem);
+        console.log(product.stock , item.quantity);
+        if (item.quantity == product.stock) {
+          const qtyInput = cartItem.querySelector("input");
+          const incBtn = cartItem.querySelector(".increase");
+          qtyInput.value = product.stock;
+          incBtn.disabled = true;
+
+          incBtn.style.cursor = "not-allowed";
+          
+        }
 
         // Quantity update handlers
         const qtyInput = cartItem.querySelector("input");

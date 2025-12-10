@@ -62,7 +62,7 @@ const getCart = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const cart = await Cart.findOne({ userId }).populate(
     "products.productId",
-    "product_name price productImg "
+    "product_name price productImg stock "
   );
   if (!cart) {
     throw new Apierror(404, "Cart not found");
