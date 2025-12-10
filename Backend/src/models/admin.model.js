@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { bcryptHash, bcryptHashCompare, generateSalt } from "../utils/customHashingFunction.js";
 const adminSchema = new mongoose.Schema(
   {
-    username: {
+    email: {
       type: String,
       required: true,
       unique: true,
@@ -41,7 +41,7 @@ adminSchema.methods.generateAccessToken = function () {
     return jwt.sign(
         {   
             _id: this._id,
-            username: this.username,
+            email: this.email,
         },
         process.env.JWT_SECRET,
         { expiresIn: "1d" }

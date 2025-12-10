@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login</title>
+    <link rel="stylesheet" href="../styles/Admin-login.css" />
+  </head>
+  <body>
+    <div class="login-wrapper">
+      <div class="login-card">
+        <!-- Left side image -->
+        <div class="login-image">
+          <img src="../images/bbbb.jpg" alt="Jewelry" />
+        </div>
+
+        <!-- Right side form -->
+        <div class="login-form">
+          <div id="png">
+            <img src="../images/logo.png" alt="Logo" class="log-logo" />
+          </div>
+          <h2>Welcome Administrator!</h2>
+          <p class="subtitle">Sign in to continue your journey</p>
+
+          <form id="loginForm">
+            <input type="email" id="email" placeholder="Email" />
+            <input type="password" id="password" placeholder="Password" />
+            <!-- <a href="/forget-password">Forget password?</a> -->
+            <button type="submit">Login</button>
+            
+           
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    document
+      .getElementById("loginForm")
+      .addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+
+        try {
+          const response = await fetch("/admin/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, password }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+           
+            localStorage.setItem("adminToken", data.token);
+            // Redirect to admin dashboard
+            window.location.href = "/Admin-dashboard";
+          } else {
+            alert(data.message || "Login failed");
+          }
+        } catch (error) {
+          console.error("Error during login:", error);
+          alert("An error occurred. Please try again.");
+        }
+      });
+  </script>
+
+</html>

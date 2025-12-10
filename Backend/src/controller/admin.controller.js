@@ -3,8 +3,13 @@ import { Apierror } from "../utils/apiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 const loginAdmin = asyncHandler(async (req, res) => {
-  const { username, password } = req.body;
-  const admin = await Admin.findOne({ username });
+  const { email, password } = req.body;
+  if (!email || !password) {
+    throw new Apierror("Email and password are required", 400);
+  }
+
+
+  const admin = await Admin.findOne({ email });
   if (!admin) {
     throw new Apierror("User not found", 401);
   }
@@ -20,7 +25,7 @@ const loginAdmin = asyncHandler(async (req, res) => {
     httpOnly: true,
     secure: true,
   };
-  res.status(200)
+  return res.status(200)
   .cookie("accessToken", accessToken, Option)
   .cookie("refreshToken", refreshToken, Option)
   .json({

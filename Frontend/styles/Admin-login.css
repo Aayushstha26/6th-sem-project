@@ -1,0 +1,128 @@
+body {
+  font-family: "Poppins", sans-serif;
+  /* background: #030B36; */
+  /* display: flex;
+  align-items: center;
+  justify-content: center; */
+  /* height: 100vh; */
+  margin: 0;
+  padding: 0;
+}
+
+/* Wrapper */
+.login-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100vh;
+}
+
+/* Card */
+.login-card {
+  display: flex;
+  width: 850px;
+  height: 500px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+}
+
+/* Left side (image) */
+.login-image {
+  flex: 1;
+}
+.login-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Right side (form) */
+.login-form {
+  flex: 1;
+  padding: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.log-logo {
+  width: 162px;
+  /* margin-top: -50px; */
+}
+
+.login-form h2 {
+  font-size: 26px;
+  margin-top: -50px;
+  color: oklab(70.547% 0.1641 -0.01718);
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 25px;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 18px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+}
+
+.login-form input:focus {
+  border-color: #030B36;
+  box-shadow: 0 0 6px rgba(3,11,54,0.3);
+}
+
+/* Button */
+.login-form button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #2a5298, #d62976);
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.login-form button:hover {
+  transform: scale(1.03);
+  background: linear-gradient(135deg, #d62976, #030B36);
+}
+
+.signup-text {
+  margin-top: 20px;
+  font-size: 14px;
+  text-align: center;
+}
+.signup-text a {
+  color: #d62976;
+  font-weight: 600;
+  text-decoration: none;
+}
+.signup-text a:hover {
+  text-decoration: underline;
+}
+
+#png{
+  /* width: 300px; */
+}
+
+#s_cart{
+    width: 30px;
+}
+
+#www{
+    width: 100%;
+    /* height: 500px; */
+}
+
