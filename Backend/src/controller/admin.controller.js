@@ -1,5 +1,7 @@
 import { Admin } from "../models/admin.model.js";
 import { Apierror } from "../utils/apiError.js";
+import { Order } from "../models/order.model.js";
+import { Apiresponse } from "../utils/apiRespone.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 const loginAdmin = asyncHandler(async (req, res) => {
@@ -7,7 +9,6 @@ const loginAdmin = asyncHandler(async (req, res) => {
   if (!email || !password) {
     throw new Apierror("Email and password are required", 400);
   }
-
 
   const admin = await Admin.findOne({ email });
   if (!admin) {
@@ -25,13 +26,14 @@ const loginAdmin = asyncHandler(async (req, res) => {
     httpOnly: true,
     secure: true,
   };
-  return res.status(200)
-  .cookie("accessToken", accessToken, Option)
-  .cookie("refreshToken", refreshToken, Option)
-  .json({
-    message: "Admin logged in successfully",
-    accessToken,
-  });
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, Option)
+    .cookie("refreshToken", refreshToken, Option)
+    .json({
+      message: "Admin logged in successfully",
+      accessToken,
+    });
 });
 
 const logoutAdmin = asyncHandler(async (req, res) => {
@@ -51,10 +53,28 @@ const logoutAdmin = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-   .clearCookie("accessToken", option)
-   .clearCookie("refreshToken", option)
+    .clearCookie("accessToken", option)
+    .clearCookie("refreshToken", option)
     .json({ message: "Admin logged out successfully" });
 });
 
+const getMonthlyOrders = asyncHandler(async (req, res) => {
+  const orders = await Order.aggregate([
+    {
+      $group: {
+        _id: {
+          $month: "$createdAt"
+        },
+        totalOrders: {$sum:1},
+        revenue: {$sum: "$amount"}
+      },
+    },
+    {
+      $sort : {"_id": 1}
+    }
+  ]);
+  return res.status(200).json( new Apiresponse(200, "Monthly orders fetched successfully", orders) );
+});
 
-export { loginAdmin , logoutAdmin };
+
+export { loginAdmin, logoutAdmin, getMonthlyOrders };
