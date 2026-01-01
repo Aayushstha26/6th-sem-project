@@ -641,7 +641,43 @@ const contentTemplates = {
                </body>
             </table>
         </div>
-    `
+    `,
+    categories: `
+        <div class="page-header">
+            <h1 class="page-title">Category Management</h1>
+            <p class="page-subtitle">Organize and manage product categories</p>
+        </div>
+        <div class="table-card">
+            <div class="table-header">
+                <h3 class="table-title">All Categories</h3>
+                <div style="display: flex; gap: 10px;">
+                    <input id="categoryInput" type="text" placeholder="Enter categories..." style="width: 300px; padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 6px;">
+                <button id="addCategoryBtn" class="view-all-btn">Add New Category</button>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category ID</th>
+                        <th>Name</th>   
+
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>#CAT-001</td>
+                        <td>Electronics</td>
+                    </tr>
+                    <tr>
+                        <td>#CAT-002</td>
+                        <td>Clothing</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+    `     
 };  
 
 // Function to load content based on selected section
@@ -659,5 +695,31 @@ navLinks.forEach(link => {
 });
 
 // Load default content
-loadContent('dashboard');   
+loadContent('dashboard');  
+
+
+});
+document.querySelector('.dashboard-content').addEventListener('click', async (e) => {
+
+  if (e.target.id === 'addCategoryBtn') {
+    const input = document.getElementById('categoryInput');
+    const name = input.value.trim();
+
+    if (!name) return;
+
+    const res = await fetch('http://localhost:4000/category/addCategory', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+      },
+      body: JSON.stringify({ name })
+    });
+
+    if (res.ok) {
+      alert('Category added');
+      input.value = '';
+    }
+  }
+
 });
