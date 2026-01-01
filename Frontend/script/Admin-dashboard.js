@@ -2,14 +2,7 @@
 let userCount = 0;
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        const user= await fetch('http://localhost:4000/user/getUser', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-            }
-        });
-        const userData = await user.json();
+        const userData = await api('http://localhost:4000/user/getUser');
         console.log(userData);
         userCount = userData.data.length;
         
@@ -17,14 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Error fetching user data:', error);
     }   
     try {
-        const product = await fetch('http://localhost:4000/product/products', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-            }
-        });
-        const productData = await product.json();
+        const productData = await api('http://localhost:4000/product/products');
         console.log(productData);
          productCount = productData.products.length;
        console.log('Product Count:', productCount);
@@ -33,21 +19,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Error fetching user data:', error);
     }   
     try {
-        const order = await fetch('http://localhost:4000/order/all-orders', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-            }
-        });
-        const orderData = await order.json();
+        const orderData = await api('http://localhost:4000/order/All-orders');
         console.log(orderData);
          orderCount = orderData.data.length;
        console.log('Product Count:', productCount);
         
     } catch (error) {
         console.error('Error fetching user data:', error);
-    }   
+    } 
+    try {
+         var categoryData = await api('http://localhost:4000/category/getCategories');
+        console.log(categoryData);
+            categoryCount = categoryData.data.length;
+         console.log('Category Count:', categoryCount);
+    } catch (error) {
+        console.error('Error fetching category data:', error);
+    }  
 
 
 console.log('User Count:', userCount);
@@ -663,18 +650,8 @@ const contentTemplates = {
 
                     </tr>
                 </thead>
-                <tbody>
+                      <tbody id="categoryTableBody"></tbody>
 
-                    <tr>
-                        <td>#CAT-001</td>
-                        <td>Electronics</td>
-                    </tr>
-                    <tr>
-                        <td>#CAT-002</td>
-                        <td>Clothing</td>
-                    </tr>
-
-                </tbody>
             </table>
         </div>
     `     
@@ -690,8 +667,10 @@ navLinks.forEach(link => {
         e.preventDefault();
         const section = link.getAttribute('data-section');
         loadContent(section);
+        if (section === 'categories') {
+            renderCategories(categoryData.data); // Clear existing categories
     }   
-    );
+});
 });
 
 // Load default content
@@ -723,3 +702,25 @@ document.querySelector('.dashboard-content').addEventListener('click', async (e)
   }
 
 });
+
+async function  api (url){
+    const response = await fetch(url, {
+        headers: {
+    'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }   
+    });
+    return response.json();
+}
+function renderCategories(categories) {
+    console.log(categories);
+  const tbody = document.getElementById('categoryTableBody');
+  if (!tbody) return;
+
+  tbody.innerHTML = categories.map((cat, index) => `
+    <tr>
+     <td>${cat._id.slice(-10).toUpperCase()}</td>
+      <td>${cat.name}</td>
+    </tr>
+  `).join('');
+}
