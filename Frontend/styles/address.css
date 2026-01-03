@@ -45,6 +45,11 @@ font-family: "Public Sans", sans-serif;
 
 }
 
+.dash img {
+  width: 30px;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
 
 
 .nav_bar {
@@ -243,6 +248,7 @@ font-family: "Public Sans", sans-serif;
   display: flex;
   flex-direction: column;
   margin-bottom: 18px;
+  position: relative;
 }
 
 .input-group label {

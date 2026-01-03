@@ -346,7 +346,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="result-meta">
                     ${
                       item.price
-                        ? `<span class="result-price">$${item.price}</span>`
+                        ? `<span class="result-price">RS${item.price}</span>`
                         : ""
                     }
                     ${
@@ -355,8 +355,12 @@ document.addEventListener("DOMContentLoaded", () => {
                         : ""
                     }
                     ${
-                      item.stock
-                        ? `<span class="result-stock">${item.stock} in stock</span>`
+                      item.stock !== undefined
+                        ? `<span class="result-stock">${
+                            item.stock > 0
+                              ? `${item.stock} in stock`
+                              : "out of stock"
+                          }</span>`
                         : ""
                     }
                 </div>

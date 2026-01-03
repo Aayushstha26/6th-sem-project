@@ -93,8 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <p><strong>Items:</strong> ${order.items
               .map((item) => item.product.product_name)
               .join(", ")}</p>
-            <p><strong>Total:</strong> $${order.amount}</p>
-            <p><strong>Payment:</strong> ${order.paymentMethod}</p>
+            <p><strong>Total:</strong> Rs${order.amount}</p>
             <p><strong>Payment:</strong> ${order.paymentStatus}</p>
             <p><strong>Status:</strong> <span class="status ${
               order.orderStatus
@@ -171,8 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <p><strong>Items:</strong> ${order.items
               .map((item) => item.product.product_name)
               .join(", ")}</p>
-            <p><strong>Total:</strong> $${order.amount}</p>
-            <p><strong>Payment:</strong> ${order.paymentMethod}</p>
+            <p><strong>Total:</strong> Rs${order.amount}</p>
             <p><strong>Payment:</strong> ${order.paymentStatus}</p>
             <p><strong>Status:</strong> <span class="status ${
               order.orderStatus
