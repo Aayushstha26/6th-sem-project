@@ -1,64 +1,67 @@
- // Sidebar Toggle
+
+
+// Sidebar Toggle
 let userCount = 0;
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        const userData = await api('http://localhost:4000/user/getUser');
-        console.log(userData);
-        userCount = userData.data.length;
-        
-    } catch (error) {
-        console.error('Error fetching user data:', error);
-    }   
-    try {
-        const productData = await api('http://localhost:4000/product/products');
-        console.log(productData);
-         productCount = productData.products.length;
-       console.log('Product Count:', productCount);
-        
-    } catch (error) {
-        console.error('Error fetching user data:', error);
-    }   
-    try {
-        const orderData = await api('http://localhost:4000/order/All-orders');
-        console.log(orderData);
-         orderCount = orderData.data.length;
-       console.log('Product Count:', productCount);
-        
-    } catch (error) {
-        console.error('Error fetching user data:', error);
-    } 
-    try {
-         var categoryData = await api('http://localhost:4000/category/getCategories');
-        console.log(categoryData);
-            categoryCount = categoryData.data.length;
-         console.log('Category Count:', categoryCount);
-    } catch (error) {
-        console.error('Error fetching category data:', error);
-    }  
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const userData = await api("http://localhost:4000/user/getUser");
+    console.log(userData);
+    userCount = userData.data.length;
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+  }
+  try {
+    const productData = await api("http://localhost:4000/product/products");
+    console.log(productData);
+    productCount = productData.products.length;
+    console.log("Product Count:", productCount);
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+  }
+  try {
+    const orderData = await api("http://localhost:4000/order/All-orders");
+    console.log(orderData);
+    orderCount = orderData.data.length;
+    console.log("Product Count:", productCount);
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+  }
+  try {
+    var categoryData = await api(
+      "http://localhost:4000/category/getCategories"
+    );
+    console.log(categoryData);
+    categoryCount = categoryData.data.length;
+    console.log("Category Count:", categoryCount);
+  } catch (error) {
+    console.error("Error fetching category data:", error);
+  }
+  var data = await loadMonthlyOrders();
+  console.log(data);
+  const revenue = data.revenue;
+  const percentageChange = data.percentageChange;
 
+  console.log("User Count:", userCount);
+  const menuToggle = document.getElementById("menuToggle");
+  const sidebar = document.getElementById("sidebar");
+  const mainContent = document.getElementById("mainContent");
 
-console.log('User Count:', userCount);
-        const menuToggle = document.getElementById('menuToggle');
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('mainContent');
+  menuToggle.addEventListener("click", () => {
+    sidebar.classList.toggle("collapsed");
+    mainContent.classList.toggle("expanded");
 
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
-            
-            // Mobile toggle
-            if (window.innerWidth <= 768) {
-                sidebar.classList.toggle('mobile-open');
-            }
-        });
-        
+    // Mobile toggle
+    if (window.innerWidth <= 768) {
+      sidebar.classList.toggle("mobile-open");
+    }
+  });
 
-// Navigation System
-const navLinks = document.querySelectorAll('.nav-link');
-const dashboardContent = document.querySelector('.dashboard-content');
+  // Navigation System
+  const navLinks = document.querySelectorAll(".nav-link");
+  const dashboardContent = document.querySelector(".dashboard-content");
 
-// Content templates for each section
-const contentTemplates = {
+  // Content templates for each section
+  const contentTemplates = {
     dashboard: `
         <div class="page-header">
             <h1 class="page-title">Dashboard Overview</h1>
@@ -97,8 +100,8 @@ const contentTemplates = {
                     <div class="stat-icon">💰</div>
                 </div>
                 <div class="stat-label">Total Revenue</div>
-                <div class="stat-value">$284.5K</div>
-                <div class="stat-change positive">↑ 23% from last month</div>
+                <div class="stat-value">${revenue}</div>
+                <div class="stat-change positive">↑ ${percentageChange} from last month</div>
             </div>
         </div>
 
@@ -654,73 +657,89 @@ const contentTemplates = {
 
             </table>
         </div>
-    `     
-};  
+    `,
+  };
 
-// Function to load content based on selected section
-function loadContent(section) {
-
+  // Function to load content based on selected section
+  function loadContent(section) {
     dashboardContent.innerHTML = contentTemplates[section];
-}
-navLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const section = link.getAttribute('data-section');
-        loadContent(section);
-        if (section === 'categories') {
-            renderCategories(categoryData.data); // Clear existing categories
-    }   
-});
-});
-
-// Load default content
-loadContent('dashboard');  
-
-
-});
-document.querySelector('.dashboard-content').addEventListener('click', async (e) => {
-
-  if (e.target.id === 'addCategoryBtn') {
-    const input = document.getElementById('categoryInput');
-    const name = input.value.trim();
-
-    if (!name) return;
-
-    const res = await fetch('http://localhost:4000/category/addCategory', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-      },
-      body: JSON.stringify({ name })
-    });
-
-    if (res.ok) {
-      alert('Category added');
-      input.value = '';
-    }
   }
-
-});
-
-async function  api (url){
-    const response = await fetch(url, {
-        headers: {
-    'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-        }   
+  navLinks.forEach((link) => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const section = link.getAttribute("data-section");
+      loadContent(section);
+      if (section === "categories") {
+        renderCategories(categoryData.data); // Clear existing categories
+      }
     });
-    return response.json();
+  });
+
+  // Load default content
+  loadContent("dashboard");
+});
+document
+  .querySelector(".dashboard-content")
+  .addEventListener("click", async (e) => {
+    if (e.target.id === "addCategoryBtn") {
+      const input = document.getElementById("categoryInput");
+      const name = input.value.trim();
+
+      if (!name) return;
+
+      const res = await fetch("http://localhost:4000/category/addCategory", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+        },
+        body: JSON.stringify({ name }),
+      });
+
+      if (res.ok) {
+        alert("Category added");
+        input.value = "";
+        renderCategories(categoryData.data);
+      }
+    }
+  });
+
+async function api(url) {
+  const response = await fetch(url, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+    },
+  });
+  return response.json();
 }
 function renderCategories(categories) {
-    console.log(categories);
-  const tbody = document.getElementById('categoryTableBody');
+  console.log(categories);
+  const tbody = document.getElementById("categoryTableBody");
   if (!tbody) return;
 
-  tbody.innerHTML = categories.map((cat, index) => `
+  tbody.innerHTML = categories
+    .map(
+      (cat, index) => `
     <tr>
      <td>${cat._id.slice(-10).toUpperCase()}</td>
       <td>${cat.name}</td>
     </tr>
-  `).join('');
+  `
+    )
+    .join("");
 }
+async function loadMonthlyOrders() {
+  const res = await getMonthlyOrders();
+  console.log(res);
+  const labels = res.data.data.labels;
+  const orders = res.data.data.orders;
+  const revenue = res.data.data.revenue;
+  const percentageChange = res.data.summary.ordersPercentageChange;
+  console.log(labels, orders, revenue , percentageChange);
+    return { labels, orders, revenue, percentageChange };
+}
+function getMonthlyOrders() {
+  return api("http://localhost:4000/admin/monthly-orders");
+}
+
