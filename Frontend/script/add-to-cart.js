@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const data = await res.json();
         console.log(data);
         alert("Item added to cart successfully!");
+        addToCart(); // Update cart count in UI
       } catch (err) {
         console.error("Failed to add item to cart", err);
         alert("Failed to add item to cart. Please try again.");
@@ -40,3 +41,41 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 });
+function getCartCount() {
+  const count = localStorage.getItem('cartCount');
+  return count ? parseInt(count) : 0;
+}
+
+// Update cart count in localStorage and UI
+function updateCartCount(count) {
+  // Save to localStorage
+  localStorage.setItem('cartCount', count);
+ 
+  
+  // Update the badge
+  const cartBadge = document.getElementById('cart-count');
+  cartBadge.textContent = count;
+  
+  // Hide badge if count is 0
+  if (count === 0) {
+    cartBadge.style.display = 'none';
+  } else {
+    cartBadge.style.display = 'flex';
+  }
+}
+
+// Add item to cart
+function addToCart() {
+  let currentCount = getCartCount();
+  currentCount++;
+  updateCartCount(currentCount);
+}
+
+// Remove item from cart
+function removeFromCart() {
+  let currentCount = getCartCount();
+  if (currentCount > 0) {
+    currentCount--;
+    updateCartCount(currentCount);
+  }
+}

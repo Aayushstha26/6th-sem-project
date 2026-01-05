@@ -502,6 +502,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function updateNavbar(showSearchBox = true) {
   const rightPart = document.querySelector(".right_part");
   const username = localStorage.getItem("username");
+  let c = getCartCount();
 
   // If user is NOT logged in
   if (!username) {
@@ -562,6 +563,8 @@ function updateNavbar(showSearchBox = true) {
       <div class="cart" id="cart">
         <a href="/cart">
           <img id="s_cart" src="../images/ShoppingCart.png" alt="AAVA" />
+                        <span id="cart-count" class="cart-badge">${c}</span>
+
         </a>
       </div>
 
@@ -608,5 +611,25 @@ function showToast(message) {
     toast.remove();
   }, 3500);
 }
+function getCartCount() {
+  const count = localStorage.getItem('cartCount');
+  return count ? parseInt(count) : 0;
+}
 
+// Update cart count in localStorage and UI
+function updateCartCount(count) {
+  // Save to localStorage
+  localStorage.setItem('cartCount', count);
+  
+  // Update the badge
+  const cartBadge = document.getElementById('cart-count');
+  cartBadge.textContent = count;
+  
+  // Hide badge if count is 0
+  if (count === 0) {
+    cartBadge.style.display = 'none';
+  } else {
+    cartBadge.style.display = 'flex';
+  }
+}
 export { updateNavbar };
