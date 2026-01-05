@@ -4,14 +4,14 @@
 let userCount = 0;
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    const userData = await api("http://localhost:4000/user/getUser");
+    var userData = await api("http://localhost:4000/user/getUser");
     console.log(userData);
     userCount = userData.data.length;
   } catch (error) {
     console.error("Error fetching user data:", error);
   }
   try {
-    const productData = await api("http://localhost:4000/product/products");
+    var productData = await api("http://localhost:4000/product/products");
     console.log(productData);
     productCount = productData.products.length;
     console.log("Product Count:", productCount);
@@ -219,73 +219,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <th>User ID</th>
                         <th>Name</th>
                         <th>Email</th>
-                        <th>Role</th>
-                        <th>Status</th>
+                        <th>Phone</th>
                         <th>Joined Date</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>#USR-001</td>
-                        <td>John Smith</td>
-                        <td>john.smith@email.com</td>
-                        <td>Customer</td>
-                        <td><span class="status-badge status-completed">Active</span></td>
-                        <td>Jan 15, 2024</td>
-                        <td>
-                            <button style="padding: 4px 8px; margin: 0 2px; border: none; border-radius: 4px; cursor: pointer; background: #3498db; color: white;">Edit</button>
-                            <button style="padding: 4px 8px; margin: 0 2px; border: none; border-radius: 4px; cursor: pointer; background: #e74c3c; color: white;">Delete</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#USR-002</td>
-                        <td>Sarah Johnson</td>
-                        <td>sarah.j@email.com</td>
-                        <td>Customer</td>
-                        <td><span class="status-badge status-completed">Active</span></td>
-                        <td>Feb 20, 2024</td>
-                        <td>
-                            <button style="padding: 4px 8px; margin: 0 2px; border: none; border-radius: 4px; cursor: pointer; background: #3498db; color: white;">Edit</button>
-                            <button style="padding: 4px 8px; margin: 0 2px; border: none; border-radius: 4px; cursor: pointer; background: #e74c3c; color: white;">Delete</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#USR-003</td>
-                        <td>Mike Davis</td>
-                        <td>mike.d@email.com</td>
-                        <td>Admin</td>
-                        <td><span class="status-badge status-completed">Active</span></td>
-                        <td>Mar 10, 2024</td>
-                        <td>
-                            <button style="padding: 4px 8px; margin: 0 2px; border: none; border-radius: 4px; cursor: pointer; background: #3498db; color: white;">Edit</button>
-                            <button style="padding: 4px 8px; margin: 0 2px; border: none; border-radius: 4px; cursor: pointer; background: #e74c3c; color: white;">Delete</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#USR-004</td>
-                        <td>Emily Brown</td>
-                        <td>emily.b@email.com</td>
-                        <td>Customer</td>
-                        <td><span class="status-badge status-pending">Inactive</span></td>
-                        <td>Apr 5, 2024</td>
-                        <td>
-                            <button style="padding: 4px 8px; margin: 0 2px; border: none; border-radius: 4px; cursor: pointer; background: #3498db; color: white;">Edit</button>
-                            <button style="padding: 4px 8px; margin: 0 2px; border: none; border-radius: 4px; cursor: pointer; background: #e74c3c; color: white;">Delete</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#USR-005</td>
-                        <td>David Wilson</td>
-                        <td>david.w@email.com</td>
-                        <td>Customer</td>
-                        <td><span class="status-badge status-completed">Active</span></td>
-                        <td>May 12, 2024</td>
-                        <td>
-                            <button style="padding: 4px 8px; margin: 0 2px; border: none; border-radius: 4px; cursor: pointer; background: #3498db; color: white;">Edit</button>
-                            <button style="padding: 4px 8px; margin: 0 2px; border: none; border-radius: 4px; cursor: pointer; background: #e74c3c; color: white;">Delete</button>
-                        </td>
-                    </tr>
+                <tbody id= "userTableBody">
+                   
                 </tbody>
             </table>
         </div>
@@ -342,6 +282,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <tr>
                         <th>Product ID</th>
                         <th>Name</th>
+                        <th>description</th>
                         <th>Category</th>
                         <th>Price</th>
                         <th>Stock</th>
@@ -349,7 +290,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="productTableBody">
                     <tr>
                         <td>#PRD-001</td>
                         <td>Wireless Headphones</td>
@@ -672,6 +613,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (section === "categories") {
         renderCategories(categoryData.data); // Clear existing categories
       }
+      if (section === "users") {
+        renderUserTable(userData.data); // Clear existing users
+      }
+      if (section === "products") {
+        renderProductTable(productData.products); // Clear existing products
+      }
     });
   });
 
@@ -743,3 +690,48 @@ function getMonthlyOrders() {
   return api("http://localhost:4000/admin/monthly-orders");
 }
 
+function renderUserTable(users) {
+  const tbody = document.getElementById("userTableBody");
+  if (!tbody) return;
+    tbody.innerHTML = users
+    .map(
+      (user, index) => `
+    <tr>    
+        <td>#USR-${String(index + 1).padStart(3, "0")}</td>
+        <td>${user.Firstname +" "+ user.Lastname}</td>
+        <td>${user.Email}</td>
+        <td>${user.Phone || "N/A"}</td>
+        <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+        <td>
+            <button style="padding: 4px 8px; margin: 0 2px; border: none; border-radius: 4px; cursor: pointer; background: #3498db; color: white;">Edit</button>
+            <button style="padding: 4px 8px; margin: 0 2px; border: none; border-radius: 4px; cursor: pointer; background: #e74c3c; color: white;">Delete</button>
+        </td>   
+    </tr>
+  `
+    )
+    .join("");
+}
+function renderProductTable(products) {
+  const tbody = document.getElementById("productTableBody");
+  if (!tbody) return;
+    tbody.innerHTML = products
+    .map(
+      (product, index) => `
+    <tr>
+        <td>#PRD-${String(index + 1).padStart(3, "0")}</td>
+        <td>${product.product_name}</td>
+        <td>${product.description}</td>
+        <td>${product.category.name}</td>
+        <td>$${product.price.toFixed(2)}</td>
+        <td>${product.stock}</td>
+        <td><span class="status-badge status-completed">${product.stock > 0 ? "In Stock" : "Out of Stock"}</span></td>
+        <td>
+            <button style="padding: 4px 8px; margin: 0 2px; border: none; border-radius: 4px; cursor: pointer; background: #3498db; color: white;">Edit</button>        
+            <button style="padding: 4px 8px; margin: 0 2px; border: none; border-radius: 4px; cursor: pointer; background: #e74c3c; color: white;">Delete</button>
+        </td>
+    </tr>   
+        
+    `   
+    )
+    .join("");
+}   
