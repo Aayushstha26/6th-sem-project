@@ -87,6 +87,30 @@ body {
   color: white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+.nav-logout {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 14px 16px;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.nav-logout:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  transform: translateX(5px);
+}
+
+.nav-logout.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
 
 .nav-icon {
   font-size: 20px;
@@ -96,6 +120,7 @@ body {
 .sidebar.collapsed .nav-text {
   display: none;
 }
+
 
 /* Main Content */
 .main-content {

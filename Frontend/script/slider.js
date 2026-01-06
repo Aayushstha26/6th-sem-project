@@ -510,6 +510,7 @@ function updateNavbar(showSearchBox = true) {
       <div class="cart" id="cart">
         <a href="">
           <img id="s_cart" src="../images/ShoppingCart.png" alt="AAVA" />
+      
         </a>
       </div>
       <div class="profile" id="profile">
@@ -519,6 +520,10 @@ function updateNavbar(showSearchBox = true) {
         </a>
       </div>
     `;
+    const cart_count = document.getElementById("cart-count");
+    if (cart_count) {
+      cart_count.style.display = "none";
+    }
     return;
   }
 
@@ -594,6 +599,8 @@ function updateNavbar(showSearchBox = true) {
 
     localStorage.removeItem("username");
     localStorage.removeItem("accessToken");
+    // localStorage.removeItem("cartCount");
+
     updateNavbar(); // refresh
   });
 }
@@ -612,24 +619,24 @@ function showToast(message) {
   }, 3500);
 }
 function getCartCount() {
-  const count = localStorage.getItem('cartCount');
+  const count = localStorage.getItem("cartCount");
   return count ? parseInt(count) : 0;
 }
 
 // Update cart count in localStorage and UI
 function updateCartCount(count) {
   // Save to localStorage
-  localStorage.setItem('cartCount', count);
-  
+  localStorage.setItem("cartCount", count);
+
   // Update the badge
-  const cartBadge = document.getElementById('cart-count');
+  const cartBadge = document.getElementById("cart-count");
   cartBadge.textContent = count;
-  
+
   // Hide badge if count is 0
   if (count === 0) {
-    cartBadge.style.display = 'none';
+    cartBadge.style.display = "none";
   } else {
-    cartBadge.style.display = 'flex';
+    cartBadge.style.display = "flex";
   }
 }
 export { updateNavbar };
