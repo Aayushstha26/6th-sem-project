@@ -5,6 +5,7 @@ import { Apierror } from "../utils/apiError.js";
 import { Apiresponse } from "../utils/apiRespone.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { customSearchFunction } from "../utils/customSearchFunction.js";
+import { addOrUpdateRating ,isValidRating, calculateAverageRating } from "../utils/customRatingFunction.js";
 
 const addProduct = asyncHandler(async (req, res) => {
   const { product_name, description, price, category, stock } = req.body;
@@ -125,7 +126,24 @@ const deleteProduct = asyncHandler(async (req, res) => {
     .status(200)
     .json(new Apiresponse(200, "Product deleted successfully"));
 });
-
+const rateProduct = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { rating } = req.body;
+  const userId = req.user._id;
+  if (!isValidRating(rating)) {
+    throw new Apierror(400, "Rating must be an integer between 1 and 5");
+  }
+  const product = await Product.findById(id);
+  if (!product) {
+    throw new Apierror(404, "Product not found");
+  }
+  addOrUpdateRating(product.ratings, userId, rating);
+  product.averageRating = calculateAverageRating(product.ratings);
+  await product.save();
+  return res
+    .status(200)
+    .json(new Apiresponse(200, "Product rated successfully"));
+});
 export {
   addProduct,
   getProducts,
@@ -133,4 +151,5 @@ export {
   getProductById,
   deleteProduct,
   searchProducts,
+  rateProduct,
 };
