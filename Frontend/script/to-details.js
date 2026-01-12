@@ -25,58 +25,58 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-   const addToCartBtn = document.querySelector(".cart-btn");
-   const buy = document.querySelector(".buy-btn");
-const quantity = Number(quantityInput.value) || 1;
-console.log("Requested quantity:", quantity);
-quantityInput.addEventListener("change", () => {
-  let qty = Number(quantityInput.value) || 1;
-  if (qty < 1) qty = 1;
-  quantityInput.value = qty;
-  // Update button states based on new quantity
-  if (qty > product.stock) {
-    addToCartBtn.disabled = true;
-    buy.disabled = true;
-    addToCartBtn.textContent = `Only ${product.stock} item available`;
-    buy.textContent = `Only ${product.stock} item available`;
-    addToCartBtn.style.cursor = "not-allowed";
-    buy.style.cursor = "not-allowed";
-    buy.style.fontSize = "14px";
-    addToCartBtn.style.fontSize = "14px";
-  } else {
-    addToCartBtn.disabled = false;
-    buy.disabled = false; 
-    addToCartBtn.textContent = "Add to Cart";
-    buy.textContent = "Buy Now";
-    addToCartBtn.style.cursor = "pointer";
-    buy.style.cursor = "pointer";
-  }
-});
+    const addToCartBtn = document.querySelector(".cart-btn");
+    const buy = document.querySelector(".buy-btn");
+    const quantity = Number(quantityInput.value) || 1;
+    console.log("Requested quantity:", quantity);
+    quantityInput.addEventListener("change", () => {
+      let qty = Number(quantityInput.value) || 1;
+      if (qty < 1) qty = 1;
+      quantityInput.value = qty;
+      // Update button states based on new quantity
+      if (qty > product.stock) {
+        addToCartBtn.disabled = true;
+        buy.disabled = true;
+        addToCartBtn.textContent = `Only ${product.stock} item available`;
+        buy.textContent = `Only ${product.stock} item available`;
+        addToCartBtn.style.cursor = "not-allowed";
+        buy.style.cursor = "not-allowed";
+        buy.style.fontSize = "14px";
+        addToCartBtn.style.fontSize = "14px";
+      } else {
+        addToCartBtn.disabled = false;
+        buy.disabled = false;
+        addToCartBtn.textContent = "Add to Cart";
+        buy.textContent = "Buy Now";
+        addToCartBtn.style.cursor = "pointer";
+        buy.style.cursor = "pointer";
+      }
+    });
 
-// CASE 1: Product completely out of stock
-if (product.stock <= 0) {
-  addToCartBtn.disabled = true;
-  addToCartBtn.textContent = "Out of Stock";
-  buy.disabled = true;
-  buy.textContent = "Out of Stock";
-  buy.style.cursor = "not-allowed";
-  addToCartBtn.style.cursor = "not-allowed";
-}
-// CASE 2: User quantity is more than available stock
-else if (quantity > product.stock) {
-  addToCartBtn.disabled = true;
-   buy.disabled = true;
-  addToCartBtn.textContent = `Only ${product.stock} item available`;
-  buy.textContent = `Only ${product.stock} item available`;
-  addToCartBtn.style.cursor = "not-allowed";
-  buy.style.cursor = "not-allowed";
-}
-// CASE 3: Everything is fine — enable button
-else {
-  addToCartBtn.disabled = false;
-    buy.disabled = false;
-  addToCartBtn.textContent = "Add to Cart";
-}
+    // CASE 1: Product completely out of stock
+    if (product.stock <= 0) {
+      addToCartBtn.disabled = true;
+      addToCartBtn.textContent = "Out of Stock";
+      buy.disabled = true;
+      buy.textContent = "Out of Stock";
+      buy.style.cursor = "not-allowed";
+      addToCartBtn.style.cursor = "not-allowed";
+    }
+    // CASE 2: User quantity is more than available stock
+    else if (quantity > product.stock) {
+      addToCartBtn.disabled = true;
+      buy.disabled = true;
+      addToCartBtn.textContent = `Only ${product.stock} item available`;
+      buy.textContent = `Only ${product.stock} item available`;
+      addToCartBtn.style.cursor = "not-allowed";
+      buy.style.cursor = "not-allowed";
+    }
+    // CASE 3: Everything is fine — enable button
+    else {
+      addToCartBtn.disabled = false;
+      buy.disabled = false;
+      addToCartBtn.textContent = "Add to Cart";
+    }
 
 
     // ✅ Set product details safely
@@ -90,11 +90,139 @@ else {
     ).textContent = `RS. ${product.price}`;
     document.querySelector(".product-description").textContent =
       product.description;
+
+    // --- Ratings & Reviews Logic ---
+    loadReviews(productId);
+
+    const toggleReviewFormBtn = document.getElementById("toggleReviewFormBtn");
+    const reviewFormContainer = document.getElementById("reviewFormContainer");
+    const cancelReviewBtn = document.getElementById("cancelReviewBtn");
+    const reviewForm = document.getElementById("reviewForm");
+
+    if (toggleReviewFormBtn) {
+      toggleReviewFormBtn.addEventListener("click", () => {
+        reviewFormContainer.classList.remove("hidden");
+        toggleReviewFormBtn.style.display = "none";
+      });
+    }
+
+    if (cancelReviewBtn) {
+      cancelReviewBtn.addEventListener("click", () => {
+        reviewFormContainer.classList.add("hidden");
+        toggleReviewFormBtn.style.display = "inline-block";
+        reviewForm.reset();
+      });
+    }
+
+    if (reviewForm) {
+      reviewForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const rating = document.querySelector('input[name="rating"]:checked')?.value;
+        const name = document.getElementById("reviewName").value;
+        const comment = document.getElementById("reviewComment").value;
+
+        if (!rating || !name || !comment) {
+          alert("Please fill in all fields");
+          return;
+        }
+
+        const newReview = {
+          id: Date.now(),
+          productId: productId,
+          rating: parseInt(rating),
+          name: name,
+          comment: comment,
+          date: new Date().toLocaleDateString()
+        };
+
+        saveReview(productId, newReview);
+        reviewFormContainer.classList.add("hidden");
+        toggleReviewFormBtn.style.display = "inline-block";
+        reviewForm.reset();
+
+        // Refresh reviews
+        loadReviews(productId);
+      });
+    }
   } catch (err) {
     console.error("❌ Error loading product details:", err);
     document.querySelector(".details-container").innerHTML =
       "<p>Failed to load product details.</p>";
   }
-
- 
 });
+
+function loadReviews(productId) {
+  const reviews = JSON.parse(localStorage.getItem(`reviews_${productId}`)) || [];
+  renderReviews(reviews);
+  updateRatingSummary(reviews);
+}
+
+function saveReview(productId, review) {
+  const reviews = JSON.parse(localStorage.getItem(`reviews_${productId}`)) || [];
+  reviews.unshift(review); // Add to top
+  localStorage.setItem(`reviews_${productId}`, JSON.stringify(reviews));
+}
+
+function renderReviews(reviews) {
+  const reviewsList = document.getElementById("reviewsList");
+  if (!reviewsList) return;
+
+  if (reviews.length === 0) {
+    reviewsList.innerHTML = '<p style="color: #777; text-align: center; padding: 20px;">No reviews yet. Be the first to review!</p>';
+    return;
+  }
+
+  reviewsList.innerHTML = reviews.map(review => `
+        <div class="review-card">
+            <div class="review-header">
+                <span class="reviewer-name">${review.name}</span>
+                <span class="review-date">${review.date}</span>
+            </div>
+            <div class="review-stars">${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}</div>
+            <p class="review-text">${review.comment}</p>
+        </div>
+    `).join("");
+}
+
+function updateRatingSummary(reviews) {
+  const avgRatingEl = document.getElementById("avgRating");
+  const avgStarsEl = document.getElementById("avgStars");
+  const totalReviewsEl = document.getElementById("totalReviews");
+
+  if (!avgRatingEl) return;
+
+  const total = reviews.length;
+  totalReviewsEl.textContent = total;
+
+  if (total === 0) {
+    avgRatingEl.textContent = "0.0";
+    avgStarsEl.textContent = "★★★★★"; // Grey out via CSS if needed, or just leave as is
+    // Reset bars
+    [1, 2, 3, 4, 5].forEach(i => {
+      document.getElementById(`bar${i}`).style.width = "0%";
+      document.getElementById(`count${i}`).textContent = "0";
+    });
+    return;
+  }
+
+  const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+  const avg = (sum / total).toFixed(1);
+
+  avgRatingEl.textContent = avg;
+
+  // Create visual star representation for avg
+  const filledStars = Math.round(avg);
+  avgStarsEl.textContent = "★".repeat(filledStars) + "☆".repeat(5 - filledStars);
+
+  // Update bars
+  const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  reviews.forEach(r => counts[r.rating]++);
+
+  [1, 2, 3, 4, 5].forEach(i => {
+    const percentage = (counts[i] / total) * 100;
+    document.getElementById(`bar${i}`).style.width = `${percentage}%`;
+    document.getElementById(`count${i}`).textContent = counts[i];
+  });
+}
+
