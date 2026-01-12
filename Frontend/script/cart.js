@@ -145,6 +145,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           },
           body: JSON.stringify({ productId: productId }),
         });
+        localStorage.removeItem('cartCount');
         location.reload();
       } catch (err) {
         console.error("Failed to remove item", err);
