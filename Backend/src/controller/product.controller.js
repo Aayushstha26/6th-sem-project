@@ -5,7 +5,11 @@ import { Apierror } from "../utils/apiError.js";
 import { Apiresponse } from "../utils/apiRespone.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { customSearchFunction } from "../utils/customSearchFunction.js";
-import { addOrUpdateRating ,isValidRating, calculateAverageRating } from "../utils/customRatingFunction.js";
+import {
+  addOrUpdateRating,
+  isValidRating,
+  calculateAverageRating,
+} from "../utils/customRatingFunction.js";
 
 const addProduct = asyncHandler(async (req, res) => {
   const { product_name, description, price, category, stock } = req.body;
@@ -88,7 +92,6 @@ const searchProducts = asyncHandler(async (req, res) => {
   });
   console.log("Filtered products:", products);
 
-
   return res.status(200).json({
     results: products.length,
     products,
@@ -128,7 +131,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
 });
 const rateProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { rating , review} = req.body;
+  const { rating, review } = req.body;
   const userId = req.user._id;
   if (!isValidRating(rating)) {
     throw new Apierror(400, "Rating must be an integer between 1 and 5");
@@ -137,7 +140,7 @@ const rateProduct = asyncHandler(async (req, res) => {
   if (!product) {
     throw new Apierror(404, "Product not found");
   }
-  addOrUpdateRating(product.ratings, userId, rating , review);
+  addOrUpdateRating(product.ratings, userId, rating, review);
   product.averageRating = calculateAverageRating(product.ratings);
 
   await product.save();

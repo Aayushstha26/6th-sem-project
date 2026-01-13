@@ -89,5 +89,22 @@ const removeFromCart = asyncHandler(async (req, res) => {
     cart,
   });
 });
+const getCartCount = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const cartItems = await Cart.findOne({ userId: userId });
+  const itemCount = cartItems ? calculateCartCount(cartItems) : 0;
+  return res.status(200).json({
+    itemCount,
+  });
+});
+function calculateCartCount(cart) {
+  let count = 0;
 
-export { addToCart, getCart , removeFromCart };
+  for (let i = 0; i < cart.products.length; i++) {
+    count += cart.products[i].quantity;
+  }
+
+  return count;
+}
+
+export { addToCart, getCart , removeFromCart, getCartCount };
