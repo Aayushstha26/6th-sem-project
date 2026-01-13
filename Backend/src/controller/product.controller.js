@@ -128,7 +128,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
 });
 const rateProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { rating } = req.body;
+  const { rating , review} = req.body;
   const userId = req.user._id;
   if (!isValidRating(rating)) {
     throw new Apierror(400, "Rating must be an integer between 1 and 5");
@@ -137,8 +137,9 @@ const rateProduct = asyncHandler(async (req, res) => {
   if (!product) {
     throw new Apierror(404, "Product not found");
   }
-  addOrUpdateRating(product.ratings, userId, rating);
+  addOrUpdateRating(product.ratings, userId, rating , review);
   product.averageRating = calculateAverageRating(product.ratings);
+
   await product.save();
   return res
     .status(200)

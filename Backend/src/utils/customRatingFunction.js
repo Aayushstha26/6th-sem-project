@@ -10,12 +10,13 @@ function findUserRatingIndex(ratingsArray, userId) {
     }
     return -1;
 }
-function addOrUpdateRating(ratingsArray, userId, rating) {
+function addOrUpdateRating(ratingsArray, userId, rating, review = "")  {
     const index = findUserRatingIndex(ratingsArray, userId);
     if (index !== -1) {
         ratingsArray[index].rating = rating;
+        ratingsArray[index].review = review;
     } else {
-        ratingsArray.push({ user: userId, rating: rating });
+        ratingsArray.push({ user: userId, rating: rating , review: review });
     }
     return ratingsArray;
 }

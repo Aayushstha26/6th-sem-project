@@ -40,6 +40,9 @@ const productSchema = new Schema({
                 min: 1,
                 max: 5,
             },
+            review: {
+                type: String,
+            },
         }
     ],
     averageRating: {
