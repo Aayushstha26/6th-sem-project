@@ -401,10 +401,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             <h1 class="page-title">Payment Management</h1>
             <p class="page-subtitle">Monitor all transactions and payment activities</p>
         </div>
-
-        
-
-       
     `,
     categories: `
         <div class="page-header">
@@ -432,6 +428,55 @@ document.addEventListener("DOMContentLoaded", async () => {
             </table>
         </div>
     `,
+    analytics: `
+        <div class="page-header">
+            <h1 class="page-title">Analytics & Reports</h1>
+            <p class="page-subtitle">Detailed performance metrics and trends</p>
+        </div>
+
+        <div class="stats-grid">
+             <div class="stat-card" style="--card-color: #2ecc71; --card-bg: rgba(46, 204, 113, 0.1)">
+                <div class="stat-header">
+                    <div class="stat-icon">💰</div>
+                </div>
+                <div class="stat-label">Total Revenue</div>
+                <div class="stat-value">${revenue}</div>
+                <div class="stat-change positive">↑ ${percentageChange}% from last month</div>
+            </div>
+             <div class="stat-card" style="--card-color: #bfa37c; --card-bg: rgba(191, 163, 124, 0.1)">
+                <div class="stat-header">
+                    <div class="stat-icon">🛒</div>
+                </div>
+                <div class="stat-label">Total Orders</div>
+                <div class="stat-value">${orderCount}</div>
+            </div>
+             <div class="stat-card" style="--card-color: #fa7e1e; --card-bg: rgba(250, 126, 30, 0.1)">
+                <div class="stat-header">
+                    <div class="stat-icon">📦</div>
+                </div>
+                <div class="stat-label">Products In Stock</div>
+                <div class="stat-value">${stockcount}</div>
+            </div>
+        </div>
+
+        <div class="chart-section" style="grid-template-columns: 1fr;">
+             <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">Monthly Revenue & Orders</h3>
+                </div>
+                <canvas id="analyticsMainChart" height="100"></canvas>
+            </div>
+        </div>
+        
+         <div class="chart-section">
+            <div class="chart-card">
+                 <div class="chart-header">
+                    <h3 class="chart-title">Category Distribution</h3>
+                </div>
+                <canvas id="categoryChart" height="200"></canvas>
+            </div>
+        </div>
+    `,
   };
 
   // Function to load content based on selected section
@@ -451,6 +496,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
       if (section === "products") {
         renderProductTable(productData.products); // Clear existing products
+      }
+      if (section === "analytics") {
+          setTimeout(() => {
+            renderAnalyticsCharts(data, productData.products);
+          }, 0);
       }
     });
   });
@@ -567,6 +617,103 @@ function renderProductTable(products) {
     `   
     )
     .join("");
+} 
+
+function renderAnalyticsCharts(data, products) {
+    const ctx = document.getElementById('analyticsMainChart');
+    const catCtx = document.getElementById('categoryChart');
+    
+    if (ctx) {
+        // Destroy existing chart if it exists attached to the canvas
+        // Note: In vanilla JS without storing the chart instance, it's hard to destroy properly. 
+        // A simple hack is to clone the node or check for status.
+        // For this simple implementation, we'll assume the view re-renders fresh HTML each time.
+        
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.labels,
+                datasets: [
+                    {
+                        label: 'Revenue',
+                        data: data.revenue,
+                        backgroundColor: 'rgba(46, 204, 113, 0.5)',
+                        borderColor: '#2ecc71',
+                        borderWidth: 1,
+                        yAxisID: 'y',
+                    },
+                    {
+                        label: 'Orders',
+                        data: data.orders,
+                        backgroundColor: 'rgba(250, 126, 30, 0.5)',
+                        borderColor: '#fa7e1e',
+                        borderWidth: 1,
+                        yAxisID: 'y1',
+                        type: 'line'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: { display: true, text: 'Revenue ($)' }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                         title: { display: true, text: 'Order Count' }
+                    },
+                }
+            }
+        });
+    }
+
+    if (catCtx && products) {
+        // Calculate Category Distribution
+        const categoryCounts = {};
+        products.forEach(p => {
+            const catName = p.category?.name || 'Uncategorized';
+            categoryCounts[catName] = (categoryCounts[catName] || 0) + 1;
+        });
+
+        new Chart(catCtx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(categoryCounts),
+                datasets: [{
+                    data: Object.values(categoryCounts),
+                    backgroundColor: [
+                        '#d62976',
+                        '#fa7e1e',
+                        '#f39c12',
+                        '#2ecc71',
+                        '#3498db',
+                        '#9b59b6'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    }
+                }
+            }
+        });
+    }
 } 
 
 document.addEventListener("DOMContentLoaded", async () => {

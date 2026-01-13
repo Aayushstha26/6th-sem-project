@@ -1,4 +1,4 @@
-import { updateCartCountUi, getCartCount} from "./slider.js";
+// import { updateCartCountUi, getCartCount} from "./slider.js";
 document.addEventListener("DOMContentLoaded", async () => {
   const qty = document.getElementById("quantity");
   const addToCartBtn = document.querySelectorAll(".cart-btn");
