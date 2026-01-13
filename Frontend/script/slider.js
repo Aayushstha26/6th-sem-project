@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("accessToken");
   if (token) {
     updateNavbar();
+    getCartCount();
   }
   const regs = document.getElementById("regs");
   const registerModal = document.getElementById("registerModal");
@@ -618,25 +619,48 @@ function showToast(message) {
     toast.remove();
   }, 3500);
 }
-function getCartCount() {
-  const count = localStorage.getItem("cartCount");
-  return count ? parseInt(count) : 0;
-}
-
-// Update cart count in localStorage and UI
-function updateCartCount(count) {
-  // Save to localStorage
-  localStorage.setItem("cartCount", count);
-
-  // Update the badge
-  const cartBadge = document.getElementById("cart-count");
-  cartBadge.textContent = count;
-
-  // Hide badge if count is 0
-  if (count === 0) {
-    cartBadge.style.display = "none";
-  } else {
-    cartBadge.style.display = "flex";
+// function getCartCount() {
+//   const count = localStorage.getItem("cartCount");
+//   return count ? parseInt(count) : 0;
+// }
+async function getCartCount() {
+  const token = localStorage.getItem("accessToken");
+  try {
+    const res = await fetch("http://localhost:4000/cart/getCartCount", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
+    updateCartCountUi(data.itemCount || 0);
+  } catch (err) {
+    console.error("Failed to fetch cart count", err);
+    return 0;
   }
 }
-export { updateNavbar };
+function updateCartCountUi(count) {
+  const cartBadge = document.getElementById("cart-count");
+  cartBadge.textContent = count;
+} 
+
+
+
+// // Update cart count in localStorage and UI
+// function updateCartCount(count) {
+//   // Save to localStorage
+//   localStorage.setItem("cartCount", count);
+
+//   // Update the badge
+//   const cartBadge = document.getElementById("cart-count");
+//   cartBadge.textContent = count;
+
+//   // Hide badge if count is 0
+//   if (count === 0) {
+//     cartBadge.style.display = "none";
+//   } else {
+//     cartBadge.style.display = "flex";
+//   }
+// }
+export { updateNavbar , getCartCount, updateCartCountUi};

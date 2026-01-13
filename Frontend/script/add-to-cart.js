@@ -1,14 +1,18 @@
+import { updateCartCountUi, getCartCount} from "./slider.js";
 document.addEventListener("DOMContentLoaded", async () => {
   const qty = document.getElementById("quantity");
   const addToCartBtn = document.querySelectorAll(".cart-btn");
-
+const token = localStorage.getItem("accessToken");
+if (token) {
+  getCartCount();
+}
   addToCartBtn.forEach((btn) => {
     btn.addEventListener("click", async (e) => {
       e.preventDefault();
 
       const urlParams = new URLSearchParams(window.location.search);
       const productId = urlParams.get("id");
-      const token = localStorage.getItem("accessToken");
+      
 
       if (!token) {
         alert("Please login to add items to your cart.");
