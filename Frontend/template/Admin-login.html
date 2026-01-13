@@ -59,7 +59,7 @@
            
             localStorage.setItem("adminToken", data.accessToken);
             // Redirect to admin dashboard
-            window.location.href = "/Admin-dashboard";
+            window.location.href = "../template/admin-v2/dashboard.html";
           } else {
             alert(data.message || "Login failed");
           }

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Aava Treasures Admin</title>
+    <!-- Styles -->
+    <link rel="stylesheet" href="../../styles/admin-v2/global.css">
+    <link rel="stylesheet" href="../../styles/admin-v2/dashboard.css">
+    <!-- Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">🏆</span>
+                    <span class="logo-text">Aava Admin</span>
+                </div>
+                <button id="sidebarToggle" class="icon-btn">
+                    <span class="material-icons-round">menu_open</span>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="#dashboard" class="nav-link active" data-view="dashboard">
+                            <span class="material-icons-round">dashboard</span>
+                            <span class="nav-label">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#analytics" class="nav-link" data-view="analytics">
+                            <span class="material-icons-round">analytics</span>
+                            <span class="nav-label">Analytics</span>
+                        </a>
+                    </li>
+                    <li class="nav-header">Management</li>
+                    <li class="nav-item">
+                        <a href="#users" class="nav-link" data-view="users">
+                            <span class="material-icons-round">people</span>
+                            <span class="nav-label">Users</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#categories" class="nav-link" data-view="categories">
+                            <span class="material-icons-round">category</span>
+                            <span class="nav-label">Categories</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#products" class="nav-link" data-view="products">
+                            <span class="material-icons-round">inventory_2</span>
+                            <span class="nav-label">Products</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#orders" class="nav-link" data-view="orders">
+                            <span class="material-icons-round">shopping_cart</span>
+                            <span class="nav-label">Orders</span>
+                            <span class="badge warning hidden" id="pendingOrdersBadge">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-header">System</li>
+                    <li class="nav-item">
+                        <a href="#settings" class="nav-link" data-view="settings">
+                            <span class="material-icons-round">settings</span>
+                            <span class="nav-label">Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="nav-link logout">
+                    <span class="material-icons-round">logout</span>
+                    <span class="nav-label">Logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Wrapper -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <h2 id="pageTitle">Dashboard Overview</h2>
+                </div>
+                
+                <div class="topbar-right">
+                    <div class="search-box">
+                        <span class="material-icons-round search-icon">search</span>
+                        <input type="text" placeholder="Search anything...">
+                    </div>
+                    
+                    <button class="icon-btn notification-btn">
+                        <span class="material-icons-round">notifications</span>
+                        <span class="dot"></span>
+                    </button>
+
+                    <div class="profile-dropdown">
+                        <div class="profile-trigger">
+                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=FDB931&color=fff" alt="Admin" class="avatar">
+                            <div class="profile-info">
+                                <span class="name">Admin User</span>
+                                <span class="role">Super Admin</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dynamic View Container -->
+            <div id="viewContainer" class="view-container">
+                <!-- Content will be injected here by JS -->
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Loading Dashboard...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../script/admin-v2/dashboard.js"></script>
+</body>
+</html>

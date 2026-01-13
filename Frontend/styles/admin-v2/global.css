@@ -1,0 +1,57 @@
+/* Global Variables & Reset */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Aava Treasures Brand Palette */
+  --primary-gradient: linear-gradient(135deg, #d62976 0%, #fa7e1e 100%); /* Brand Gradient */
+  --secondary-gradient: linear-gradient(135deg, #2d1f12 0%, #4a3b32 100%);
+  
+  --primary-color: #d62976;
+  --secondary-color: #fa7e1e;
+  --accent-color: #bfa37c; /* Bronze/Gold from buttons */
+  
+  --bg-color: #faf7f0; /* Brand Off-white */
+  --glass-bg: rgba(255, 255, 255, 0.90);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.5);
+  --glass-shadow: 0 8px 32px 0 rgba(214, 41, 118, 0.1); /* Pinkish shadow */
+  
+  --text-dark: #2d1f12; /* Brand Dark Brown */
+  --text-muted: #666;
+  --text-light: #ffffff;
+  
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Outfit', sans-serif;
+}
+
+body {
+  background: var(--bg-color);
+  color: var(--text-dark);
+  min-height: 100vh;
+}
+
+/* Utility to center everything */
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
