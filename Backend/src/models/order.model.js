@@ -40,6 +40,11 @@ const orderSchema = new mongoose.Schema({
     transactionId  : {
         type: String,
     },
+    payment: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Payment",
+        default: null,
+    },
     createdAt: {
         type: Date,
         default: Date.now,

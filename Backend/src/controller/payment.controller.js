@@ -3,6 +3,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 import { generateHash } from "../utils/crypto.js";
 import { Order } from "../models/order.model.js";
 import { Cart } from "../models/cart.model.js";
+import { Payment } from "../models/payment.model.js";
 const createSignature = asyncHandler(async (req, res) => {
   const { total_amount, transaction_uuid, product_code } = req.body;
   console.log("Generating signature for:", {
@@ -70,6 +71,13 @@ const verifyPayment = asyncHandler(async (req, res) => {
       throw new Apierror(400, "Amount mismatch with eSewa response");
     }
   } catch (error) {
+    Payment.create({
+      userId,
+      transaction_uuid,
+      amount: total_amount,
+      paymentMethod: "ESewa",
+      status: "Failed",
+    });
     console.error("eSewa verification error:", error);
     if (error instanceof Apierror) {
       throw error;
@@ -104,6 +112,16 @@ const verifyPayment = asyncHandler(async (req, res) => {
     );
   }
 
+  // Record payment
+  const paymentRecord = await Payment.create({
+    userId,
+    transaction_uuid,
+    amount: total_amount,
+    paymentMethod: "ESewa",
+    status: "Success",
+    paidAt: new Date(),
+  });
+
   // Create order
   const order = await Order.create({
     user: userId,
@@ -116,12 +134,15 @@ const verifyPayment = asyncHandler(async (req, res) => {
     orderStatus: "Pending",
     paymentStatus: "Paid",
     transactionId: transaction_uuid,
+    payment : paymentRecord._id,
   });
 
   if (!order) {
     throw new Apierror(500, "Failed to create order");
   }
-
+   paymentRecord.orderId = order._id;
+  await paymentRecord.save();
+  
   // Update product stock
   for (let item of cart.products) {
     const product = item.productId;
