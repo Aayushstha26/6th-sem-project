@@ -107,6 +107,16 @@ const getNewArrivals = asyncHandler(async (req, res) => {
     products,
   });
 });
+const getTopRatedProducts = asyncHandler(async (req, res) => {
+  const products = await Product.find()
+    .populate("category")
+    .sort({ averageRating: -1 })
+    .limit(10);
+  return res.status(200).json({
+    results: products.length,
+    products,
+  });
+});
 const getProductById = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const product = await Product.findById(id).populate("category", "name");
@@ -152,6 +162,7 @@ export {
   addProduct,
   getProducts,
   getNewArrivals,
+  getTopRatedProducts,
   getProductById,
   deleteProduct,
   searchProducts,

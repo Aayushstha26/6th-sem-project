@@ -4,6 +4,7 @@ import {
   addProduct,
   getProducts,
   getNewArrivals,
+  getTopRatedProducts,
   getProductById,
   deleteProduct,
   searchProducts,
@@ -18,6 +19,7 @@ const router = Router();
 router.route("/add").post(upload.single("productImg"), addProduct);
 router.route("/products").get(getProducts);
 router.route("/new-arrivals").get(getNewArrivals);
+router.route("/top-rated").get(getTopRatedProducts);
 router.route("/search").post(searchProducts);
 router.route("/:id").get(getProductById);
 router.route("/delete/:id").delete(deleteProduct);
