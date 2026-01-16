@@ -663,4 +663,4 @@ function updateCartCountUi(count) {
 //     cartBadge.style.display = "flex";
 //   }
 // }
-export { updateNavbar , getCartCount, updateCartCountUi};
+export { updateNavbar , getCartCount, updateCartCountUi, showToast};

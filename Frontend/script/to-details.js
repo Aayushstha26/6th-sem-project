@@ -1,3 +1,5 @@
+import {  showToast} from "./slider.js";
+
 document.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const productId = urlParams.get("id");
@@ -158,10 +160,31 @@ function loadReviews(productId) {
   updateRatingSummary(reviews);
 }
 
-function saveReview(productId, review) {
-  const reviews = JSON.parse(localStorage.getItem(`reviews_${productId}`)) || [];
-  reviews.unshift(review); // Add to top
-  localStorage.setItem(`reviews_${productId}`, JSON.stringify(reviews));
+async function saveReview (productId, review) {
+  // const reviews = JSON.parse(localStorage.getItem(`reviews_${productId}`)) || [];
+  // reviews.unshift(review); // Add to top
+  // localStorage.setItem(`reviews_${productId}`, JSON.stringify(reviews));
+  const token = localStorage.getItem("accessToken");
+
+  const res = await fetch(`http://localhost:4000/product/rate/${productId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      rating: review.rating,
+      review: review.comment  
+    })
+  }).then((res)=> {
+    res.json();
+    showToast("Review submitted successfully", false);
+    console.log("Review submitted successfully"); 
+  }).catch(
+    (err) => {
+      console.error("Error submitting review:", err);
+      showToast("Error submitting review", true);
+    }
+  );
 }
 
 function renderReviews(reviews) {
