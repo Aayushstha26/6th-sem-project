@@ -150,6 +150,7 @@ async function renderView(viewName) {
             pageTitle.innerText = 'Order Management';
             const ordersRes = await fetchOrders();
             if(ordersRes && ordersRes.data) {
+                console.log("ordersRes.data",ordersRes.data);
                 container.innerHTML = getOrdersTemplate(ordersRes.data);
             } else {
                  container.innerHTML = `<p class="error-message">Failed to load orders.</p>`;
@@ -225,7 +226,7 @@ function getDashboardTemplate(data) {
                 </div>
                 <div>
                     <div class="stat-label">Total Revenue</div>
-                    <div class="stat-value">$${data.revenue.toLocaleString()}</div>
+                    <div class="stat-value">Rs. ${data.revenue.toLocaleString()}</div>
                     <div class="stat-change positive">↑ 23% from last month</div>
                 </div>
             </div>
@@ -426,31 +427,56 @@ function getOrdersTemplate(orders) {
     const completed = orders.filter(o => o.status === 'Delivered').length;
     const processing = orders.filter(o => o.status === 'Processing').length;
     const pending = orders.filter(o => o.status === 'Pending' || !o.status).length;
-    console.log(orders);
+
     const rows = orders.map(order => {
-        let statusColor = 'warning';
-        if(order.status === 'Delivered') statusColor = 'success';
-        if(order.status === 'Cancelled') statusColor = 'danger';
-        if(order.status === 'Processing') statusColor = 'info';
-        
+        // Product safe handling
+        const firstItem = order.items?.[0];
+        const firstProductName =
+            firstItem?.product?.product_name || "Product unavailable";
+
+        const productDisplay =
+            order.items && order.items.length > 1
+                ? `${firstProductName} + ${order.items.length - 1} more`
+                : firstProductName;
+
+        const totalQty = order.items
+            ? order.items.reduce((acc, item) => acc + (item.quantity || 0), 0)
+            : 0;
+
+        // Status color
+        const statusColor =
+            order.status === "Delivered"
+                ? "success"
+                : order.status === "Processing"
+                ? "info"
+                : "pending";
+
+        // User name safe handling
+        const customerName = order.user
+            ? `${order.user.Firstname || ""} ${order.user.Lastname || ""}`.trim() || "Unknown"
+            : "Unknown";
+
         return `
-        <tr>
-            <td>#ORD-${order._id.substring(0, 8).toUpperCase()}</td>
-            <td>${order.user ? (order.user.name || order.user.Firstname || 'Unknown') : 'Unknown'}</td>
-            <td>${order.product_name || 'Multiple Products'}</td>
-            <td>${order.quantity || 1}</td>
-            <td>$${order.totalAmount || order.amount || 0}</td>
-            <td>
-                <span class="badge ${statusColor}">
-                    ${order.status || 'Pending'}
-                </span>
-            </td>
-            <td>${new Date(order.createdAt).toLocaleDateString()}</td>
-            <td class="text-right">
-                <button class="icon-btn-sm" title="View Details" style="background: #3498db; color: white;">View</button>
-            </td>
-        </tr>
-    `}).join('');
+            <tr>
+                <td>#ORD-${order._id.slice(0, 8).toUpperCase()}</td>
+                <td>${customerName}</td>
+                <td>${productDisplay}</td>
+                <td>${totalQty}</td>
+                <td>Rs. ${order.totalAmount || order.amount || 0}</td>
+                <td>
+                    <span class="badge ${statusColor}">
+                        ${order.status || "Pending"}
+                    </span>
+                </td>
+                <td>${new Date(order.createdAt).toLocaleDateString()}</td>
+                <td class="text-right">
+                    <button class="icon-btn-sm" style="background:#3498db;color:white">
+                        View
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join("");
 
     return `
         <div class="page-header">
@@ -459,40 +485,25 @@ function getOrdersTemplate(orders) {
         </div>
 
         <div class="stats-grid">
-            <div class="stat-card" style="--card-color: #bfa37c; --card-bg: rgba(191, 163, 124, 0.1)">
-                <div class="stat-icon">🛒</div>
+            <div class="stat-card">
                 <div class="stat-label">Total Orders</div>
                 <div class="stat-value">${orderCount}</div>
             </div>
-            <div class="stat-card" style="--card-color: #2ecc71; --card-bg: rgba(46, 204, 113, 0.1)">
-                <div class="stat-icon">✅</div>
+            <div class="stat-card">
                 <div class="stat-label">Completed</div>
                 <div class="stat-value">${completed}</div>
             </div>
-            <div class="stat-card" style="--card-color: #fa7e1e; --card-bg: rgba(250, 126, 30, 0.1)">
-                <div class="stat-icon">⏳</div>
+            <div class="stat-card">
                 <div class="stat-label">Processing</div>
                 <div class="stat-value">${processing}</div>
             </div>
-            <div class="stat-card" style="--card-color: #f39c12; --card-bg: rgba(243, 156, 18, 0.1)">
-                <div class="stat-icon">📦</div>
+            <div class="stat-card">
                 <div class="stat-label">Pending</div>
                 <div class="stat-value">${pending}</div>
             </div>
         </div>
 
         <div class="card table-card">
-            <div class="table-header-action">
-                <div class="table-filters">
-                    <select class="filter-select">
-                        <option>All Status</option>
-                        <option>Completed</option>
-                        <option>Processing</option>
-                        <option>Pending</option>
-                    </select>
-                    <input type="date" class="filter-date">
-                </div>
-            </div>
             <div class="table-responsive">
                 <table class="data-table">
                     <thead>
@@ -500,7 +511,7 @@ function getOrdersTemplate(orders) {
                             <th>Order ID</th>
                             <th>Customer</th>
                             <th>Product</th>
-                            <th>Quantity</th>
+                            <th>Qty</th>
                             <th>Amount</th>
                             <th>Status</th>
                             <th>Date</th>
@@ -513,6 +524,7 @@ function getOrdersTemplate(orders) {
         </div>
     `;
 }
+
 
 // Category Module Functions
 async function fetchCategories() {
@@ -592,7 +604,7 @@ function getProductsTemplate(products) {
             </td>
             <td>${p.description ? p.description.substring(0, 30) + '...' : '-'}</td>
             <td>${p.category ? (p.category.name || p.category) : 'Uncategorized'}</td>
-            <td>$${p.price}</td>
+            <td>Rs${p.price}</td>
             <td>${p.stock}</td>
              <td>
                 <span class="badge ${stockStatus}">
@@ -747,7 +759,7 @@ function getAnalyticsTemplate(data) {
                     <div class="stat-icon">💰</div>
                 </div>
                 <div class="stat-label">Total Revenue</div>
-                <div class="stat-value">$${revenue.toLocaleString()}</div>
+                <div class="stat-value">Rs. ${revenue.toLocaleString()}</div>
                 <div class="stat-change positive">↑ ${percentageChange}% from last month</div>
             </div>
              <div class="stat-card" style="--card-color: #bfa37c; --card-bg: rgba(191, 163, 124, 0.1)">
@@ -834,7 +846,7 @@ function initAnalyticsCharts(data) {
                         type: 'linear',
                         display: true,
                         position: 'left',
-                        title: { display: true, text: 'Revenue ($)' }
+                        title: { display: true, text: 'Revenue (Rs.)' }
                     },
                     y1: {
                         type: 'linear',

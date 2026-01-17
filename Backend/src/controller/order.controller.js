@@ -47,7 +47,8 @@ const createOrder = asyncHandler(async (req, res) => {
 });
 
 const getAllOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find().populate("user", "name email");
+  const orders = (await Order.find().populate("user", "Firstname Lastname Email")
+  .populate({path:"items.product",select:"product_name price productImg"}));
   return res
     .status(200)
     .json(new Apiresponse(200, "Orders fetched successfully", orders));

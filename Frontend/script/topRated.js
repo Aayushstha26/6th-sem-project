@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <path d="M480 32L384 128L416 160L512 64L480 32Z" fill="#F4D190"/>
                 <path d="M512 64L480 32L448 64V96L480 128L512 96V64Z" fill="#E6C077"/>
               </svg>
-              <span class="product-price">RS. ${p.price}</span>
+              <span class="product-price">Rs. ${p.price}</span>
             </div>
           </div>
         </div>

@@ -558,7 +558,7 @@
     color: #155724;
 }
 
-.badge.warning, .status-pending {
+.badge.warning, .status-pending, .badge.pending {
     background: #fff3cd;
     color: #856404;
 }
@@ -568,7 +568,7 @@
     color: #721c24;
 }
 
-.badge.info, .status-processing {
+.badge.info, .status-processing, .badge.info {
     background: #d1ecf1;
     color: #0c5460;
 }

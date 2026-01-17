@@ -272,7 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <p><strong>Order ID:</strong> #ORD2023</p>
                 <p><strong>Item:</strong> Earring</p>
 
-        <p><strong>Amount:</strong> $320</p>
+        <p><strong>Amount:</strong> Rs. 320</p>
         <p><strong>Method:</strong> eSewa</p>
         <p><strong>Transaction Ref:</strong> TXN94853212</p>
         <p><strong>Status:</strong> <span class="status success">Successful</span></p>
@@ -287,7 +287,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <p><strong>Order ID:</strong> #ORD2022</p>
                 <p><strong>Item:</strong> Earring</p>
 
-        <p><strong>Amount:</strong> $85</p>
+        <p><strong>Amount:</strong> Rs. 85</p>
         <p><strong>Method:</strong> Cash on Delivery</p>
         <p><strong>Transaction Ref:</strong> TXN93248422</p>
         <p><strong>Status:</strong> <span class="status pending">Pending</span></p>
@@ -301,7 +301,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <h4>Payment #PAY1021</h4>
         <p><strong>Order ID:</strong> #ORD2021</p>
         <p><strong>Item:</strong> Earring</p>
-        <p><strong>Amount:</strong> $150</p>
+        <p><strong>Amount:</strong> Rs. 150</p>
         <p><strong>Method:</strong> Khalti</p>
         <p><strong>Transaction Ref:</strong> TXN92484102</p>
         <p><strong>Status:</strong> <span class="status failed">Failed</span></p>

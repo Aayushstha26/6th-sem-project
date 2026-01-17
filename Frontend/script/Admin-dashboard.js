@@ -148,7 +148,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <td>#ORD-2024-001</td>
                         <td>John Smith</td>
                         <td>Wireless Headphones</td>
-                        <td>$199.99</td>
+                        <td>Rs. 199.99</td>
                         <td><span class="status-badge status-completed">Completed</span></td>
                         <td>Dec 8, 2025</td>
                     </tr>
@@ -156,7 +156,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <td>#ORD-2024-002</td>
                         <td>Sarah Johnson</td>
                         <td>Smart Watch</td>
-                        <td>$349.99</td>
+                        <td>Rs. 349.99</td>
                         <td><span class="status-badge status-processing">Processing</span></td>
                         <td>Dec 8, 2025</td>
                     </tr>
@@ -164,7 +164,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <td>#ORD-2024-003</td>
                         <td>Mike Davis</td>
                         <td>Laptop Stand</td>
-                        <td>$79.99</td>
+                        <td>Rs. 79.99</td>
                         <td><span class="status-badge status-pending">Pending</span></td>
                         <td>Dec 7, 2025</td>
                     </tr>
@@ -336,7 +336,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <td>John Smith</td>
                         <td>Wireless Headphones</td>
                         <td>1</td>
-                        <td>$199.99</td>
+                        <td>Rs. 199.99</td>
                         <td><span class="status-badge status-completed">Completed</span></td>
                         <td>Dec 8, 2025</td>
                         <td>
@@ -348,7 +348,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <td>Sarah Johnson</td>
                         <td>Smart Watch</td>
                         <td>2</td>
-                        <td>$699.98</td>
+                        <td>Rs. 699.98</td>
                         <td><span class="status-badge status-processing">Processing</span></td>
                         <td>Dec 8, 2025</td>
                         <td>
@@ -360,7 +360,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <td>Mike Davis</td>
                         <td>Laptop Stand</td>
                         <td>1</td>
-                        <td>$79.99</td>
+                        <td>Rs. 79.99</td>
                         <td><span class="status-badge status-pending">Pending</span></td>
                         <td>Dec 7, 2025</td>
                         <td>
@@ -372,7 +372,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <td>Emily Brown</td>
                         <td>Mechanical Keyboard</td>
                         <td>1</td>
-                        <td>$159.99</td>
+                        <td>Rs. 159.99</td>
                         <td><span class="status-badge status-completed">Completed</span></td>
                         <td>Dec 7, 2025</td>
                         <td>
@@ -384,7 +384,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <td>David Wilson</td>
                         <td>USB-C Hub</td>
                         <td>3</td>
-                        <td>$149.97</td>
+                        <td>Rs. 149.97</td>
                         <td><span class="status-badge status-completed">Completed</span></td>
                         <td>Dec 6, 2025</td>
                         <td>
@@ -664,7 +664,7 @@ function renderAnalyticsCharts(data, products) {
                         type: 'linear',
                         display: true,
                         position: 'left',
-                        title: { display: true, text: 'Revenue ($)' }
+                        title: { display: true, text: 'Revenue (Rs.)' }
                     },
                     y1: {
                         type: 'linear',
