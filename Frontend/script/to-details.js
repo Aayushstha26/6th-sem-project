@@ -121,30 +121,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         e.preventDefault();
 
         const rating = document.querySelector('input[name="rating"]:checked')?.value;
-        const name = document.getElementById("reviewName").value;
         const comment = document.getElementById("reviewComment").value;
 
-        if (!rating || !name || !comment) {
+        if (!rating || !comment) {
           alert("Please fill in all fields");
           return;
         }
 
         const newReview = {
-          id: Date.now(),
           productId: productId,
           rating: parseInt(rating),
-          name: name,
           comment: comment,
-          date: new Date().toLocaleDateString()
         };
 
-        saveReview(productId, newReview);
-        reviewFormContainer.classList.add("hidden");
-        toggleReviewFormBtn.style.display = "inline-block";
-        reviewForm.reset();
+        saveReview(productId, newReview).then(() => {
+          reviewFormContainer.classList.add("hidden");
+          toggleReviewFormBtn.style.display = "inline-block";
+          reviewForm.reset();
 
-        // Refresh reviews
-        loadReviews(productId);
+          // Refresh reviews by fetching product again
+          window.location.reload(); // Simplest way for now without full refactor
+        });
       });
     }
   } catch (err) {
@@ -166,7 +163,7 @@ async function saveReview (productId, review) {
   // localStorage.setItem(`reviews_${productId}`, JSON.stringify(reviews));
   const token = localStorage.getItem("accessToken");
 
-  const res = await fetch(`http://localhost:4000/product/rate/${productId}`, {
+  return fetch(`http://localhost:4000/product/rate/${productId}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -176,7 +173,6 @@ async function saveReview (productId, review) {
       review: review.comment  
     })
   }).then((res)=> {
-    res.json();
     showToast("Review submitted successfully", false);
     console.log("Review submitted successfully"); 
   }).catch(
