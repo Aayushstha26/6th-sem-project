@@ -10,6 +10,7 @@ import {
   isValidRating,
   calculateAverageRating,
 } from "../utils/customRatingFunction.js";
+import { getTopRatedProductsManual } from "../utils/customTopRatedFunction.js";
 
 const addProduct = asyncHandler(async (req, res) => {
   const { product_name, description, price, category, stock } = req.body;
@@ -108,13 +109,13 @@ const getNewArrivals = asyncHandler(async (req, res) => {
   });
 });
 const getTopRatedProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find()
-    .populate("category")
-    .sort({ averageRating: -1 })
-    .limit(10);
+  const products = await Product.find().populate("category");
+  
+  const topRatedProducts = getTopRatedProductsManual(products, 5);
+
   return res.status(200).json({
-    results: products.length,
-    products,
+    results: topRatedProducts.length,
+    products: topRatedProducts,
   });
 });
 const getProductById = asyncHandler(async (req, res) => {
