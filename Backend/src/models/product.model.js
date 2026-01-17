@@ -43,6 +43,10 @@ const productSchema = new Schema({
             review: {
                 type: String,
             },
+            date: {
+                type: Date,
+                default: Date.now,
+            },
         }
     ],
     averageRating: {

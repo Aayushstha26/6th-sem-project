@@ -94,7 +94,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       product.description;
 
     // --- Ratings & Reviews Logic ---
-    loadReviews(productId);
+    loadReviews(product);
 
     const toggleReviewFormBtn = document.getElementById("toggleReviewFormBtn");
     const reviewFormContainer = document.getElementById("reviewFormContainer");
@@ -154,8 +154,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-function loadReviews(productId) {
-  const reviews = JSON.parse(localStorage.getItem(`reviews_${productId}`)) || [];
+function loadReviews(product) {
+ const reviews = product.ratings || [];
   renderReviews(reviews);
   updateRatingSummary(reviews);
 }
@@ -199,11 +199,11 @@ function renderReviews(reviews) {
   reviewsList.innerHTML = reviews.map(review => `
         <div class="review-card">
             <div class="review-header">
-                <span class="reviewer-name">${review.name}</span>
-                <span class="review-date">${review.date}</span>
+                <span class="reviewer-name">${review.user.Firstname + " " + review.user.Lastname}</span>
+                <span class="review-date">${new Date(review.date).toLocaleDateString()}</span>
             </div>
             <div class="review-stars">${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}</div>
-            <p class="review-text">${review.comment}</p>
+            <p class="review-text">${review.review}</p>
         </div>
     `).join("");
 }

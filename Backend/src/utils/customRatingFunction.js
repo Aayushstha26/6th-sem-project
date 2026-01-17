@@ -15,8 +15,9 @@ function addOrUpdateRating(ratingsArray, userId, rating, review = "")  {
     if (index !== -1) {
         ratingsArray[index].rating = rating;
         ratingsArray[index].review = review;
+        ratingsArray[index].date = new Date();
     } else {
-        ratingsArray.push({ user: userId, rating: rating , review: review });
+        ratingsArray.push({ user: userId, rating: rating , review: review, date: new Date() });
     }
     return ratingsArray;
 }

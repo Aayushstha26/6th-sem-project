@@ -49,8 +49,12 @@ const getProducts = asyncHandler(async (req, res) => {
     filter.category = cat?._id;
   }
   const products = await Product.find(filter)
-    .populate("category", "name")
-    .sort({ createdAt: -1 });
+  .populate("category", "name")
+  .populate({
+    path: "ratings.user",
+    select: "Firstname Lastname"
+  })
+  .sort({ createdAt: -1 });
   // if (search && search.trim()) {
   //   const searchTerm = search.trim().toLowerCase();
 
@@ -76,7 +80,12 @@ const searchProducts = asyncHandler(async (req, res) => {
     throw new Apierror(400, "Search term is required");
   }
   const searchTerm = search.trim().toLowerCase();
-  let products = await Product.find().populate("category", "name");
+  let products = await Product.find()
+    .populate("category", "name")
+    .populate({
+      path: "ratings.user",
+      select: "Firstname Lastname",
+    });
   if (!products || products.length === 0) {
     return res.status(200).json({
       results: 0,
@@ -101,6 +110,10 @@ const searchProducts = asyncHandler(async (req, res) => {
 const getNewArrivals = asyncHandler(async (req, res) => {
   const products = await Product.find()
     .populate("category")
+    .populate({
+      path: "ratings.user",
+      select: "Firstname Lastname",
+    })
     .sort({ createdAt: -1 })
     .limit(10);
   return res.status(200).json({
@@ -109,7 +122,12 @@ const getNewArrivals = asyncHandler(async (req, res) => {
   });
 });
 const getTopRatedProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find().populate("category");
+  const products = await Product.find()
+    .populate("category")
+    .populate({
+      path: "ratings.user",
+      select: "Firstname Lastname",
+    });
   
   const topRatedProducts = getTopRatedProductsManual(products, 5);
 
@@ -120,7 +138,12 @@ const getTopRatedProducts = asyncHandler(async (req, res) => {
 });
 const getProductById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const product = await Product.findById(id).populate("category", "name");
+  const product = await Product.findById(id)
+    .populate("category", "name")
+    .populate({
+      path: "ratings.user",
+      select: "Firstname Lastname",
+    });
   if (!product) {
     throw new Apierror(404, "Product not found");
   }
@@ -159,6 +182,7 @@ const rateProduct = asyncHandler(async (req, res) => {
     .status(200)
     .json(new Apiresponse(200, "Product rated successfully"));
 });
+
 export {
   addProduct,
   getProducts,
