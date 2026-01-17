@@ -327,7 +327,6 @@ function getUsersTemplate(users) {
             <td>${user.Phone || user.phone || 'N/A'}</td>
             <td>${new Date(user.createdAt || Date.now()).toLocaleDateString()}</td>
             <td>
-                <button style="padding: 4px 8px; margin: 0 2px; border: none; border-radius: 4px; cursor: pointer; background: #3498db; color: white;">Edit</button>
                 <button style="padding: 4px 8px; margin: 0 2px; border: none; border-radius: 4px; cursor: pointer; background: #e74c3c; color: white;">Delete</button>
             </td>
         </tr>
@@ -424,9 +423,9 @@ async function fetchOrders() {
 
 function getOrdersTemplate(orders) {
     const orderCount = orders.length;
-    const completed = orders.filter(o => o.status === 'Delivered').length;
-    const processing = orders.filter(o => o.status === 'Processing').length;
-    const pending = orders.filter(o => o.status === 'Pending' || !o.status).length;
+    const completed = orders.filter(o => o.orderStatus === 'Delivered').length;
+    const processing = orders.filter(o => o.orderStatus === 'Processing').length;
+    const pending = orders.filter(o => o.orderStatus === 'Pending' || !o.orderStatus).length;
 
     const rows = orders.map(order => {
         // Product safe handling
@@ -445,9 +444,9 @@ function getOrdersTemplate(orders) {
 
         // Status color
         const statusColor =
-            order.status === "Delivered"
+            order.orderStatus === "Delivered"
                 ? "success"
-                : order.status === "Processing"
+                : order.orderStatus === "Processing"
                 ? "info"
                 : "pending";
 
@@ -465,12 +464,12 @@ function getOrdersTemplate(orders) {
                 <td>Rs. ${order.totalAmount || order.amount || 0}</td>
                 <td>
                     <span class="badge ${statusColor}">
-                        ${order.status || "Pending"}
+                        ${order.orderStatus || "Pending"}
                     </span>
                 </td>
                 <td>${new Date(order.createdAt).toLocaleDateString()}</td>
                 <td class="text-right">
-                    <button class="icon-btn-sm" style="background:#3498db;color:white">
+                    <button class="icon-btn-sm" style="background:#3498db;color:white" onclick="viewOrder('${order._id}')">
                         View
                     </button>
                 </td>
@@ -493,10 +492,7 @@ function getOrdersTemplate(orders) {
                 <div class="stat-label">Completed</div>
                 <div class="stat-value">${completed}</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-label">Processing</div>
-                <div class="stat-value">${processing}</div>
-            </div>
+           
             <div class="stat-card">
                 <div class="stat-label">Pending</div>
                 <div class="stat-value">${pending}</div>
@@ -918,6 +914,146 @@ window.deleteProduct = async (id) => {
     } catch (error) {
         console.error('Delete error:', error);
         showToast('Failed to delete product', 'error');
+    }
+};
+
+window.viewOrder = async (id) => {
+    try {
+        const res = await apiCall(`http://localhost:4000/order/${id}`);
+        if (!res || !res.data) {
+            showToast('Order details not found', 'error');
+            return;
+        }
+
+        const order = res.data;
+        console.log(order);
+        const itemsList = order.items.map(item => `
+            <div class="order-item-card">
+                <div class="order-item-left">
+                    <div class="order-item-img-placeholder">📦</div>
+                    <div class="order-item-content">
+                        <div class="order-item-name">${item.product?.product_name || 'Product unavailable'}</div>
+                        <div class="order-item-meta">Qty: ${item.quantity} × Rs. ${item.price}</div>
+                    </div>
+                </div>
+                <div class="order-item-total">Rs. ${item.quantity * item.price}</div>
+            </div>
+        `).join('');
+
+        const modalOverlay = document.createElement('div');
+        modalOverlay.className = 'confirm-modal-overlay show'; 
+        modalOverlay.style.zIndex = '2000';
+
+        modalOverlay.innerHTML = `
+            <div class="confirm-modal order-details-modal">
+                <div class="modal-header">
+                    <h2>Order Details</h2>
+                    <span class="material-icons-round" id="closeOrderModal" style="cursor: pointer;">close</span>
+                </div>
+                
+                <div class="order-info-grid">
+                    <div class="order-info-item">
+                        <div class="info-label">Customer</div>
+                        <div class="info-value">${order.user?.Firstname} ${order.user?.Lastname}</div>
+                        <div class="info-meta text-xs text-muted">${order.user?.Email}</div>
+                    </div>
+                    <div class="order-info-item">
+                        <div class="info-label">Order Date</div>
+                        <div class="info-value">${new Date(order.createdAt).toLocaleDateString()}</div>
+                        <div class="info-meta text-xs text-muted">${new Date(order.createdAt).toLocaleTimeString()}</div>
+                    </div>
+                    <div class="order-info-item">
+                        <div class="info-label">Order ID</div>
+                        <div class="info-value primary">#ORD-${order._id.toUpperCase()}</div>
+                    </div>
+                    <div class="order-info-item">
+                        <div class="info-label">Status</div>
+                        <div class="status-update-container">
+                            <span class="badge ${order.orderStatus === 'Delivered' ? 'success' : 'pending'}">${order.orderStatus || 'Pending'}</span>
+                            <select id="updateStatusSelect" class="status-select">
+                                <option value="Pending" ${order.orderStatus === 'Pending' ? 'selected' : ''}>Pending</option>
+                                <option value="Delivered" ${order.orderStatus === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                                <option value="Cancelled" ${order.orderStatus === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                            </select>
+                            <button class="btn-primary-sm" id="saveStatusBtn" style="padding: 4px 10px; font-size: 11px;">Update</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-items-section">
+                    <div class="order-items-section-title">Order Items</div>
+                    ${itemsList}
+                </div>
+
+                <div class="order-summary-footer">
+                    <div class="total-row">
+                        <span class="total-label">Total Amount</span>
+                        <span class="total-amount">Rs. ${order.amount || 0}</span>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="confirm-modal-btn btn-cancel" id="closeOrderModalBtn">Close</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modalOverlay);
+
+        const closeModal = () => {
+            modalOverlay.classList.remove('show');
+            setTimeout(() => modalOverlay.remove(), 300);
+        };
+
+        modalOverlay.querySelector('#closeOrderModal').onclick = closeModal;
+        modalOverlay.querySelector('#closeOrderModalBtn').onclick = closeModal;
+        
+        modalOverlay.querySelector('#saveStatusBtn').onclick = async () => {
+            const newStatus = modalOverlay.querySelector('#updateStatusSelect').value;
+            if (newStatus === order.orderStatus) {
+                showToast('Status is already ' + newStatus, 'info');
+                return;
+            }
+            const success = await updateOrderStatus(order._id, newStatus);
+            if (success) {
+                closeModal();
+                renderView('orders'); // Refresh the list
+            }
+        };
+
+        modalOverlay.onclick = (e) => {
+            if (e.target === modalOverlay) closeModal();
+        };
+
+    } catch (error) {
+        console.error('Fetch order details error:', error);
+        showToast('Failed to fetch order details', 'error');
+    }
+};
+
+window.updateOrderStatus = async (id, status) => {
+    try {
+        const res = await fetch(`http://localhost:4000/order/update-status/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+            },
+            body: JSON.stringify({ status })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+            showToast('Order status updated successfully', 'success');
+            return true;
+        } else {
+            showToast(data.message || 'Failed to update status', 'error');
+            return false;
+        }
+    } catch (error) {
+        console.error('Update status error:', error);
+        showToast('Error updating order status', 'error');
+        return false;
     }
 };
 

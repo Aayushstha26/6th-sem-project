@@ -1,11 +1,11 @@
 /* Standardized Notifications */
 :root {
     --notif-primary: #d62976;
-    --notif-success: #10b981;
-    --notif-danger: #ef4444;
-    --notif-warning: #f59e0b;
-    --notif-info: #2196f3;
-    --notif-text: #2d1f12;
+    --notif-success: #059669; /* Slightly darker/richer emerald */
+    --notif-danger: #dc2626; /* Slightly richer red */
+    --notif-warning: #d97706; /* Richer amber */
+    --notif-info: #0284c7; /* Richer blue */
+    --notif-text: #ffffff;  /* Changed to white for colored backgrounds */
     --notif-bg: #ffffff;
 }
 
@@ -21,28 +21,29 @@
 }
 
 .toast {
-    background: var(--notif-bg);
+    background: #333; /* Default dark background for contrast */
     color: var(--notif-text);
-    padding: 16px 24px;
+    padding: 16px 20px;
     border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
     display: flex;
     align-items: center;
     gap: 12px;
-    min-width: 300px;
+    min-width: 320px;
     transform: translateX(120%);
-    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    border-left: 4px solid var(--notif-primary);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(8px);
 }
 
 .toast.show {
     transform: translateX(0);
 }
 
-.toast.error { border-left-color: var(--notif-danger); }
-.toast.success { border-left-color: var(--notif-success); }
-.toast.warning { border-left-color: var(--notif-warning); }
-.toast.info { border-left-color: var(--notif-info); }
+.toast.error { background: var(--notif-danger); border-color: rgba(255,255,255,0.2); }
+.toast.success { background: var(--notif-success); border-color: rgba(255,255,255,0.2); }
+.toast.warning { background: var(--notif-warning); border-color: rgba(255,255,255,0.2); }
+.toast.info { background: var(--notif-info); border-color: rgba(255,255,255,0.2); }
 
 .toast-icon {
     font-size: 24px;
