@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <title>Login</title>
     <link rel="stylesheet" href="../styles/Admin-login.css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/notifications.css" />
   </head>
   <body>
     <div class="login-wrapper">
@@ -58,16 +60,16 @@
           if (response.ok) {
            
             localStorage.setItem("adminToken", data.accessToken);
-            // Redirect to admin dashboard
             window.location.href = "../template/admin-v2/dashboard.html";
           } else {
-            alert(data.message || "Login failed");
+            showToast(data.message || "Login failed", "error");
           }
         } catch (error) {
           console.error("Error during login:", error);
-          alert("An error occurred. Please try again.");
+          showToast("An error occurred. Please try again.", "error");
         }
       });
   </script>
+  <script src="../script/notifications.js"></script>
 
 </html>

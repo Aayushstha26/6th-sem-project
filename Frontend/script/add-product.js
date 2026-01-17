@@ -17,22 +17,49 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (error) {
     console.log("Error while fetching categories:", error);
   }
+
+  // Handle Edit Mode
+  const urlParams = new URLSearchParams(window.location.search);
+  const productId = urlParams.get("id");
+
+  if (productId) {
+    document.querySelector("h2").textContent = "Edit Product";
+    document.querySelector(".submit-btn").textContent = "Update Product";
+    const productImageInput = document.getElementById("productImage");
+    productImageInput.required = false; // Make image optional for edit
+
+    try {
+      const res = await fetch(`http://localhost:4000/product/${productId}`);
+      const data = await res.json();
+      if (res.ok) {
+        document.getElementById("productName").value = data.product.product_name;
+        document.getElementById("productPrice").value = data.product.price;
+        document.getElementById("productDesc").value = data.product.description;
+        document.getElementById("productStock").value = data.product.stock;
+        document.getElementById("productCategory").value = data.product.category._id || data.product.category;
+      }
+    } catch (error) {
+      console.error("Error fetching product details:", error);
+    }
+  }
 });
 
+let addProductForm = document.getElementById("addProductForm");
 addProductForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  let addProductForm = document.getElementById("addProductForm");
+  
+  const urlParams = new URLSearchParams(window.location.search);
+  const productId = urlParams.get("id");
+
   let productName = document.getElementById("productName");
   let productPrice = document.getElementById("productPrice");
   let productDesc = document.getElementById("productDesc");
-  let productImage = document.getElementById("productImage"); // should be type="file"
+  let productImage = document.getElementById("productImage");
   let productStock = document.getElementById("productStock");
   let formResults = document.getElementById("formResults");
-
   let category = document.getElementById("productCategory").value;
-  console.log(category);
+
   try {
-    // use FormData, not JSON
     const formData = new FormData();
     formData.append("product_name", productName.value);
     formData.append("price", productPrice.value);
@@ -40,28 +67,67 @@ addProductForm.addEventListener("submit", async (e) => {
     formData.append("category", category);
     formData.append("stock", productStock.value);
 
-    // append the file (important!)
     if (productImage.files.length > 0) {
       formData.append("productImg", productImage.files[0]);
     }
 
-    const req = await fetch("http://localhost:4000/product/add", {
-      method: "POST",
-      body: formData, // no need for headers, FormData sets it
+    const url = productId 
+      ? `http://localhost:4000/product/update/${productId}` 
+      : "http://localhost:4000/product/add";
+    
+    const method = productId ? "PUT" : "POST";
+
+    const req = await fetch(url, {
+      method: method,
+      body: formData,
     });
 
     const result = await req.json();
-    formResults.innerHTML = result.message;
-
+    
     if (req.ok) {
-      formResults.style.color = "green";    
-      addProductForm.reset();
+      showToast(productId ? "Product updated successfully!" : "Product added successfully!", "success");
+      
+      if (!productId) {
+        addProductForm.reset();
+      } else {
+        setTimeout(() => {
+          window.location.href = "/admin-v2/dashboard"; 
+        }, 2000);
+      }
     } else {
-      formResults.style.color = "red";
+      showToast(result.message || "Error occurred", "error");
     }
   } catch (error) {
-    formResults.innerHTML = "Error while submitting form";
-    formResults.style.color = "red";
+    showToast("Error while submitting form", "error");
     console.error(error);
   }
 });
+
+// Defining a fallback showToast if not globally available (though it should be if dashboard.js is loaded, 
+// but add-product.html might be standalone).
+function showToast(message, type = 'info') {
+    // Check if parent window has showToast
+    if (window.parent && window.parent.showToast) {
+        window.parent.showToast(message, type);
+        return;
+    }
+    
+    // Local implementation for standalone add-product.html
+    const existingToast = document.querySelector('.toast');
+    if (existingToast) existingToast.remove();
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type} show`; // Force show since we don't have the fancy dashboard animations here easily without more CSS
+    toast.style.position = 'fixed';
+    toast.style.top = '20px';
+    toast.style.right = '20px';
+    toast.style.padding = '16px 24px';
+    toast.style.background = type === 'error' ? '#ef4444' : '#10b981';
+    toast.style.color = 'white';
+    toast.style.borderRadius = '8px';
+    toast.style.zIndex = '10000';
+    toast.innerHTML = message;
+
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 4000);
+}

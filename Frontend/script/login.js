@@ -103,7 +103,7 @@ window.addEventListener("DOMContentLoaded", () => {
           // Example: access user's name
           console.log("User Name:", decoded.username);
         } else {
-          alert(data.message || "Login failed");
+          showToast(data.message || "Login failed", "error");
         }
         // alert(result.message);
       } catch (err) {

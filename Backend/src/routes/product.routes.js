@@ -7,6 +7,7 @@ import {
   getTopRatedProducts,
   getProductById,
   deleteProduct,
+  updateProduct,
   searchProducts,
   rateProduct,
 } from "../controller/product.controller.js";
@@ -23,6 +24,7 @@ router.route("/top-rated").get(getTopRatedProducts);
 router.route("/search").post(searchProducts);
 router.route("/:id").get(getProductById);
 router.route("/delete/:id").delete(deleteProduct);
+router.route("/update/:id").put(upload.single("productImg"), updateProduct);
 router.route("/rate/:id").post( verifyJwt,rateProduct);
 // router.get("/product-page", (req, res) => {
 //   const productPath = path.resolve("../frontend/template/Products.html");

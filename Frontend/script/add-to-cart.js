@@ -1,4 +1,4 @@
-// import { updateCartCountUi, getCartCount} from "./slider.js";
+import { updateCartCountUi, getCartCount} from "./slider.js";
 document.addEventListener("DOMContentLoaded", async () => {
   const qty = document.getElementById("quantity");
   const addToCartBtn = document.querySelectorAll(".cart-btn");
@@ -15,7 +15,7 @@ if (token) {
       
 
       if (!token) {
-        alert("Please login to add items to your cart.");
+        showToast("Please login to add items to your cart.", "warning");
         return;
       }
 
@@ -36,50 +36,55 @@ if (token) {
 
         const data = await res.json();
         console.log(data);
-        alert("Item added to cart successfully!");
-        addToCart(); // Update cart count in UI
+        showToast("Item added to cart successfully!", "success");
+        updateCartCountUi(); 
+        setTimeout(() => {
+          
+          location.reload();
+        }, 2000);
+      
       } catch (err) {
         console.error("Failed to add item to cart", err);
-        alert("Failed to add item to cart. Please try again.");
+        showToast("Failed to add item to cart. Please try again.", "error");
       }
     });
   });
 });
-function getCartCount() {
-  const count = localStorage.getItem('cartCount');
-  return count ? parseInt(count) : 0;
-}
+// function getCartCount() {
+//   const count = localStorage.getItem('cartCount');
+//   return count ? parseInt(count) : 0;
+// }
 
 // Update cart count in localStorage and UI
-function updateCartCount(count) {
-  // Save to localStorage
-  localStorage.setItem('cartCount', count);
+// function updateCartCount(count) {
+//   // Save to localStorage
+//   localStorage.setItem('cartCount', count);
  
   
-  // Update the badge
-  const cartBadge = document.getElementById('cart-count');
-  cartBadge.textContent = count;
+//   // Update the badge
+//   const cartBadge = document.getElementById('cart-count');
+//   cartBadge.textContent = count;
   
-  // Hide badge if count is 0
-  if (count === 0) {
-    cartBadge.style.display = 'none';
-  } else {
-    cartBadge.style.display = 'flex';
-  }
-}
+//   // Hide badge if count is 0
+//   if (count === 0) {
+//     cartBadge.style.display = 'none';
+//   } else {
+//     cartBadge.style.display = 'flex';
+//   }
+// }
 
-// Add item to cart
-function addToCart() {
-  let currentCount = getCartCount();
-  currentCount++;
-  updateCartCount(currentCount);
-}
+// // Add item to cart
+// function addToCart() {
+//   let currentCount = getCartCount();
+//   currentCount++;
+//   updateCartCount(currentCount);
+// }
 
-// Remove item from cart
-function removeFromCart() {
-  let currentCount = getCartCount();
-  if (currentCount > 0) {
-    currentCount--;
-    updateCartCount(currentCount);
-  }
-}
+// // Remove item from cart
+// function removeFromCart() {
+//   let currentCount = getCartCount();
+//   if (currentCount > 0) {
+//     currentCount--;
+//     updateCartCount(currentCount);
+//   }
+// }

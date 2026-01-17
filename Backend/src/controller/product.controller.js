@@ -183,6 +183,37 @@ const rateProduct = asyncHandler(async (req, res) => {
     .json(new Apiresponse(200, "Product rated successfully"));
 });
 
+const updateProduct = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { product_name, description, price, category, stock } = req.body;
+
+  const product = await Product.findById(id);
+  if (!product) {
+    throw new Apierror(404, "Product not found");
+  }
+
+  if (product_name) product.product_name = product_name;
+  if (description) product.description = description;
+  if (price) product.price = price;
+  if (category) product.category = category;
+  if (stock !== undefined) product.stock = stock;
+
+  if (req.file) {
+    const productLocalPath = req.file.path;
+    const productImg = await uploadOnCloudinary(productLocalPath);
+    if (!productImg) {
+      throw new Apierror(500, "Error while uploading new image");
+    }
+    product.productImg = productImg.url;
+  }
+
+  await product.save();
+
+  return res
+    .status(200)
+    .json(new Apiresponse(200, "Product updated successfully", product));
+});
+
 export {
   addProduct,
   getProducts,
@@ -190,6 +221,7 @@ export {
   getTopRatedProducts,
   getProductById,
   deleteProduct,
+  updateProduct,
   searchProducts,
   rateProduct,
 };

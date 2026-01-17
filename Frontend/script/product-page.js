@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     e.preventDefault();
     const searchTerm = searchBox.value.trim();
     if (searchTerm.length === 0) {
-      alert("Please enter a search term.");
+      showToast("Please enter a search term.", "warning");
       return;
     }
     search(searchTerm);

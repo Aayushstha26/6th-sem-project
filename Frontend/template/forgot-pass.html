@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forgot Password</title>
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/notifications.css" />
     <style>
         * {
             margin: 0;
@@ -354,7 +356,7 @@
         function goBackToLogin(e) {
             e.preventDefault();
             // In a real application, this would navigate to the login page
-            alert('Redirecting to login page...');
+            showToast('Redirecting to login page...', 'info');
         }
 
         // Real-time email validation
@@ -366,5 +368,6 @@
             }
         });
     </script>
+    <script src="../script/notifications.js"></script>
 </body>
 </html>

@@ -1,14 +1,5 @@
 import { updateNavbar } from "./slider.js";
 
-function showToast(message) {
-  const toast = document.createElement("div");
-  toast.className = "toast";
-  toast.innerText = message;
-
-  document.body.appendChild(toast);
-
-  setTimeout(() => toast.remove(), 4000);
-}
 
 window.addEventListener("DOMContentLoaded", async () => {
   let form = document.getElementById("address-form");
@@ -21,7 +12,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   const token = localStorage.getItem("accessToken");
   if (!token) {
-    showToast("Please login to add your address.");
+    showToast("Please login to add your address.", "warning");
     return;
   }
 
@@ -198,7 +189,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       const result = await res.json();
 
       if (res.ok) {
-        alert(result.message);
+        showToast(result.message, "success");
 
         // Prepare payment
         let product_code = "EPAYTEST";
@@ -237,11 +228,11 @@ window.addEventListener("DOMContentLoaded", async () => {
 
         form.reset();
       } else {
-        alert(result.message || "Failed to save address");
+        showToast(result.message || "Failed to save address", "error");
       }
     } catch (err) {
       console.error("Failed to save address", err);
-      alert("Error saving address. Please try again.");
+      showToast("Error saving address. Please try again.", "error");
     }
   });
 
@@ -257,7 +248,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   });
 
   if (!cartItems.ok) {
-    alert("Failed to fetch cart items.");
+    showToast("Failed to fetch cart items.", "error");
     return;
   }
 

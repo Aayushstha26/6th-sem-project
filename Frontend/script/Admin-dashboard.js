@@ -527,7 +527,7 @@ document
       });
 
       if (res.ok) {
-        alert("Category added");
+        showToast("Category added", "success");
         input.value = "";
         renderCategories(categoryData.data);
       }

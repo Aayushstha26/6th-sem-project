@@ -612,8 +612,8 @@ function getProductsTemplate(products) {
                 </span>
             </td>
             <td class="text-right">
-                <button class="icon-btn-sm" title="Edit"><span class="material-icons-round">edit</span></button>
-                <button class="icon-btn-sm danger" title="Delete"><span class="material-icons-round">delete</span></button>
+                <button class="icon-btn-sm" title="Edit" onclick="editProduct('${p._id}')"><span class="material-icons-round">edit</span></button>
+                <button class="icon-btn-sm danger" title="Delete" onclick="deleteProduct('${p._id}')"><span class="material-icons-round">delete</span></button>
             </td>
         </tr>
     `}).join('');
@@ -886,3 +886,105 @@ function initAnalyticsCharts(data) {
         });
     }
 }
+// Product Actions
+window.editProduct = (id) => {
+    window.location.href = `/add-product?id=${id}`;
+};
+
+window.deleteProduct = async (id) => {
+    const confirmed = await showConfirm(
+        'Delete Product',
+        'Are you sure you want to delete this product? This action cannot be undone.'
+    );
+    
+    if (!confirmed) return;
+
+    try {
+        const res = await fetch(`http://localhost:4000/product/delete/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+            }
+        });
+
+        if (res.ok) {
+            showToast('Product deleted successfully', 'success');
+            // Refresh products
+            renderView('products');
+        } else {
+            const data = await res.json();
+            showToast(data.message || 'Error deleting product', 'error');
+        }
+    } catch (error) {
+        console.error('Delete error:', error);
+        showToast('Failed to delete product', 'error');
+    }
+};
+
+// --- Notifications & Modals ---
+
+window.showToast = (message, type = 'info') => {
+    const existingToast = document.querySelector('.toast');
+    if (existingToast) existingToast.remove();
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    let icon = 'info';
+    if (type === 'success') icon = 'check_circle';
+    if (type === 'error') icon = 'error';
+    if (type === 'warning') icon = 'warning';
+
+    toast.innerHTML = `
+        <span class="material-icons-round toast-icon">${icon}</span>
+        <span class="toast-message">${message}</span>
+    `;
+
+    document.body.appendChild(toast);
+    
+    // Animate in
+    setTimeout(() => toast.classList.add('show'), 100);
+
+    // Auto remove
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+};
+
+window.showConfirm = (title, message) => {
+    return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.className = 'confirm-modal-overlay';
+        
+        overlay.innerHTML = `
+            <div class="confirm-modal">
+                <div class="confirm-modal-title">${title}</div>
+                <div class="confirm-modal-message">${message}</div>
+                <div class="confirm-modal-actions">
+                    <button class="confirm-modal-btn btn-cancel">Cancel</button>
+                    <button class="confirm-modal-btn btn-confirm-danger">Delete</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+        
+        // Animate in
+        setTimeout(() => overlay.classList.add('show'), 10);
+
+        const close = (result) => {
+            overlay.classList.remove('show');
+            setTimeout(() => {
+                overlay.remove();
+                resolve(result);
+            }, 300);
+        };
+
+        overlay.querySelector('.btn-cancel').onclick = () => close(false);
+        overlay.querySelector('.btn-confirm-danger').onclick = () => close(true);
+        overlay.onclick = (e) => {
+            if (e.target === overlay) close(false);
+        };
+    });
+};

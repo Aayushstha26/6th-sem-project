@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const token = localStorage.getItem("accessToken");
   if (!token) {
     // window.location.href = "/signin";
-    alert("Please login to access the cart.");
+    showToast("Please login to access the cart.", "warning");
     return;
   } else {
     updateNavbar(false);

@@ -252,7 +252,7 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     const searchTerm = searchBox.value.trim();
     if (searchTerm.length === 0) {
-      alert("Please enter a search term.");
+      showToast("Please enter a search term.", "warning");
       return;
     }
     search(searchTerm);
@@ -466,10 +466,10 @@ document.addEventListener("DOMContentLoaded", () => {
               loginModal.style.display = "none";
               console.log("User Name:", decoded.username);
             } else {
-              alert(data.message || "Login failed");
+              showToast(data.message || "Login failed", "error");
             }
           } catch (err) {
-            alert("Error: " + err.message);
+            showToast("Error: " + err.message, "error");
           }
         });
         function parseJwt(token) {
@@ -605,20 +605,6 @@ function updateNavbar(showSearchBox = true) {
     updateNavbar(); // refresh
   });
 }
-function showToast(message) {
-  const toast = document.createElement("div");
-  toast.className = "toast";
-  toast.innerHTML = `
-    <img src="../images/check.png" class="toast-icon" alt="Success" />
-    <span class="toast-message">${message}</span>
-  `;
-
-  document.body.appendChild(toast);
-
-  setTimeout(() => {
-    toast.remove();
-  }, 3500);
-}
 // function getCartCount() {
 //   const count = localStorage.getItem("cartCount");
 //   return count ? parseInt(count) : 0;
@@ -663,4 +649,4 @@ function updateCartCountUi(count) {
 //     cartBadge.style.display = "flex";
 //   }
 // }
-export { updateNavbar , getCartCount, updateCartCountUi, showToast};
+export { updateNavbar , getCartCount, updateCartCountUi};

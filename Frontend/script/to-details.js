@@ -1,5 +1,4 @@
-import {  showToast} from "./slider.js";
-
+import { updateCartCountUi, getCartCount} from "./slider.js";
 document.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const productId = urlParams.get("id");
@@ -124,7 +123,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const comment = document.getElementById("reviewComment").value;
 
         if (!rating || !comment) {
-          alert("Please fill in all fields");
+          showToast("Please fill in all fields", "warning");
           return;
         }
 
@@ -173,12 +172,12 @@ async function saveReview (productId, review) {
       review: review.comment  
     })
   }).then((res)=> {
-    showToast("Review submitted successfully", false);
+    showToast("Review submitted successfully", "success");
     console.log("Review submitted successfully"); 
   }).catch(
     (err) => {
       console.error("Error submitting review:", err);
-      showToast("Error submitting review", true);
+      showToast("Error submitting review", "error");
     }
   );
 }
