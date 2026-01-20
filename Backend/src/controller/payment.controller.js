@@ -1,9 +1,11 @@
+// import mongoose from "mongoose";
 import { Apierror } from "../utils/apiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { generateHash } from "../utils/crypto.js";
 import { Order } from "../models/order.model.js";
 import { Cart } from "../models/cart.model.js";
 import { Payment } from "../models/payment.model.js";
+import { Product } from "../models/product.model.js";
 const createSignature = asyncHandler(async (req, res) => {
   const { total_amount, transaction_uuid, product_code } = req.body;
   console.log("Generating signature for:", {
@@ -162,4 +164,101 @@ const verifyPayment = asyncHandler(async (req, res) => {
   });
 });
 
-export { createSignature, verifyPayment };
+import mongoose from "mongoose";
+
+const createCODPayment = asyncHandler(async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const userId = req.user._id;
+
+    const cart = await Cart.findOne({ userId })
+      .populate("products.productId", "product_name price stock")
+      .session(session);
+
+    if (!cart || cart.products.length === 0) {
+      throw new Apierror(400, "Cart is empty");
+    }
+
+    let totalAmount = 0;
+
+    // ✅ STOCK VALIDATION FIRST
+    for (let item of cart.products) {
+      if (item.productId.stock < item.quantity) {
+        throw new Apierror(
+          400,
+          `Insufficient stock for ${item.productId.product_name}`
+        );
+      }
+      totalAmount += item.productId.price * item.quantity;
+    }
+
+    // ✅ PAYMENT
+    const payment = await Payment.create(
+      [{
+        userId,
+        transaction_uuid: `COD-${Date.now()}`,
+        amount: totalAmount,
+        paymentMethod: "CashOnDelivery",
+        status: "Pending",
+        paidAt: null,
+      }],
+      { session }
+    );
+
+    // ✅ ORDER
+    const order = await Order.create(
+      [{
+        user: userId,
+        items: cart.products.map(item => ({
+          product: item.productId._id,
+          quantity: item.quantity,
+          price: item.productId.price,
+        })),
+        amount: totalAmount,
+        orderStatus: "Pending",
+        paymentStatus: "Pending",
+        transactionId: payment[0].transaction_uuid,
+        payment: payment[0]._id,
+      }],
+      { session }
+    );
+
+    // Link payment → order
+    payment[0].orderId = order[0]._id;
+    await payment[0].save({ session });
+
+    // ✅ UPDATE STOCK
+    for (let item of cart.products) {
+      await Product.updateOne(
+        { _id: item.productId._id },
+        { $inc: { stock: -item.quantity } },
+        { session }
+      );
+    }
+
+    // ✅ CLEAR CART
+    cart.products = [];
+    cart.totalAmount = 0;
+    await cart.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return res.status(201).json({
+      success: true,
+      message: "COD order placed successfully",
+      orderId: order[0]._id,
+    });
+
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+});
+
+  
+
+export { createSignature, verifyPayment , createCODPayment };
