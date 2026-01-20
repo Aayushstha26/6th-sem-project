@@ -1,4 +1,4 @@
-// import mongoose from "mongoose";
+import mongoose from "mongoose";
 import { Apierror } from "../utils/apiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { generateHash } from "../utils/crypto.js";
@@ -164,7 +164,6 @@ const verifyPayment = asyncHandler(async (req, res) => {
   });
 });
 
-import mongoose from "mongoose";
 
 const createCODPayment = asyncHandler(async (req, res) => {
   const session = await mongoose.startSession();
