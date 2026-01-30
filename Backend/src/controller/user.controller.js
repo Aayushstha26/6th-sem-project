@@ -153,8 +153,11 @@ const changePassword = asyncHandler(async (req, res) => {
     .json(new Apiresponse(200, "Password changed successfully")); 
 });
 const deleteUser = asyncHandler(async (req, res) => {
-  const userId = req.params.id;
-  const user = await User.findByIdAndDelete(userId);
+  const {id} = req.params;
+  if (!id) {
+    throw new Apierror(400, "User ID is required");
+  }
+  const user = await User.findByIdAndDelete(id);
   if (!user) {
     throw new Apierror(404, "User not found");
   }
