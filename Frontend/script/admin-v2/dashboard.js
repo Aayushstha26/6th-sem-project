@@ -1,186 +1,190 @@
 /* Dashboard Logic for Admin v2 */
 
-document.addEventListener('DOMContentLoaded', async () => {
-    // DOM Elements
-    const sidebar = document.getElementById('sidebar');
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const viewContainer = document.getElementById('viewContainer');
-    const pageTitle = document.getElementById('pageTitle');
-    const logoutBtn = document.getElementById('logoutBtn');
-    
-    // Check Auth
-    const token = localStorage.getItem('adminToken');
-    if (!token) {
-        window.location.href = './login.html';
-        return;
-    }
+document.addEventListener("DOMContentLoaded", async () => {
+  // DOM Elements
+  const sidebar = document.getElementById("sidebar");
+  const sidebarToggle = document.getElementById("sidebarToggle");
+  const viewContainer = document.getElementById("viewContainer");
+  const pageTitle = document.getElementById("pageTitle");
+  const logoutBtn = document.getElementById("logoutBtn");
 
-    // Toggle Sidebar
-    sidebarToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('collapsed');
+  // Check Auth
+  const token = localStorage.getItem("adminToken");
+  if (!token) {
+    window.location.href = "./login.html";
+    return;
+  }
+
+  // Toggle Sidebar
+  sidebarToggle.addEventListener("click", () => {
+    sidebar.classList.toggle("collapsed");
+  });
+
+  // Logout
+  logoutBtn.addEventListener("click", () => {
+    localStorage.removeItem("adminToken");
+    window.location.href = "./login.html";
+  });
+
+  // Navigation Logic (SPA Routing)
+  const links = document.querySelectorAll(".nav-link[data-view]");
+  links.forEach((link) => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const viewName = link.dataset.view;
+
+      // Update Active State
+      links.forEach((l) => l.classList.remove("active"));
+      link.classList.add("active");
+
+      // Render View
+      renderView(viewName);
     });
+  });
 
-    // Logout
-    logoutBtn.addEventListener('click', () => {
-        localStorage.removeItem('adminToken');
-        window.location.href = './login.html';
-    });
-
-    // Navigation Logic (SPA Routing)
-    const links = document.querySelectorAll('.nav-link[data-view]');
-    links.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const viewName = link.dataset.view;
-            
-            // Update Active State
-            links.forEach(l => l.classList.remove('active'));
-            link.classList.add('active');
-            
-            // Render View
-            renderView(viewName);
-        });
-    });
-
-    // Initial View Load
-    renderView('dashboard');
+  // Initial View Load
+  renderView("dashboard");
 });
 
 // Mock Data (For Development) - In production, replace with API calls
 async function fetchDashboardStats() {
-    try {
-        // Here we can call the actual API you have
-        // Reusing existing endpoint: /admin/monthly-orders for charts maybe
-         const [userRes, productRes, orderRes, analysisRes] = await Promise.all([
-             apiCall('http://localhost:4000/user/getUser'),
-             apiCall('http://localhost:4000/product/products'),
-             apiCall('http://localhost:4000/order/All-orders'),
-             apiCall('http://localhost:4000/admin/monthly-orders')
-         ]);
+  try {
+    // Here we can call the actual API you have
+    // Reusing existing endpoint: /admin/monthly-orders for charts maybe
+    const [userRes, productRes, orderRes, analysisRes] = await Promise.all([
+      apiCall("http://localhost:4000/user/getUser"),
+      apiCall("http://localhost:4000/product/products"),
+      apiCall("http://localhost:4000/order/All-orders"),
+      apiCall("http://localhost:4000/admin/monthly-orders"),
+    ]);
 
-         const stockCount = productRes.products ? productRes.products.filter(p => p.stock > 0).length : 0;
-         const lowStock = productRes.products ? productRes.products.filter(p => p.stock <= 5 && p.stock > 0).length : 0;
+    const stockCount = productRes.products
+      ? productRes.products.filter((p) => p.stock > 0).length
+      : 0;
+    const lowStock = productRes.products
+      ? productRes.products.filter((p) => p.stock <= 5 && p.stock > 0).length
+      : 0;
 
-         return {
-             users: userRes.data ? userRes.data.length : 0,
-             products: productRes.products ? productRes.products.length : 0,
-             orders: orderRes.data ? orderRes.data.length : 0,
-             revenue: analysisRes.data.summary.totalRevenue || 0,
-             stockCount: stockCount,
-             lowStock: lowStock,
-             chartData: analysisRes.data // { labels, orders, revenue }
-         };
-
-    } catch (e) {
-        console.error("Failed to load stats", e);
-        return null;
-    }
+    return {
+      users: userRes.data ? userRes.data.length : 0,
+      products: productRes.products ? productRes.products.length : 0,
+      orders: orderRes.data ? orderRes.data.length : 0,
+      revenue: analysisRes.data.summary.totalRevenue || 0,
+      stockCount: stockCount,
+      lowStock: lowStock,
+      chartData: analysisRes.data, // { labels, orders, revenue }
+    };
+  } catch (e) {
+    console.error("Failed to load stats", e);
+    return null;
+  }
 }
 
 async function apiCall(url) {
-    const token = localStorage.getItem('adminToken');
-    const res = await fetch(url, {
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        }
-    });
-    return res.json();
+  const token = localStorage.getItem("adminToken");
+  const res = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  return res.json();
 }
 
 // Templates & Render Logic
 async function renderView(viewName) {
-    const container = document.getElementById('viewContainer');
-    const pageTitle = document.getElementById('pageTitle');
-    
-    // Set Loading
-    container.innerHTML = `
+  const container = document.getElementById("viewContainer");
+  const pageTitle = document.getElementById("pageTitle");
+
+  // Set Loading
+  container.innerHTML = `
         <div class="loading-state">
             <div class="spinner"></div>
             <p>Loading ${viewName}...</p>
         </div>
     `;
 
-    // Routing Switch
-    switch(viewName) {
-        case 'dashboard':
-            pageTitle.innerText = 'Dashboard Overview';
-            const stats = await fetchDashboardStats();
-            if(stats) {
-                container.innerHTML = getDashboardTemplate(stats);
-                // Charts removed from overview, now in analytics
-            } else {
-                 container.innerHTML = `<p class="error-message">Failed to load data.</p>`;
-            }
-            break;
+  // Routing Switch
+  switch (viewName) {
+    case "dashboard":
+      pageTitle.innerText = "Dashboard Overview";
+      const stats = await fetchDashboardStats();
+      if (stats) {
+        container.innerHTML = getDashboardTemplate(stats);
+        // Charts removed from overview, now in analytics
+      } else {
+        container.innerHTML = `<p class="error-message">Failed to load data.</p>`;
+      }
+      break;
 
-        case 'users':
-            pageTitle.innerText = 'User Management';
-            const users = await fetchUsers();
-            if(users) {
-                container.innerHTML = getUsersTemplate(users);
-                setupUserSearch(users);
-            } else {
-                container.innerHTML = `<p class="error-message">Failed to load users.</p>`;
-            }
-            break;
-            
-        case 'products':
-            pageTitle.innerText = 'Product Inventory';
-            const productsData = await fetchProducts();
-            if(productsData) {
-                container.innerHTML = getProductsTemplate(productsData.products || []);
-                setupProductSearch(productsData.products || []);
-            } else {
-                container.innerHTML = `<p class="error-message">Failed to load products.</p>`;
-            }
-            break;
+    case "users":
+      pageTitle.innerText = "User Management";
+      const users = await fetchUsers();
+      if (users) {
+        container.innerHTML = getUsersTemplate(users);
+       
+        setupUserSearch(users);
+      } else {
+        container.innerHTML = `<p class="error-message">Failed to load users.</p>`;
+      }
+      break;
 
-        case 'categories':
-            pageTitle.innerText = 'Category Management';
-            const categoriesRes = await fetchCategories();
-            if(categoriesRes && categoriesRes.data) {
-                container.innerHTML = getCategoriesTemplate(categoriesRes.data);
-            } else {
-                 container.innerHTML = `<p class="error-message">Failed to load categories.</p>`;
-            }
-            break;
+    case "products":
+      pageTitle.innerText = "Product Inventory";
+      const productsData = await fetchProducts();
+      if (productsData) {
+        container.innerHTML = getProductsTemplate(productsData.products || []);
+        setupProductSearch(productsData.products || []);
+      } else {
+        container.innerHTML = `<p class="error-message">Failed to load products.</p>`;
+      }
+      break;
 
-        case 'orders':
-            pageTitle.innerText = 'Order Management';
-            const ordersRes = await fetchOrders();
-            if(ordersRes && ordersRes.data) {
-                console.log("ordersRes.data",ordersRes.data);
-                container.innerHTML = getOrdersTemplate(ordersRes.data);
-            } else {
-                 container.innerHTML = `<p class="error-message">Failed to load orders.</p>`;
-            }
-            break;
+    case "categories":
+      pageTitle.innerText = "Category Management";
+      const categoriesRes = await fetchCategories();
+      if (categoriesRes && categoriesRes.data) {
+        container.innerHTML = getCategoriesTemplate(categoriesRes.data);
+      } else {
+        container.innerHTML = `<p class="error-message">Failed to load categories.</p>`;
+      }
+      break;
 
-        case 'analytics':
-            pageTitle.innerText = 'Analytics & Reports';
-            const analyticsData = await fetchAnalyticsData();
-            if(analyticsData) {
-                container.innerHTML = getAnalyticsTemplate(analyticsData);
-                initAnalyticsCharts(analyticsData);
-            } else {
-                container.innerHTML = `<p class="error-message">Failed to load analytics.</p>`;
-            }
-            break;
+    case "orders":
+      pageTitle.innerText = "Order Management";
+      const ordersRes = await fetchOrders();
+      if (ordersRes && ordersRes.data) {
+        console.log("ordersRes.data", ordersRes.data);
+        container.innerHTML = getOrdersTemplate(ordersRes.data);
+      } else {
+        container.innerHTML = `<p class="error-message">Failed to load orders.</p>`;
+      }
+      break;
 
-        case 'settings':
-             pageTitle.innerText = 'Settings';
-             container.innerHTML = `<h3>Settings Module Coming Soon</h3>`;
-             break;
+    case "analytics":
+      pageTitle.innerText = "Analytics & Reports";
+      const analyticsData = await fetchAnalyticsData();
+      if (analyticsData) {
+        container.innerHTML = getAnalyticsTemplate(analyticsData);
+        initAnalyticsCharts(analyticsData);
+      } else {
+        container.innerHTML = `<p class="error-message">Failed to load analytics.</p>`;
+      }
+      break;
 
-        default:
-             container.innerHTML = `<p>View not found</p>`;
-    }
+    case "settings":
+      pageTitle.innerText = "Settings";
+      container.innerHTML = `<h3>Settings Module Coming Soon</h3>`;
+      break;
+
+    default:
+      container.innerHTML = `<p>View not found</p>`;
+  }
 }
 
 // Templates
 function getDashboardTemplate(data) {
-    return `
+  return `
         <div class="page-header" style="margin-bottom: 30px;">
             <h1 style="font-size: 28px; font-weight: 700; color: var(--text-dark); margin-bottom: 5px;">Dashboard Overview</h1>
             <p style="color: var(--text-muted); font-size: 14px;">Welcome back! Here's what's happening with Aava Treasures today.</p>
@@ -245,94 +249,102 @@ function getDashboardTemplate(data) {
 }
 
 function initAnalyticsCharts(data) {
-    const ctx = document.getElementById('mainChart').getContext('2d');
-    const stockCtx = document.getElementById('stockChart').getContext('2d');
+  const ctx = document.getElementById("mainChart").getContext("2d");
+  const stockCtx = document.getElementById("stockChart").getContext("2d");
 
-    // Gradient
-    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(214, 41, 118, 0.5)'); // Brand Pink
-    gradient.addColorStop(1, 'rgba(214, 41, 118, 0.0)');
+  // Gradient
+  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+  gradient.addColorStop(0, "rgba(214, 41, 118, 0.5)"); // Brand Pink
+  gradient.addColorStop(1, "rgba(214, 41, 118, 0.0)");
 
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: data.chartData.labels,
-            datasets: [{
-                label: 'Revenue',
-                data: data.chartData.revenue,
-                borderColor: '#d62976', // Brand Pink
-                backgroundColor: gradient,
-                borderWidth: 2,
-                fill: true,
-                tension: 0.4,
-                pointRadius: 4,
-                pointHoverRadius: 6
-            }]
+  new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: data.chartData.labels,
+      datasets: [
+        {
+          label: "Revenue",
+          data: data.chartData.revenue,
+          borderColor: "#d62976", // Brand Pink
+          backgroundColor: gradient,
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6,
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                y: { grid: { borderDash: [5, 5] } },
-                x: { grid: { display: false } }
-            }
-        }
-    });
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+      },
+      scales: {
+        y: { grid: { borderDash: [5, 5] } },
+        x: { grid: { display: false } },
+      },
+    },
+  });
 
-    // Calculate Stock
-    const products = data.products || [];
-    const inStock = products.filter(p => p.stock > 10).length;
-    const lowStock = products.filter(p => p.stock <= 10 && p.stock > 0).length;
-    const outStock = products.filter(p => p.stock === 0).length;
+  // Calculate Stock
+  const products = data.products || [];
+  const inStock = products.filter((p) => p.stock > 10).length;
+  const lowStock = products.filter((p) => p.stock <= 10 && p.stock > 0).length;
+  const outStock = products.filter((p) => p.stock === 0).length;
 
-    new Chart(stockCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['In Stock', 'Low Stock', 'Out of Stock'],
-            datasets: [{
-                data: [inStock, lowStock, outStock], 
-                backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], // Success, Warning, Danger (Standard)
-                borderWidth: 0
-            }]
+  new Chart(stockCtx, {
+    type: "doughnut",
+    data: {
+      labels: ["In Stock", "Low Stock", "Out of Stock"],
+      datasets: [
+        {
+          data: [inStock, lowStock, outStock],
+          backgroundColor: ["#10b981", "#f59e0b", "#ef4444"], // Success, Warning, Danger (Standard)
+          borderWidth: 0,
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-        }
-    });
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+    },
+  });
 }
 
 // User Module Functions
 async function fetchUsers() {
-    try {
-        const res = await apiCall('http://localhost:4000/user/getUser');
-        return res.data; 
-    } catch (e) {
-        console.error("Failed to fetch users", e);
-        return null;
-    }
+  try {
+    const res = await apiCall("http://localhost:4000/user/getUser");
+    return res.data;
+  } catch (e) {
+    console.error("Failed to fetch users", e);
+    return null;
+  }
 }
 
 // User Management Template
 function getUsersTemplate(users) {
-    const userCount = users.length;
-    const rows = users.map((user, index) => `
+  const userCount = users.length;
+  const rows = users
+    .map(
+      (user, index) => `
         <tr>
             <td>#USR-${String(index + 1).padStart(3, "0")}</td>
-            <td>${user.Firstname || user.name || 'User'} ${user.Lastname || ''}</td>
-            <td>${user.Email || user.email || 'N/A'}</td>
-            <td>${user.Phone || user.phone || 'N/A'}</td>
+            <td>${user.Firstname || user.name || "User"} ${user.Lastname || ""}</td>
+            <td>${user.Email || user.email || "N/A"}</td>
+            <td>${user.Phone || user.phone || "N/A"}</td>
             <td>${new Date(user.createdAt || Date.now()).toLocaleDateString()}</td>
             <td>
-                <button style="padding: 4px 8px; margin: 0 2px; border: none; border-radius: 4px; cursor: pointer; background: #e74c3c; color: white;">Delete</button>
+                <button id="deluser" onclick = "deleteUserbtn('${user._id}')" style="padding: 4px 8px; margin: 0 2px; border: none; border-radius: 4px; cursor: pointer; background: #e74c3c; color: white;">Delete</button>
             </td>
         </tr>
-    `).join('');
+    `,
+    )
+    .join("");
 
-    return `
+  return `
         <div class="page-header">
             <h1 class="page-title">User Management</h1>
             <p class="page-subtitle">Manage and monitor all registered users</p>
@@ -374,88 +386,107 @@ function getUsersTemplate(users) {
 }
 
 function setupUserSearch(allUsers) {
-    const input = document.getElementById('userSearch');
-    const tbody = document.getElementById('userTableBody');
-    if(!input || !tbody) return;
+  const input = document.getElementById("userSearch");
+  const tbody = document.getElementById("userTableBody");
+  if (!input || !tbody) return;
 
-    input.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        const filtered = allUsers.filter(u => 
-            (u.Firstname && u.Firstname.toLowerCase().includes(term)) ||
-            (u.Lastname && u.Lastname.toLowerCase().includes(term)) ||
-            (u.Email && u.Email.toLowerCase().includes(term)) ||
-            (u.name && u.name.toLowerCase().includes(term))
-        );
-        tbody.innerHTML = filtered.map((user, index) => `
+  input.addEventListener("input", (e) => {
+    const term = e.target.value.toLowerCase();
+    const filtered = allUsers.filter(
+      (u) =>
+        (u.Firstname && u.Firstname.toLowerCase().includes(term)) ||
+        (u.Lastname && u.Lastname.toLowerCase().includes(term)) ||
+        (u.Email && u.Email.toLowerCase().includes(term)) ||
+        (u.name && u.name.toLowerCase().includes(term)),
+    );
+    tbody.innerHTML = filtered
+      .map(
+        (user, index) => `
             <tr>
                 <td>#USR-${String(index + 1).padStart(3, "0")}</td>
-                <td>${user.Firstname || user.name || 'User'} ${user.Lastname || ''}</td>
-                <td>${user.Email || user.email || 'N/A'}</td>
-                <td>${user.Phone || user.phone || 'N/A'}</td>
+                <td>${user.Firstname || user.name || "User"} ${user.Lastname || ""}</td>
+                <td>${user.Email || user.email || "N/A"}</td>
+                <td>${user.Phone || user.phone || "N/A"}</td>
                 <td>${new Date(user.createdAt || Date.now()).toLocaleDateString()}</td>
                 <td>
-                    <button style="padding: 4px 8px; margin: 0 2px; border: none; border-radius: 4px; cursor: pointer; background: #3498db; color: white;">Edit</button>
-                    <button style="padding: 4px 8px; margin: 0 2px; border: none; border-radius: 4px; cursor: pointer; background: #e74c3c; color: white;">Delete</button>
+                    <button onclick="window.showToast('Edit feature coming soon', 'info')" style="padding: 4px 8px; margin: 0 2px; border: none; border-radius: 4px; cursor: pointer; background: #3498db; color: white;">Edit</button>
+                    <button onclick="deleteUserbtn('${user._id}')" style="padding: 4px 8px; margin: 0 2px; border: none; border-radius: 4px; cursor: pointer; background: #e74c3c; color: white;">Delete</button>
                 </td>
             </tr>
-        `).join('');
-    });
+        `,
+      )
+      .join("");
+  });
 }
 
 function generateAvatarColor(name) {
-    const colors = ['#f1c40f', '#e67e22', '#e74c3c', '#9b59b6', '#3498db', '#1abc9c', '#2ecc71'];
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-        hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return colors[Math.abs(hash) % colors.length];
+  const colors = [
+    "#f1c40f",
+    "#e67e22",
+    "#e74c3c",
+    "#9b59b6",
+    "#3498db",
+    "#1abc9c",
+    "#2ecc71",
+  ];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return colors[Math.abs(hash) % colors.length];
 }
 
 // Order Module Functions
 async function fetchOrders() {
-    try {
-        return await apiCall('http://localhost:4000/order/All-orders');
-    } catch (e) {
-        console.error("Failed to fetch orders", e);
-        return null;
-    }
+  try {
+    return await apiCall("http://localhost:4000/order/All-orders");
+  } catch (e) {
+    console.error("Failed to fetch orders", e);
+    return null;
+  }
 }
 
 function getOrdersTemplate(orders) {
-    const orderCount = orders.length;
-    const completed = orders.filter(o => o.orderStatus === 'Delivered').length;
-    const processing = orders.filter(o => o.orderStatus === 'Processing').length;
-    const pending = orders.filter(o => o.orderStatus === 'Pending' || !o.orderStatus).length;
+  const orderCount = orders.length;
+  const completed = orders.filter((o) => o.orderStatus === "Delivered").length;
+  const processing = orders.filter(
+    (o) => o.orderStatus === "Processing",
+  ).length;
+  const pending = orders.filter(
+    (o) => o.orderStatus === "Pending" || !o.orderStatus,
+  ).length;
 
-    const rows = orders.map(order => {
-        // Product safe handling
-        const firstItem = order.items?.[0];
-        const firstProductName =
-            firstItem?.product?.product_name || "Product unavailable";
+  const rows = orders
+    .map((order) => {
+      // Product safe handling
+      const firstItem = order.items?.[0];
+      const firstProductName =
+        firstItem?.product?.product_name || "Product unavailable";
 
-        const productDisplay =
-            order.items && order.items.length > 1
-                ? `${firstProductName} + ${order.items.length - 1} more`
-                : firstProductName;
+      const productDisplay =
+        order.items && order.items.length > 1
+          ? `${firstProductName} + ${order.items.length - 1} more`
+          : firstProductName;
 
-        const totalQty = order.items
-            ? order.items.reduce((acc, item) => acc + (item.quantity || 0), 0)
-            : 0;
+      const totalQty = order.items
+        ? order.items.reduce((acc, item) => acc + (item.quantity || 0), 0)
+        : 0;
 
-        // Status color
-        const statusColor =
-            order.orderStatus === "Delivered"
-                ? "success"
-                : order.orderStatus === "Processing"
-                ? "info"
-                : "pending";
+      // Status color
+      const statusColor =
+        order.orderStatus === "Delivered"
+          ? "success"
+          : order.orderStatus === "Processing"
+            ? "info"
+            : "pending";
 
-        // User name safe handling
-        const customerName = order.user
-            ? `${order.user.Firstname || ""} ${order.user.Lastname || ""}`.trim() || "Unknown"
-            : "Unknown";
+      // User name safe handling
+      const customerName = order.user
+        ? `${order.user.Firstname || ""} ${order.user.Lastname || ""}`.trim() ||
+          "Unknown"
+        : "Unknown";
 
-        return `
+      return `
             <tr>
                 <td>#ORD-${order._id.slice(0, 8).toUpperCase()}</td>
                 <td>${customerName}</td>
@@ -475,9 +506,10 @@ function getOrdersTemplate(orders) {
                 </td>
             </tr>
         `;
-    }).join("");
+    })
+    .join("");
 
-    return `
+  return `
         <div class="page-header">
             <h1 class="page-title">Order Management</h1>
             <p class="page-subtitle">Track and manage all customer orders</p>
@@ -521,27 +553,30 @@ function getOrdersTemplate(orders) {
     `;
 }
 
-
 // Category Module Functions
 async function fetchCategories() {
-    try {
-        return await apiCall('http://localhost:4000/category/getCategories');
-    } catch (e) {
-        console.error("Failed to fetch categories", e);
-        return null;
-    }
+  try {
+    return await apiCall("http://localhost:4000/category/getCategories");
+  } catch (e) {
+    console.error("Failed to fetch categories", e);
+    return null;
+  }
 }
 
 // Category Management Template
 function getCategoriesTemplate(categories) {
-    const rows = categories.map(cat => `
+  const rows = categories
+    .map(
+      (cat) => `
         <tr>
-            <td>${cat._id ? cat._id.slice(-10).toUpperCase() : 'N/A'}</td>
+            <td>${cat._id ? cat._id.slice(-10).toUpperCase() : "N/A"}</td>
             <td>${cat.name}</td>
         </tr>
-    `).join('');
+    `,
+    )
+    .join("");
 
-    return `
+  return `
         <div class="page-header">
             <h1 class="page-title">Category Management</h1>
             <p class="page-subtitle">Organize and manage product categories</p>
@@ -570,36 +605,39 @@ function getCategoriesTemplate(categories) {
 
 // Product Module Functions
 async function fetchProducts() {
-    try {
-        return await apiCall('http://localhost:4000/product/products');
-    } catch (e) {
-        console.error("Failed to fetch products", e);
-        return null;
-    }
+  try {
+    return await apiCall("http://localhost:4000/product/products");
+  } catch (e) {
+    console.error("Failed to fetch products", e);
+    return null;
+  }
 }
 
 // Product Management Template
 function getProductsTemplate(products) {
-    const productCount = products.length;
-    const inStock = products.filter(p => p.stock > 10).length;
-    const lowStock = products.filter(p => p.stock <= 10 && p.stock > 0).length;
-    const outStock = products.filter(p => p.stock === 0).length;
+  const productCount = products.length;
+  const inStock = products.filter((p) => p.stock > 10).length;
+  const lowStock = products.filter((p) => p.stock <= 10 && p.stock > 0).length;
+  const outStock = products.filter((p) => p.stock === 0).length;
 
-    const rows = products.map(p => {
-        const stockStatus = p.stock > 10 ? 'success' : (p.stock > 0 ? 'warning' : 'danger');
-        const stockLabel = p.stock > 10 ? 'In Stock' : (p.stock > 0 ? 'Low Stock' : 'Out of Stock');
-        
-        return `
+  const rows = products
+    .map((p) => {
+      const stockStatus =
+        p.stock > 10 ? "success" : p.stock > 0 ? "warning" : "danger";
+      const stockLabel =
+        p.stock > 10 ? "In Stock" : p.stock > 0 ? "Low Stock" : "Out of Stock";
+
+      return `
         <tr>
-            <td>#PRD-${p._id ? p._id.slice(-6).toUpperCase() : 'N/A'}</td>
+            <td>#PRD-${p._id ? p._id.slice(-6).toUpperCase() : "N/A"}</td>
             <td>
                 <div class="user-cell">
                     <div class="avatar-sm" style="background: #eee; color: #333;">📦</div>
                     <span>${p.product_name}</span>
                 </div>
             </td>
-            <td>${p.description ? p.description.substring(0, 30) + '...' : '-'}</td>
-            <td>${p.category ? (p.category.name || p.category) : 'Uncategorized'}</td>
+            <td>${p.description ? p.description.substring(0, 30) + "..." : "-"}</td>
+            <td>${p.category ? p.category.name || p.category : "Uncategorized"}</td>
             <td>Rs${p.price}</td>
             <td>${p.stock}</td>
              <td>
@@ -612,9 +650,11 @@ function getProductsTemplate(products) {
                 <button class="icon-btn-sm danger" title="Delete" onclick="deleteProduct('${p._id}')"><span class="material-icons-round">delete</span></button>
             </td>
         </tr>
-    `}).join('');
+    `;
+    })
+    .join("");
 
-    return `
+  return `
         <div class="page-header">
             <h1 class="page-title">Product Management</h1>
             <p class="page-subtitle">Manage your product inventory and listings</p>
@@ -679,71 +719,89 @@ function getProductsTemplate(products) {
 }
 
 function setupProductSearch(products) {
-    const input = document.getElementById('productSearch');
-    const tbody = document.getElementById('productTableBody');
-    if(!input || !tbody) return;
+  const input = document.getElementById("productSearch");
+  const tbody = document.getElementById("productTableBody");
+  if (!input || !tbody) return;
 
-    input.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        const filtered = products.filter(p => p.product_name.toLowerCase().includes(term));
-        // Simple re-render logic same as users
-        tbody.innerHTML = filtered.map(p => {
-             const stockStatus = p.stock > 10 ? 'success' : (p.stock > 0 ? 'warning' : 'danger');
-             const stockLabel = p.stock > 10 ? 'In Stock' : (p.stock > 0 ? 'Low Stock' : 'Out of Stock');
-             return `
+  input.addEventListener("input", (e) => {
+    const term = e.target.value.toLowerCase();
+    const filtered = products.filter((p) =>
+      p.product_name.toLowerCase().includes(term),
+    );
+    // Simple re-render logic same as users
+    tbody.innerHTML = filtered
+      .map((p) => {
+        const stockStatus =
+          p.stock > 10 ? "success" : p.stock > 0 ? "warning" : "danger";
+        const stockLabel =
+          p.stock > 10
+            ? "In Stock"
+            : p.stock > 0
+              ? "Low Stock"
+              : "Out of Stock";
+        return `
              <tr>
                 <td>
                     <div class="user-cell">
                         <div class="avatar-sm" style="background: #eee; color: #333;">📦</div>
                         <div>
                             <div class="font-bold">${p.product_name}</div>
-                            <div class="text-xs text-muted">${p.category ? p.category.name : 'Uncategorized'}</div>
+                            <div class="text-xs text-muted">${p.category ? p.category.name : "Uncategorized"}</div>
                         </div>
                     </div>
                 </td>
                 <td>$${p.price}</td>
                 <td>
-                    <span class="badge ${stockStatus === 'danger' ? 'danger' : 'warning'}" 
-                          style="background: ${stockStatus === 'success' ? '#10b894' : ''}; color: ${stockStatus === 'success' ? 'white' : ''}">
+                    <span class="badge ${stockStatus === "danger" ? "danger" : "warning"}" 
+                          style="background: ${stockStatus === "success" ? "#10b894" : ""}; color: ${stockStatus === "success" ? "white" : ""}">
                         ${stockLabel} (${p.stock})
                     </span>
                 </td>
-                <td>${p.description ? p.description.substring(0, 30) + '...' : '-'}</td>
+                <td>${p.description ? p.description.substring(0, 30) + "..." : "-"}</td>
                 <td class="text-right">
-                    <button class="icon-btn-sm" title="Edit"><span class="material-icons-round">edit</span></button>
-                    <button class="icon-btn-sm danger" title="Delete"><span class="material-icons-round">delete</span></button>
+                    <button class="icon-btn-sm" title="Edit" onclick="editProduct('${p._id}')"><span class="material-icons-round">edit</span></button>
+                    <button class="icon-btn-sm danger" title="Delete" onclick="deleteProduct('${p._id}')"><span class="material-icons-round">delete</span></button>
                 </td>
             </tr>
              `;
-        }).join('');
-    });
+      })
+      .join("");
+  });
 }
 
 // Analytics Module Functions
 async function fetchAnalyticsData() {
-    try {
-        const [analysisRes, productRes] = await Promise.all([
-             apiCall('http://localhost:4000/admin/monthly-orders'), 
-             apiCall('http://localhost:4000/product/products')
-        ]);
-        
-        return {
-            chartData: analysisRes.data,
-            products: productRes.products
-        };
-    } catch (e) {
-        console.error(e);
-        return null;
-    }
+  try {
+    const [analysisRes, productRes] = await Promise.all([
+      apiCall("http://localhost:4000/admin/monthly-orders"),
+      apiCall("http://localhost:4000/product/products"),
+    ]);
+
+    return {
+      chartData: analysisRes.data,
+      products: productRes.products,
+    };
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
 }
 
 function getAnalyticsTemplate(data) {
-    const revenue = data.chartData ? (data.chartData.summary ? data.chartData.summary.totalRevenue : (data.chartData.data?.revenue?.reduce((a,b)=>a+b,0) || 0)) : 0;
-    const orderCount = data.chartData ? (data.chartData.summary ? data.chartData.summary.totalOrders : (data.chartData.data?.orders?.reduce((a,b)=>a+b,0) || 0)) : 0;
-    const stockCount = data.products ? data.products.length : 0;
-    const percentageChange = data.chartData?.summary?.ordersPercentageChange || 0;
+  const revenue = data.chartData
+    ? data.chartData.summary
+      ? data.chartData.summary.totalRevenue
+      : data.chartData.data?.revenue?.reduce((a, b) => a + b, 0) || 0
+    : 0;
+  const orderCount = data.chartData
+    ? data.chartData.summary
+      ? data.chartData.summary.totalOrders
+      : data.chartData.data?.orders?.reduce((a, b) => a + b, 0) || 0
+    : 0;
+  const stockCount = data.products ? data.products.length : 0;
+  const percentageChange = data.chartData?.summary?.ordersPercentageChange || 0;
 
-     return `
+  return `
         <div class="page-header">
             <h1 class="page-title">Analytics & Reports</h1>
             <p class="page-subtitle">Detailed performance metrics and trends</p>
@@ -799,152 +857,198 @@ function getAnalyticsTemplate(data) {
 }
 
 function initAnalyticsCharts(data) {
-    const mainCtx = document.getElementById('analyticsMainChart').getContext('2d');
-    const catCtx = document.getElementById('categoryChart').getContext('2d');
-    
-    const chartLabels = data.chartData?.data?.labels || [];
-    const chartRevenue = data.chartData?.data?.revenue || [];
-    const chartOrders = data.chartData?.data?.orders || [];
-    
-    if (mainCtx) {
-        new Chart(mainCtx, {
-            type: 'bar',
-            data: {
-                labels: chartLabels,
-                datasets: [
-                    {
-                        label: 'Revenue',
-                        data: chartRevenue,
-                        backgroundColor: 'rgba(214, 41, 118, 0.8)',
-                        yAxisID: 'y',
-                    },
-                    {
-                        label: 'Orders',
-                        data: chartOrders,
-                        borderColor: '#fa7e1e',
-                        backgroundColor: 'transparent',
-                        borderWidth: 2,
-                        yAxisID: 'y1',
-                        type: 'line',
-                        tension: 0.4
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                    mode: 'index',
-                    intersect: false,
-                },
-                scales: {
-                    y: {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        title: { display: true, text: 'Revenue (Rs.)' }
-                    },
-                    y1: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        grid: { drawOnChartArea: false },
-                        title: { display: true, text: 'Order Count' }
-                    },
-                }
-            }
-        });
-    }
+  const mainCtx = document
+    .getElementById("analyticsMainChart")
+    .getContext("2d");
+  const catCtx = document.getElementById("categoryChart").getContext("2d");
 
-    if (catCtx && data.products) {
-        const categoryCounts = {};
-        data.products.forEach(p => {
-            const catName = p.category?.name || 'Uncategorized';
-            categoryCounts[catName] = (categoryCounts[catName] || 0) + 1;
-        });
+  const chartLabels = data.chartData?.data?.labels || [];
+  const chartRevenue = data.chartData?.data?.revenue || [];
+  const chartOrders = data.chartData?.data?.orders || [];
 
-        new Chart(catCtx, {
-            type: 'doughnut',
-            data: {
-                labels: Object.keys(categoryCounts),
-                datasets: [{
-                    data: Object.values(categoryCounts),
-                    backgroundColor: ['#d62976', '#fa7e1e', '#f39c12', '#2ecc71', '#3498db', '#9b59b6']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'right' }
-                }
-            }
-        });
-    }
+  if (mainCtx) {
+    new Chart(mainCtx, {
+      type: "bar",
+      data: {
+        labels: chartLabels,
+        datasets: [
+          {
+            label: "Revenue",
+            data: chartRevenue,
+            backgroundColor: "rgba(214, 41, 118, 0.8)",
+            yAxisID: "y",
+          },
+          {
+            label: "Orders",
+            data: chartOrders,
+            borderColor: "#fa7e1e",
+            backgroundColor: "transparent",
+            borderWidth: 2,
+            yAxisID: "y1",
+            type: "line",
+            tension: 0.4,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          mode: "index",
+          intersect: false,
+        },
+        scales: {
+          y: {
+            type: "linear",
+            display: true,
+            position: "left",
+            title: { display: true, text: "Revenue (Rs.)" },
+          },
+          y1: {
+            type: "linear",
+            display: true,
+            position: "right",
+            grid: { drawOnChartArea: false },
+            title: { display: true, text: "Order Count" },
+          },
+        },
+      },
+    });
+  }
+
+  if (catCtx && data.products) {
+    const categoryCounts = {};
+    data.products.forEach((p) => {
+      const catName = p.category?.name || "Uncategorized";
+      categoryCounts[catName] = (categoryCounts[catName] || 0) + 1;
+    });
+
+    new Chart(catCtx, {
+      type: "doughnut",
+      data: {
+        labels: Object.keys(categoryCounts),
+        datasets: [
+          {
+            data: Object.values(categoryCounts),
+            backgroundColor: [
+              "#d62976",
+              "#fa7e1e",
+              "#f39c12",
+              "#2ecc71",
+              "#3498db",
+              "#9b59b6",
+            ],
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: "right" },
+        },
+      },
+    });
+  }
 }
 // Product Actions
 window.editProduct = (id) => {
-    window.location.href = `/add-product?id=${id}`;
+  window.location.href = `/add-product?id=${id}`;
 };
 
 window.deleteProduct = async (id) => {
+  const confirmed = await showConfirm(
+    "Delete Product",
+    "Are you sure you want to delete this product? This action cannot be undone.",
+  );
+
+  if (!confirmed) return;
+
+  try {
+    const res = await fetch(`http://localhost:4000/product/delete/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+      },
+    });
+
+    if (res.ok) {
+      showToast("Product deleted successfully", "success");
+      // Refresh products
+      renderView("products");
+    } else {
+      const data = await res.json();
+      showToast(data.message || "Error deleting product", "error");
+    }
+  } catch (error) {
+    console.error("Delete error:", error);
+    showToast("Failed to delete product", "error");
+  }
+};
+
+window.deleteUserbtn = async (id) => {
     const confirmed = await showConfirm(
-        'Delete Product',
-        'Are you sure you want to delete this product? This action cannot be undone.'
+        "Delete User",
+        "Are you sure you want to delete this user? This action cannot be undone.",
     );
-    
     if (!confirmed) return;
-
     try {
-        const res = await fetch(`http://localhost:4000/product/delete/${id}`, {
-            method: 'DELETE',
+        const res = await fetch(`http://localhost:4000/user/delete-user/${id}`, {
+            method: "DELETE",
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-            }
+                Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+            },
         });
-
         if (res.ok) {
-            showToast('Product deleted successfully', 'success');
-            // Refresh products
-            renderView('products');
-        } else {
+            showToast("User deleted successfully", "success");
+            // Refresh users
+            renderView("users");
+        }
+
+        else {
             const data = await res.json();
-            showToast(data.message || 'Error deleting product', 'error');
+            showToast(data.message || "Error deleting user", "error");
         }
     } catch (error) {
-        console.error('Delete error:', error);
-        showToast('Failed to delete product', 'error');
+        console.error("Delete error:", error);
+        showToast("Failed to delete user", "error");
     }
 };
 
-window.viewOrder = async (id) => {
-    try {
-        const res = await apiCall(`http://localhost:4000/order/${id}`);
-        if (!res || !res.data) {
-            showToast('Order details not found', 'error');
-            return;
-        }
+// Order Actions
 
-        const order = res.data;
-        console.log(order);
-        const itemsList = order.items.map(item => `
+window.viewOrder = async (id) => {
+  try {
+    const res = await apiCall(`http://localhost:4000/order/${id}`);
+    if (!res || !res.data) {
+      showToast("Order details not found", "error");
+      return;
+    }
+
+    const order = res.data;
+    console.log(order);
+    const itemsList = order.items
+      .map(
+        (item) => `
             <div class="order-item-card">
                 <div class="order-item-left">
                     <div class="order-item-img-placeholder">📦</div>
                     <div class="order-item-content">
-                        <div class="order-item-name">${item.product?.product_name || 'Product unavailable'}</div>
+                        <div class="order-item-name">${item.product?.product_name || "Product unavailable"}</div>
                         <div class="order-item-meta">Qty: ${item.quantity} × Rs. ${item.price}</div>
                     </div>
                 </div>
                 <div class="order-item-total">Rs. ${item.quantity * item.price}</div>
             </div>
-        `).join('');
+        `,
+      )
+      .join("");
 
-        const modalOverlay = document.createElement('div');
-        modalOverlay.className = 'confirm-modal-overlay show'; 
-        modalOverlay.style.zIndex = '2000';
+    const modalOverlay = document.createElement("div");
+    modalOverlay.className = "confirm-modal-overlay show";
+    modalOverlay.style.zIndex = "2000";
 
-        modalOverlay.innerHTML = `
+    modalOverlay.innerHTML = `
             <div class="confirm-modal order-details-modal">
                 <div class="modal-header">
                     <h2>Order Details</h2>
@@ -969,11 +1073,11 @@ window.viewOrder = async (id) => {
                     <div class="order-info-item">
                         <div class="info-label">Status</div>
                         <div class="status-update-container">
-                            <span class="badge ${order.orderStatus === 'Delivered' ? 'success' : 'pending'}">${order.orderStatus || 'Pending'}</span>
+                            <span class="badge ${order.orderStatus === "Delivered" ? "success" : "pending"}">${order.orderStatus || "Pending"}</span>
                             <select id="updateStatusSelect" class="status-select">
-                                <option value="Pending" ${order.orderStatus === 'Pending' ? 'selected' : ''}>Pending</option>
-                                <option value="Delivered" ${order.orderStatus === 'Delivered' ? 'selected' : ''}>Delivered</option>
-                                <option value="Cancelled" ${order.orderStatus === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                                <option value="Pending" ${order.orderStatus === "Pending" ? "selected" : ""}>Pending</option>
+                                <option value="Delivered" ${order.orderStatus === "Delivered" ? "selected" : ""}>Delivered</option>
+                                <option value="Cancelled" ${order.orderStatus === "Cancelled" ? "selected" : ""}>Cancelled</option>
                             </select>
                             <button class="btn-primary-sm" id="saveStatusBtn" style="padding: 4px 10px; font-size: 11px;">Update</button>
                         </div>
@@ -998,102 +1102,101 @@ window.viewOrder = async (id) => {
             </div>
         `;
 
-        document.body.appendChild(modalOverlay);
+    document.body.appendChild(modalOverlay);
 
-        const closeModal = () => {
-            modalOverlay.classList.remove('show');
-            setTimeout(() => modalOverlay.remove(), 300);
-        };
+    const closeModal = () => {
+      modalOverlay.classList.remove("show");
+      setTimeout(() => modalOverlay.remove(), 300);
+    };
 
-        modalOverlay.querySelector('#closeOrderModal').onclick = closeModal;
-        modalOverlay.querySelector('#closeOrderModalBtn').onclick = closeModal;
-        
-        modalOverlay.querySelector('#saveStatusBtn').onclick = async () => {
-            const newStatus = modalOverlay.querySelector('#updateStatusSelect').value;
-            if (newStatus === order.orderStatus) {
-                showToast('Status is already ' + newStatus, 'info');
-                return;
-            }
-            const success = await updateOrderStatus(order._id, newStatus);
-            if (success) {
-                closeModal();
-                renderView('orders'); // Refresh the list
-            }
-        };
+    modalOverlay.querySelector("#closeOrderModal").onclick = closeModal;
+    modalOverlay.querySelector("#closeOrderModalBtn").onclick = closeModal;
 
-        modalOverlay.onclick = (e) => {
-            if (e.target === modalOverlay) closeModal();
-        };
+    modalOverlay.querySelector("#saveStatusBtn").onclick = async () => {
+      const newStatus = modalOverlay.querySelector("#updateStatusSelect").value;
+      if (newStatus === order.orderStatus) {
+        showToast("Status is already " + newStatus, "info");
+        return;
+      }
+      const success = await updateOrderStatus(order._id, newStatus);
+      if (success) {
+        closeModal();
+        renderView("orders"); // Refresh the list
+      }
+    };
 
-    } catch (error) {
-        console.error('Fetch order details error:', error);
-        showToast('Failed to fetch order details', 'error');
-    }
+    modalOverlay.onclick = (e) => {
+      if (e.target === modalOverlay) closeModal();
+    };
+  } catch (error) {
+    console.error("Fetch order details error:", error);
+    showToast("Failed to fetch order details", "error");
+  }
 };
 
 window.updateOrderStatus = async (id, status) => {
-    try {
-        const res = await fetch(`http://localhost:4000/order/update-status/${id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-            },
-            body: JSON.stringify({ status })
-        });
+  try {
+    const res = await fetch(`http://localhost:4000/order/update-status/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+      },
+      body: JSON.stringify({ status }),
+    });
 
-        const data = await res.json();
-        if (res.ok) {
-            showToast('Order status updated successfully', 'success');
-            return true;
-        } else {
-            showToast(data.message || 'Failed to update status', 'error');
-            return false;
-        }
-    } catch (error) {
-        console.error('Update status error:', error);
-        showToast('Error updating order status', 'error');
-        return false;
+    const data = await res.json();
+    if (res.ok) {
+      showToast("Order status updated successfully", "success");
+      return true;
+    } else {
+      showToast(data.message || "Failed to update status", "error");
+      return false;
     }
+  } catch (error) {
+    console.error("Update status error:", error);
+    showToast("Error updating order status", "error");
+    return false;
+  }
 };
 
 // --- Notifications & Modals ---
 
-window.showToast = (message, type = 'info') => {
-    const existingToast = document.querySelector('.toast');
-    if (existingToast) existingToast.remove();
+window.showToast = (message, type = "info") => {
+  const existingToast = document.querySelector(".toast");
+  if (existingToast) existingToast.remove();
 
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    
-    let icon = 'info';
-    if (type === 'success') icon = 'check_circle';
-    if (type === 'error') icon = 'error';
-    if (type === 'warning') icon = 'warning';
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
 
-    toast.innerHTML = `
+  let icon = "info";
+  if (type === "success") icon = "check_circle";
+  if (type === "error") icon = "error";
+  if (type === "warning") icon = "warning";
+
+  toast.innerHTML = `
         <span class="material-icons-round toast-icon">${icon}</span>
         <span class="toast-message">${message}</span>
     `;
 
-    document.body.appendChild(toast);
-    
-    // Animate in
-    setTimeout(() => toast.classList.add('show'), 100);
+  document.body.appendChild(toast);
 
-    // Auto remove
-    setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300);
-    }, 4000);
+  // Animate in
+  setTimeout(() => toast.classList.add("show"), 100);
+
+  // Auto remove
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
 };
 
 window.showConfirm = (title, message) => {
-    return new Promise((resolve) => {
-        const overlay = document.createElement('div');
-        overlay.className = 'confirm-modal-overlay';
-        
-        overlay.innerHTML = `
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.className = "confirm-modal-overlay";
+
+    overlay.innerHTML = `
             <div class="confirm-modal">
                 <div class="confirm-modal-title">${title}</div>
                 <div class="confirm-modal-message">${message}</div>
@@ -1104,23 +1207,23 @@ window.showConfirm = (title, message) => {
             </div>
         `;
 
-        document.body.appendChild(overlay);
-        
-        // Animate in
-        setTimeout(() => overlay.classList.add('show'), 10);
+    document.body.appendChild(overlay);
 
-        const close = (result) => {
-            overlay.classList.remove('show');
-            setTimeout(() => {
-                overlay.remove();
-                resolve(result);
-            }, 300);
-        };
+    // Animate in
+    setTimeout(() => overlay.classList.add("show"), 10);
 
-        overlay.querySelector('.btn-cancel').onclick = () => close(false);
-        overlay.querySelector('.btn-confirm-danger').onclick = () => close(true);
-        overlay.onclick = (e) => {
-            if (e.target === overlay) close(false);
-        };
-    });
+    const close = (result) => {
+      overlay.classList.remove("show");
+      setTimeout(() => {
+        overlay.remove();
+        resolve(result);
+      }, 300);
+    };
+
+    overlay.querySelector(".btn-cancel").onclick = () => close(false);
+    overlay.querySelector(".btn-confirm-danger").onclick = () => close(true);
+    overlay.onclick = (e) => {
+      if (e.target === overlay) close(false);
+    };
+  });
 };
