@@ -236,60 +236,97 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // Load cart items
+  // Load cart items OR Buy Now item
   let orderItemsDiv = document.getElementById("order-summary");
+  const buyNowItemJson = sessionStorage.getItem("buyNowItem");
 
-  const cartItems = await fetch("http://localhost:4000/cart/getCart", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  if (buyNowItemJson) {
+    // Handle Buy Now flow
+    const buyNowItem = JSON.parse(buyNowItemJson);
+    try {
+      const res = await fetch(`http://localhost:4000/product/${buyNowItem.productId}`);
+      if (!res.ok) throw new Error("Failed to fetch product details");
 
-  if (!cartItems.ok) {
-    showToast("Failed to fetch cart items.", "error");
-    return;
-  }
+      const data = await res.json();
+      const product = data.product;
+      const totalAmount = product.price * buyNowItem.quantity;
 
-  const data = await cartItems.json();
-  console.log(data);
-  let items = data.cart.products;
+      orderItemsDiv.innerHTML += `
+        <div class="item">
+          <img class="item-pic" src="${product.productImg || "../images/default.jpg"}" />
+          <div>
+            <p class="item-name">${product.product_name}</p>
+            <p class="item-qty">Qty: ${buyNowItem.quantity}</p>
+          </div>
+          <p class="item-price">Rs. ${product.price}</p>
+        </div>
+      `;
 
-  items.forEach((item) => {
-    const product = item.productId;
-    let image = product.productImg || "../images/default.jpg";
-    let name = product.product_name;
-    let qty = item.quantity;
-    let price = product.price;
+      orderItemsDiv.innerHTML += `
+        <div class="order-totals"> 
+          <div class="line"> 
+            <span>Subtotal</span> 
+            <span id="sub-total">Rs. ${totalAmount}</span> 
+          </div>
+          <div class="line total">
+            <span>Total</span>
+            <span id="total">Rs. ${totalAmount}</span> 
+          </div>
+        </div>`;
+    } catch (err) {
+      console.error("Error loading buy now item:", err);
+      showToast("Error loading product information.", "error");
+    }
+  } else {
+    // Original Cart flow
+    const cartItems = await fetch("http://localhost:4000/cart/getCart", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!cartItems.ok) {
+      showToast("Failed to fetch cart items.", "error");
+      return;
+    }
+
+    const data = await cartItems.json();
+    console.log(data);
+    let items = data.cart.products;
+
+    items.forEach((item) => {
+      const product = item.productId;
+      let image = product.productImg || "../images/default.jpg";
+      let name = product.product_name;
+      let qty = item.quantity;
+      let price = product.price;
+
+      orderItemsDiv.innerHTML += `
+        <div class="item">
+          <img class="item-pic" src="${image}" />
+          <div>
+            <p class="item-name">${name}</p>
+            <p class="item-qty">Qty: ${qty}</p>
+          </div>
+          <p class="item-price">Rs. ${price}</p>
+        </div>
+      `;
+    });
 
     orderItemsDiv.innerHTML += `
-    <div class="item">
-      <img class="item-pic" src="${image}" />
-      <div>
-        <p class="item-name">${name}</p>
-        <p class="item-qty">Qty: ${qty}</p>
-      </div>
-      <p class="item-price">Rs. ${price}</p>
-    </div>
-  `;
-  });
-
-  
-  orderItemsDiv.innerHTML += `
-  <div class="order-totals"> 
-    <div class="line"> 
-    <span>Subtotal</span> 
-    <span id="sub-total">Rs. ${data.cart.totalAmount}</span> 
-    </div>
-     <div class="line">
-       </div> <div class="line total">
-        <span>Total
-       </span>
-        <span id="total">Rs. ${data.cart.totalAmount }
-        </span> 
+      <div class="order-totals"> 
+        <div class="line"> 
+          <span>Subtotal</span> 
+          <span id="sub-total">Rs. ${data.cart.totalAmount}</span> 
         </div>
-         </div>`;
+        <div class="line total">
+          <span>Total</span>
+          <span id="total">Rs. ${data.cart.totalAmount}</span> 
+        </div>
+      </div>`;
+  }
 });
 
 const handlePaymentRedirect = (

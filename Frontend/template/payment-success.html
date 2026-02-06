@@ -75,6 +75,9 @@
             let time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
             const dateTimeElement = document.querySelector('.detail-row:nth-child(2) .detail-value');
             dateTimeElement.textContent = `${date} - ${time}`;
+            const buyNowItemJson = sessionStorage.getItem("buyNowItem");
+            const buyNowItem = buyNowItemJson ? JSON.parse(buyNowItemJson) : null;
+
             const res = fetch('/payment/verify-payment', {
                 method: 'POST',
                 headers: {
@@ -86,10 +89,18 @@
                     product_code,
                     transaction_code,
                     signature,
-                    total_amount
+                    total_amount,
+                    buyNowItem,
+                    isBuyNow: !!buyNowItem
                 }),
             }).then(response => response.json()).then(data => {
-                localStorage.removeItem('cartCount');
+                if (data.success) {
+                  if (buyNowItem) {
+                    sessionStorage.removeItem('buyNowItem');
+                  } else {
+                    localStorage.removeItem('cartCount');
+                  }
+                }
             })
         } catch (error) {
             

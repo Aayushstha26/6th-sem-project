@@ -143,6 +143,29 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
       });
     }
+    if (buy) {
+      buy.addEventListener("click", () => {
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
+          showToast("Please login to buy items.", "warning");
+          return;
+        }
+
+        const quantity = Number(quantityInput.value) || 1;
+        const buyNowItem = {
+          productId: productId,
+          quantity: quantity
+        };
+
+        // Clear any previous buyNowItem
+        sessionStorage.removeItem("buyNowItem");
+        // Store the new one
+        sessionStorage.setItem("buyNowItem", JSON.stringify(buyNowItem));
+        
+        // Redirect to address page
+        window.location.href = "/address";
+      });
+    }
   } catch (err) {
     console.error("❌ Error loading product details:", err);
     document.querySelector(".details-container").innerHTML =

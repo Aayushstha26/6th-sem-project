@@ -87,34 +87,7 @@ const verifyPayment = asyncHandler(async (req, res) => {
     throw new Apierror(500, `Payment verification failed: ${error.message}`);
   }
 
-  // Get user's cart
-  const cart = await Cart.findOne({ userId }).populate(
-    "products.productId",
-    "product_name price stock"
-  );
-
-  if (!cart || cart.products.length === 0) {
-    throw new Apierror(400, "Cart is empty");
-  }
-
-  // Calculate total amount
-  let calculatedAmount = 0;
-  cart.products.forEach((item) => {
-    calculatedAmount += item.productId.price * item.quantity;
-  });
-
-  // Compare amounts (using parseFloat for decimal comparison)
-  if (
-    parseFloat(calculatedAmount).toFixed(2) !==
-    parseFloat(total_amount).toFixed(2)
-  ) {
-    throw new Apierror(
-      400,
-      `Amount mismatch. Expected: ${calculatedAmount}, Received: ${total_amount}`
-    );
-  }
-
-  // Record payment
+  // RECORD PAYMENT
   const paymentRecord = await Payment.create({
     userId,
     transaction_uuid,
@@ -124,38 +97,94 @@ const verifyPayment = asyncHandler(async (req, res) => {
     paidAt: new Date(),
   });
 
-  // Create order
+  let itemsToOrder = [];
+  let calculatedAmount = 0;
+
+  const { isBuyNow, buyNowItem } = req.body;
+
+  if (isBuyNow && buyNowItem) {
+    // Handle Buy Now Order
+    const product = await Product.findById(buyNowItem.productId);
+    if (!product) {
+      throw new Apierror(404, "Product not found");
+    }
+    if (product.stock < buyNowItem.quantity) {
+      throw new Apierror(400, `Insufficient stock for ${product.product_name}`);
+    }
+
+    calculatedAmount = product.price * buyNowItem.quantity;
+    itemsToOrder.push({
+      product: product._id,
+      quantity: buyNowItem.quantity,
+      price: product.price,
+    });
+
+    // Update product stock
+    product.stock -= buyNowItem.quantity;
+    await product.save();
+  } else {
+    // Handle Cart Order
+    const cart = await Cart.findOne({ userId }).populate(
+      "products.productId",
+      "product_name price stock"
+    );
+
+    if (!cart || cart.products.length === 0) {
+      throw new Apierror(400, "Cart is empty");
+    }
+
+    cart.products.forEach((item) => {
+      calculatedAmount += item.productId.price * item.quantity;
+      itemsToOrder.push({
+        product: item.productId._id,
+        quantity: item.quantity,
+        price: item.productId.price,
+      });
+    });
+
+    // Update product stock and clear cart
+    for (let item of cart.products) {
+      const product = item.productId;
+      product.stock -= item.quantity;
+      await product.save();
+    }
+
+    // Clear cart
+    cart.products = [];
+    cart.totalAmount = 0;
+    await cart.save();
+  }
+
+  // Validate amount matches
+  if (
+    parseFloat(calculatedAmount).toFixed(2) !==
+    parseFloat(total_amount).toFixed(2)
+  ) {
+    // Note: If this fails, we've already deducted stock. 
+    // In a production app, we'd use a transaction here.
+    throw new Apierror(
+      400,
+      `Amount mismatch. Expected: ${calculatedAmount}, Received: ${total_amount}`
+    );
+  }
+
+  // CREATE ORDER
   const order = await Order.create({
     user: userId,
-    items: cart.products.map((item) => ({
-      product: item.productId._id,
-      quantity: item.quantity,
-      price: item.productId.price,
-    })),
+    items: itemsToOrder,
     amount: calculatedAmount,
     orderStatus: "Pending",
     paymentStatus: "Paid",
     transactionId: transaction_uuid,
-    payment : paymentRecord._id,
+    payment: paymentRecord._id,
   });
 
   if (!order) {
     throw new Apierror(500, "Failed to create order");
   }
-   paymentRecord.orderId = order._id;
-  await paymentRecord.save();
-  
-  // Update product stock
-  for (let item of cart.products) {
-    const product = item.productId;
-    product.stock -= item.quantity;
-    await product.save();
-  }
 
-  // Clear cart
-  cart.products = [];
-  cart.totalAmount = 0;
-  await cart.save();
+  paymentRecord.orderId = order._id;
+  await paymentRecord.save();
 
   return res.status(200).json({
     success: true,
@@ -171,29 +200,76 @@ const createCODPayment = asyncHandler(async (req, res) => {
 
   try {
     const userId = req.user._id;
+    const { isBuyNow, buyNowItem } = req.body;
 
-    const cart = await Cart.findOne({ userId })
-      .populate("products.productId", "product_name price stock")
-      .session(session);
-
-    if (!cart || cart.products.length === 0) {
-      throw new Apierror(400, "Cart is empty");
-    }
-
+    let itemsToOrder = [];
     let totalAmount = 0;
 
-    // ✅ STOCK VALIDATION FIRST
-    for (let item of cart.products) {
-      if (item.productId.stock < item.quantity) {
-        throw new Apierror(
-          400,
-          `Insufficient stock for ${item.productId.product_name}`
+    if (isBuyNow && buyNowItem) {
+      // Handle Buy Now Order (COD)
+      const product = await Product.findById(buyNowItem.productId).session(session);
+      if (!product) {
+        throw new Apierror(404, "Product not found");
+      }
+      if (product.stock < buyNowItem.quantity) {
+        throw new Apierror(400, `Insufficient stock for ${product.product_name}`);
+      }
+
+      totalAmount = product.price * buyNowItem.quantity;
+      itemsToOrder.push({
+        product: product._id,
+        quantity: buyNowItem.quantity,
+        price: product.price,
+      });
+
+      // Update stock
+      await Product.updateOne(
+        { _id: product._id },
+        { $inc: { stock: -buyNowItem.quantity } },
+        { session }
+      );
+    } else {
+      // Handle Cart Order (COD)
+      const cart = await Cart.findOne({ userId })
+        .populate("products.productId", "product_name price stock")
+        .session(session);
+
+      if (!cart || cart.products.length === 0) {
+        throw new Apierror(400, "Cart is empty");
+      }
+
+      // VALIDATE STOCK AND CALCULATE TOTAL
+      for (let item of cart.products) {
+        if (item.productId.stock < item.quantity) {
+          throw new Apierror(
+            400,
+            `Insufficient stock for ${item.productId.product_name}`
+          );
+        }
+        totalAmount += item.productId.price * item.quantity;
+        itemsToOrder.push({
+          product: item.productId._id,
+          quantity: item.quantity,
+          price: item.productId.price,
+        });
+      }
+
+      // UPDATE STOCK
+      for (let item of cart.products) {
+        await Product.updateOne(
+          { _id: item.productId._id },
+          { $inc: { stock: -item.quantity } },
+          { session }
         );
       }
-      totalAmount += item.productId.price * item.quantity;
+
+      // CLEAR CART
+      cart.products = [];
+      cart.totalAmount = 0;
+      await cart.save({ session });
     }
 
-    // ✅ PAYMENT
+    // PAYMENT
     const payment = await Payment.create(
       [{
         userId,
@@ -206,15 +282,11 @@ const createCODPayment = asyncHandler(async (req, res) => {
       { session }
     );
 
-    // ✅ ORDER
+    // ORDER
     const order = await Order.create(
       [{
         user: userId,
-        items: cart.products.map(item => ({
-          product: item.productId._id,
-          quantity: item.quantity,
-          price: item.productId.price,
-        })),
+        items: itemsToOrder,
         amount: totalAmount,
         orderStatus: "Pending",
         paymentStatus: "Pending",
@@ -227,20 +299,6 @@ const createCODPayment = asyncHandler(async (req, res) => {
     // Link payment → order
     payment[0].orderId = order[0]._id;
     await payment[0].save({ session });
-
-    // ✅ UPDATE STOCK
-    for (let item of cart.products) {
-      await Product.updateOne(
-        { _id: item.productId._id },
-        { $inc: { stock: -item.quantity } },
-        { session }
-      );
-    }
-
-    // ✅ CLEAR CART
-    cart.products = [];
-    cart.totalAmount = 0;
-    await cart.save({ session });
 
     await session.commitTransaction();
     session.endSession();

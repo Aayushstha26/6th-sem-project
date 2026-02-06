@@ -1,6 +1,7 @@
 import { updateNavbar } from "./slider.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
+  sessionStorage.removeItem("buyNowItem");
   const token = localStorage.getItem("accessToken");
   if (!token) {
     // window.location.href = "/signin";
