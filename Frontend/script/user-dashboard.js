@@ -62,10 +62,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
           // Calculate delivered and pending orders
           deliveredOrders = orders.filter(
-            (order) => order.orderStatus === "Delivered"
+            (order) => order.orderStatus === "Delivered",
           ).length;
           pendingOrders = orders.filter(
-            (order) => order.orderStatus === "Pending"
+            (order) => order.orderStatus === "Pending",
           ).length;
 
           console.log("Total Orders:", totalOrders);
@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="order-header">
             <h3>Order #${order._id.slice(-6)}</h3>
             <span class="order-date">${new Date(
-              order.createdAt
+              order.createdAt,
             ).toLocaleDateString("en-US", {
               month: "short",
               day: "numeric",
@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
             order._id
           }')">View Details</button>
         </div>
-      `
+      `,
               )
               .join("");
           } else {
@@ -158,7 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="order-header">
             <h3>Order #${order._id.slice(-6)}</h3>
             <span class="order-date">${new Date(
-              order.createdAt
+              order.createdAt,
             ).toLocaleDateString("en-US", {
               month: "short",
               day: "numeric",
@@ -181,7 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
             order._id
           }')">View Details</button>
         </div>
-      `
+      `,
               )
               .join("");
           } else {
@@ -197,46 +197,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
         html = `<div class="orders-container">${myOrdersHTML}</div>`;
         break;
-    case "⚙️ profile settings":
-  // Fetch current user profile data
-  let profileData = {};
-  
-  try {
-    const res = await fetch("/user/get", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+      case "⚙️ profile settings":
+        // Fetch current user profile data
+        let profileData = {};
 
-    const data = await res.json();
-    
-    if (res.ok) {
-      profileData = data.data || {};
-      console.log("Profile data:", profileData);
-    }
-  } catch (error) {
-    console.error("Error fetching profile:", error);
-    showToast("Failed to load profile data");
-  }
+        try {
+          const res = await fetch("/user/get", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
 
-  html = `
+          const data = await res.json();
+
+          if (res.ok) {
+            profileData = data.data || {};
+            console.log("Profile data:", profileData);
+          }
+        } catch (error) {
+          console.error("Error fetching profile:", error);
+          showToast("Failed to load profile data");
+        }
+
+        html = `
     <section class="profile-settings">
       <form class="profile-form" id="profileForm">
         <h2>Profile Settings</h2>
 
         <label>First Name</label>
-        <input type="text" id="fullName" name="fullName" placeholder="" value="${profileData.Firstname || ''}" required />
+        <input type="text" id="fullName" name="fullName" placeholder="" value="${profileData.Firstname || ""}" required />
 
         <label>Last Name</label>
-        <input type="text" id="fullName" name="fullName" placeholder="" value="${profileData.Lastname || ''}" required />
+        <input type="text" id="fullName" name="fullName" placeholder="" value="${profileData.Lastname || ""}" required />
 
         <label>Email</label>
-        <input type="email" id="email" name="email" placeholder="rohan@example.com" value="${profileData.Email || ''}" required />
+        <input type="email" id="email" name="email" placeholder="rohan@example.com" value="${profileData.Email || ""}" required />
 
         <label>Phone</label>
-        <input type="text" id="phone" name="phone" placeholder="+977-98XXXXXXX" value="${profileData.Phone || ''}" />
+        <input type="text" id="phone" name="phone" placeholder="+977-98XXXXXXX" value="${profileData.Phone || ""}" />
 
       
 
@@ -248,71 +248,65 @@ document.addEventListener("DOMContentLoaded", () => {
       </form>
     </section>
   `;
-  
-  // Add event listener after HTML is rendered
-  setTimeout(() => {
-    const profileForm = document.getElementById("profileForm");
-    if (profileForm) {
-      profileForm.addEventListener("submit", handleProfileUpdate);
-    }
-  }, 100);
-  
-  break;
+
+        // Add event listener after HTML is rendered
+        setTimeout(() => {
+          const profileForm = document.getElementById("profileForm");
+          if (profileForm) {
+            profileForm.addEventListener("submit", handleProfileUpdate);
+          }
+        }, 100);
+
+        break;
 
       case "💳 payment history":
-        html = `
-         <section class="payment-history">
-  <h2>Payment History</h2>
-  <div class="payment-timeline">
+        html = "";
+        try {
+          const result = await PaymentHistory();
 
-    <div class="timeline-item success">
-      <div class="timeline-date">Oct 12, 2025 — 2:45 PM</div>
-      <div class="timeline-content">
-        <h4>Payment #PAY1023</h4>
-        <p><strong>Order ID:</strong> #ORD2023</p>
-                <p><strong>Item:</strong> Earring</p>
+          html = ''
+          if (result.payments && result.payments.length > 0) {
+            html += `
+              <div class="payment-history">
+                <h2>Payment History</h2>
+                <div class="payment-timeline">
+            `;
+            
+            result.payments.forEach((payment) => {
+              const statusClass = payment.status ? payment.status.toLowerCase() : 'pending';
+              const date = new Date(payment.paidAt || payment.createdAt).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              });
 
-        <p><strong>Amount:</strong> Rs. 320</p>
-        <p><strong>Method:</strong> eSewa</p>
-        <p><strong>Transaction Ref:</strong> TXN94853212</p>
-        <p><strong>Status:</strong> <span class="status success">Successful</span></p>
-        <button class="receipt-btn">Download Receipt</button>
-      </div>
-    </div>
+              html += `
+                <div class="timeline-item ${statusClass}">
+                  <div class="timeline-content">
+                    <div class="timeline-date">${date}</div>
+                    <h4>Payment #${payment.transaction_uuid || payment._id.slice(-6)}</h4>
+                    <p><strong>Amount:</strong> Rs. ${payment.amount}</p>
+                    <p><strong>Method:</strong> ${payment.paymentMethod}</p>
+                    <p><strong>Status:</strong> <span class="status ${payment.status}">${payment.status}</span></p>
+                    ${payment.status === 'Success' ? '<button class="receipt-btn">Download Receipt</button>' : ''}
+                  </div>
+                </div>
+              `;
+            });
+            
+            html += `
+                </div>
+              </div>
+            `;
+          } else {
+            html = '<div class="payment-history"><p class="no-payments">No payment history found.</p></div>';
+          }
+          
+        } catch (err) {
+          console.error("Error loading payment history:", err);
+          html = "<p style='color:red;'>⚠️ Failed to load payment history.</p>";
+        }
 
-    <div class="timeline-item pending">
-      <div class="timeline-date">Oct 03, 2025 — 5:20 PM</div>
-      <div class="timeline-content">
-        <h4>Payment #PAY1022</h4>
-        <p><strong>Order ID:</strong> #ORD2022</p>
-                <p><strong>Item:</strong> Earring</p>
-
-        <p><strong>Amount:</strong> Rs. 85</p>
-        <p><strong>Method:</strong> Cash on Delivery</p>
-        <p><strong>Transaction Ref:</strong> TXN93248422</p>
-        <p><strong>Status:</strong> <span class="status pending">Pending</span></p>
-        <button class="receipt-btn disabled">Receipt Unavailable</button>
-      </div>
-    </div>
-
-    <div class="timeline-item failed">
-      <div class="timeline-date">Sep 28, 2025 — 8:10 PM</div>
-      <div class="timeline-content">
-        <h4>Payment #PAY1021</h4>
-        <p><strong>Order ID:</strong> #ORD2021</p>
-        <p><strong>Item:</strong> Earring</p>
-        <p><strong>Amount:</strong> Rs. 150</p>
-        <p><strong>Method:</strong> Khalti</p>
-        <p><strong>Transaction Ref:</strong> TXN92484102</p>
-        <p><strong>Status:</strong> <span class="status failed">Failed</span></p>
-        <button class="receipt-btn disabled">Retry Payment</button>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-`;
         break;
 
       default:
@@ -324,13 +318,13 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => contentArea.classList.add("fade"), 50);
   }
 
-const submit_btn = document.getElementById("submit-btn");
+  const submit_btn = document.getElementById("submit-btn");
   if (submit_btn) {
     submit_btn.addEventListener("click", handleProfileUpdate);
   }
   let logoutBtn = document.querySelector(".logout-btn");
   logoutBtn.addEventListener("click", async () => {
-    try{
+    try {
       fetch("/user/logout", {
         method: "POST",
         headers: {
@@ -342,7 +336,7 @@ const submit_btn = document.getElementById("submit-btn");
       localStorage.removeItem("username");
       localStorage.removeItem("email");
       window.location.href = "/";
-    }catch(err){  
+    } catch (err) {
       console.error("Logout failed:", err);
       showToast("Logout failed. Please try again.");
     }
@@ -365,15 +359,14 @@ function showToast(message) {
 }
 async function handleProfileUpdate(e) {
   e.preventDefault();
-  
+
   const token = localStorage.getItem("accessToken");
-  
+
   const formData = {
     Firstname: document.getElementById("fullName").value,
     Lastname: document.getElementById("fullName").value,
     Email: document.getElementById("email").value,
     Phone: document.getElementById("phone").value,
-  
   };
 
   console.log("Updating profile with:", formData);
@@ -402,9 +395,25 @@ async function handleProfileUpdate(e) {
     }
 
     showToast("Profile updated successfully!");
-    
   } catch (error) {
     console.error("Error updating profile:", error);
     showToast(error.message || "Failed to update profile");
   }
+}
+
+async function PaymentHistory() {
+  const token = localStorage.getItem("accessToken");
+  const res = await fetch("/payment/history", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const data = await res.json();
+  console.log("Payment history data:", data);
+  if (!res.ok) {
+    throw new Error(data.message || "Failed to fetch payment history");
+  }
+  return data;
 }

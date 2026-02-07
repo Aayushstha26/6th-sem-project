@@ -126,7 +126,7 @@ const verifyPayment = asyncHandler(async (req, res) => {
     // Handle Cart Order
     const cart = await Cart.findOne({ userId }).populate(
       "products.productId",
-      "product_name price stock"
+      "product_name price stock",
     );
 
     if (!cart || cart.products.length === 0) {
@@ -160,11 +160,11 @@ const verifyPayment = asyncHandler(async (req, res) => {
     parseFloat(calculatedAmount).toFixed(2) !==
     parseFloat(total_amount).toFixed(2)
   ) {
-    // Note: If this fails, we've already deducted stock. 
+    // Note: If this fails, we've already deducted stock.
     // In a production app, we'd use a transaction here.
     throw new Apierror(
       400,
-      `Amount mismatch. Expected: ${calculatedAmount}, Received: ${total_amount}`
+      `Amount mismatch. Expected: ${calculatedAmount}, Received: ${total_amount}`,
     );
   }
 
@@ -193,7 +193,6 @@ const verifyPayment = asyncHandler(async (req, res) => {
   });
 });
 
-
 const createCODPayment = asyncHandler(async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -207,12 +206,17 @@ const createCODPayment = asyncHandler(async (req, res) => {
 
     if (isBuyNow && buyNowItem) {
       // Handle Buy Now Order (COD)
-      const product = await Product.findById(buyNowItem.productId).session(session);
+      const product = await Product.findById(buyNowItem.productId).session(
+        session,
+      );
       if (!product) {
         throw new Apierror(404, "Product not found");
       }
       if (product.stock < buyNowItem.quantity) {
-        throw new Apierror(400, `Insufficient stock for ${product.product_name}`);
+        throw new Apierror(
+          400,
+          `Insufficient stock for ${product.product_name}`,
+        );
       }
 
       totalAmount = product.price * buyNowItem.quantity;
@@ -226,7 +230,7 @@ const createCODPayment = asyncHandler(async (req, res) => {
       await Product.updateOne(
         { _id: product._id },
         { $inc: { stock: -buyNowItem.quantity } },
-        { session }
+        { session },
       );
     } else {
       // Handle Cart Order (COD)
@@ -243,7 +247,7 @@ const createCODPayment = asyncHandler(async (req, res) => {
         if (item.productId.stock < item.quantity) {
           throw new Apierror(
             400,
-            `Insufficient stock for ${item.productId.product_name}`
+            `Insufficient stock for ${item.productId.product_name}`,
           );
         }
         totalAmount += item.productId.price * item.quantity;
@@ -259,7 +263,7 @@ const createCODPayment = asyncHandler(async (req, res) => {
         await Product.updateOne(
           { _id: item.productId._id },
           { $inc: { stock: -item.quantity } },
-          { session }
+          { session },
         );
       }
 
@@ -271,29 +275,33 @@ const createCODPayment = asyncHandler(async (req, res) => {
 
     // PAYMENT
     const payment = await Payment.create(
-      [{
-        userId,
-        transaction_uuid: `COD-${Date.now()}`,
-        amount: totalAmount,
-        paymentMethod: "CashOnDelivery",
-        status: "Pending",
-        paidAt: null,
-      }],
-      { session }
+      [
+        {
+          userId,
+          transaction_uuid: `COD-${Date.now()}`,
+          amount: totalAmount,
+          paymentMethod: "CashOnDelivery",
+          status: "Pending",
+          paidAt: null,
+        },
+      ],
+      { session },
     );
 
     // ORDER
     const order = await Order.create(
-      [{
-        user: userId,
-        items: itemsToOrder,
-        amount: totalAmount,
-        orderStatus: "Pending",
-        paymentStatus: "Pending",
-        transactionId: payment[0].transaction_uuid,
-        payment: payment[0]._id,
-      }],
-      { session }
+      [
+        {
+          user: userId,
+          items: itemsToOrder,
+          amount: totalAmount,
+          orderStatus: "Pending",
+          paymentStatus: "Pending",
+          transactionId: payment[0].transaction_uuid,
+          payment: payment[0]._id,
+        },
+      ],
+      { session },
     );
 
     // Link payment → order
@@ -308,7 +316,6 @@ const createCODPayment = asyncHandler(async (req, res) => {
       message: "COD order placed successfully",
       orderId: order[0]._id,
     });
-
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -316,6 +323,13 @@ const createCODPayment = asyncHandler(async (req, res) => {
   }
 });
 
-  
+const getPaymentHistory = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const payments = await Payment.find({ userId }).sort({ paidAt: -1 });
+  return res.status(200).json({
+    results: payments.length,
+    payments,
+  });
+});
 
-export { createSignature, verifyPayment , createCODPayment };
+export { createSignature, verifyPayment, createCODPayment, getPaymentHistory };
