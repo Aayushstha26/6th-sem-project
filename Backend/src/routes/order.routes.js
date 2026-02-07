@@ -12,6 +12,6 @@ orderRouter.route("/all-orders").get( verifyAdminJwt ,getAllOrders);
 orderRouter.route("/delete-order/:id").delete(verifyAdminJwt , deleteOrder);
 orderRouter.route("/status/:status").get( verifyJwt, getOrderByStatus);
 orderRouter.route("/:id").get( verifyAdminJwt, getOrderById);
-orderRouter.route("/update-status/:id").put( verifyAdminJwt, updateOrderStatus);
+orderRouter.route("/update-status/:id").put(  updateOrderStatus);
 
 export default orderRouter;

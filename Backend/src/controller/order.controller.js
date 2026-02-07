@@ -86,6 +86,7 @@ const deleteOrder = asyncHandler(async (req, res) => {
 const updateOrderStatus = asyncHandler(async (req, res) => {
   const orderId = req.params.id;
   const { status } = req.body;
+  console.log("Received status update request:", { orderId, status }); // Debug log
   const validStatuses = ["Pending", "Delivered", "Cancelled"];
   if (!validStatuses.includes(status)) {
     throw new Apierror(400, "Invalid order status");

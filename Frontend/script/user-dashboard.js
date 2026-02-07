@@ -264,17 +264,21 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
           const result = await PaymentHistory();
 
-          html = ''
+          html = "";
           if (result.payments && result.payments.length > 0) {
             html += `
               <div class="payment-history">
                 <h2>Payment History</h2>
                 <div class="payment-timeline">
             `;
-            
+
             result.payments.forEach((payment) => {
-              const statusClass = payment.status ? payment.status.toLowerCase() : 'pending';
-              const date = new Date(payment.paidAt || payment.createdAt).toLocaleDateString("en-US", {
+              const statusClass = payment.status
+                ? payment.status.toLowerCase()
+                : "pending";
+              const date = new Date(
+                payment.paidAt || payment.createdAt,
+              ).toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",
                 year: "numeric",
@@ -288,20 +292,20 @@ document.addEventListener("DOMContentLoaded", () => {
                     <p><strong>Amount:</strong> Rs. ${payment.amount}</p>
                     <p><strong>Method:</strong> ${payment.paymentMethod}</p>
                     <p><strong>Status:</strong> <span class="status ${payment.status}">${payment.status}</span></p>
-                    ${payment.status === 'Success' ? '<button class="receipt-btn">Download Receipt</button>' : ''}
+                    ${payment.status === "Success" ? '<button class="receipt-btn">Download Receipt</button>' : ""}
                   </div>
                 </div>
               `;
             });
-            
+
             html += `
                 </div>
               </div>
             `;
           } else {
-            html = '<div class="payment-history"><p class="no-payments">No payment history found.</p></div>';
+            html =
+              '<div class="payment-history"><p class="no-payments">No payment history found.</p></div>';
           }
-          
         } catch (err) {
           console.error("Error loading payment history:", err);
           html = "<p style='color:red;'>⚠️ Failed to load payment history.</p>";
@@ -401,6 +405,8 @@ async function handleProfileUpdate(e) {
   }
 }
 
+// ... existing code ...
+
 async function PaymentHistory() {
   const token = localStorage.getItem("accessToken");
   const res = await fetch("/payment/history", {
@@ -417,3 +423,190 @@ async function PaymentHistory() {
   }
   return data;
 }
+
+// ... existing code ...
+
+// Global scope to be accessible from HTML onclick
+window.viewOrderDetails = async function (orderId) {
+  console.log("View details for order:", orderId);
+  const modal = document.getElementById("order-details-modal");
+  const modalBody = document.getElementById("modal-body");
+  const closeBtn = document.querySelector(".close-modal");
+  const token = localStorage.getItem("accessToken");
+
+  if (!modal || !modalBody) {
+    console.error("Modal elements not found");
+    return;
+  }
+
+  // Show loading state
+  modal.style.display = "flex";
+  modalBody.innerHTML =
+    '<p style="text-align:center;">Loading order details...</p>';
+
+  try {
+    // Fetch all orders to find the specific one (or use specific endpoint if available)
+    // Since we are already on the dashboard, we might have the orders in memory, but fetching ensures fresh data
+    // Optimization: If a get-single-order endpoint exists, use it. Otherwise, filter from list.
+    // Assuming /order/orders returns the list.
+    const res = await fetch("/order/orders", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.message || "Failed to fetch order details");
+    }
+
+    const orders = data.data || [];
+    const order = orders.find((o) => o._id === orderId);
+
+    if (!order) {
+      throw new Error("Order not found");
+    }
+
+    // Calculate totals
+    const subtotal = order.items.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0,
+    );
+    // Assuming shipping is 0 or part of total. If total > subtotal, diff is shipping.
+    // But the order object has 'amount' which is total.
+
+    const date = new Date(order.createdAt).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    let itemsHtml = order.items
+      .map(
+        (item) => `
+            <li class="modal-item">
+                <div class="modal-item-info">
+                   <img src="${item.product.product_image}" alt="${item.product.product_name}" class="modal-item-image" onerror="this.src='../images/logo.png'">
+                    <div>
+                        <p><strong>${item.product.product_name}</strong></p>
+                        <p style="font-size: 0.9em; color: #666;">Qty: ${item.quantity}</p>
+                    </div>
+                </div>
+                <div>
+                   Rs. ${item.price * item.quantity}
+                </div>
+            </li>
+        `,
+      )
+      .join("");
+
+    // Cancel Button Logic
+    let cancelBtnHtml = "";
+    if (order.orderStatus === "Pending") {
+      cancelBtnHtml = `
+                <div class="modal-actions" style="margin-top: 20px; text-align: right;">
+                    <button class="cancel-order-btn" onclick="cancelOrder('${order._id}')">Cancel Order</button>
+                </div>
+            `;
+    }
+
+    const html = `
+            <div class="modal-order-header">
+                <h3>Order Details</h3>
+                <p>Order ID: #${order._id.slice(-6)}</p>
+                <p>Placed on: ${date}</p>
+                 <p>Status: <span class="status ${order.orderStatus}">${order.orderStatus}</span></p>
+            </div>
+
+            <div class="modal-section">
+                <h4>Items</h4>
+                <ul class="modal-item-list">
+                    ${itemsHtml}
+                </ul>
+            </div>
+
+            <div class="modal-section">
+                <h4>Payment Info</h4>
+                 <p>Method: ${order.paymentMethod}</p>
+                 <p>Status: <span class="status ${order.paymentStatus}">${order.paymentStatus}</span></p>
+            </div>
+            
+             <div class="modal-section">
+                <h4>Shipping Address</h4>
+                 <p>${order.shippingAddress || "Address not available"}</p>
+            </div>
+
+            <div class="modal-summary">
+                 <p><span>Subtotal</span> <span>Rs. ${subtotal}</span></p>
+                 <p><span>Shipping</span> <span>Rs. ${order.amount - subtotal > 0 ? order.amount - subtotal : 0}</span></p>
+                 <p style="border-top: 1px solid #ccc; padding-top: 5px; margin-top: 5px;"><strong>Total</strong> <strong>Rs. ${order.amount}</strong></p>
+            </div>
+            
+            ${cancelBtnHtml}
+        `;
+
+    modalBody.innerHTML = html;
+  } catch (error) {
+    console.error("Error loading order details:", error);
+    modalBody.innerHTML =
+      '<p style="color:red; text-align:center;">Failed to load order details.</p>';
+  }
+
+  // Close logic
+  closeBtn.onclick = function () {
+    modal.style.display = "none";
+  };
+
+  window.onclick = function (event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  };
+};
+
+// Cancel Order Function
+window.cancelOrder = async function (orderId) {
+  const isConfirmed = await showConfirm(
+    "Cancel Order",
+    "Are you sure you want to cancel this order? This action cannot be undone.",
+    { isDanger: true, confirmText: "Yes, Cancel" },
+  );
+
+  if (!isConfirmed) return;
+
+  const token = localStorage.getItem("accessToken");
+  try {
+    const res = await fetch(`/order/update-status/${orderId}`, {
+      // Assuming this endpoint exists based on convention
+      method: "PUT", // or POST/PATCH depending on backend
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ status: "Cancelled" }), // Assuming backend expects status in body
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      showToast("Order cancelled successfully!", "success");
+      // Refresh modal to show updated status or close it
+      // For now, reload the page to refresh headers/status everywhere
+      setTimeout(() => {
+        location.reload();
+      }, 1000);
+    } else {
+      throw new Error(data.message || "Failed to cancel order");
+    }
+  } catch (error) {
+    console.error("Error cancelling order:", error);
+    showToast(
+      error.message || "Failed to cancel order. Please try again.",
+      "error",
+    );
+  }
+};
