@@ -4,11 +4,16 @@
  * @param {number} limit - The number of products to return.
  * @returns {Array} - The sorted and limited array of products.
  */
-export const getTopRatedProductsManual = (products, limit = 10) => {
-  const n = products.length;
+export const getTopRatedProductsManual = (products, limit = 4) => {
+  // Filter out products with zero or no ratings
+  const ratedProducts = products.filter(product => 
+    product.averageRating && product.averageRating > 0
+  );
+  
+  const n = ratedProducts.length;
   
   // Create a shallow copy to avoid mutating the original array
-  const sortedProducts = [...products];
+  const sortedProducts = [...ratedProducts];
 
   // Selection Sort in descending order based on averageRating
   for (let i = 0; i < n - 1; i++) {

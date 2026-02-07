@@ -522,6 +522,7 @@ footer {
 .instagram-gradient {
   background: linear-gradient(to right, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: 600;
   font-size: 14px;
@@ -586,4 +587,109 @@ footer {
 .error textarea::placeholder {
   color: #e74c3c;
   top: 50% ;
+}
+
+/* Payment Method Selection Styles */
+.payment-method-section {
+  margin: 25px 0;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.payment-method-section h3 {
+  color: #c83e7c;
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.payment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.payment-option {
+  cursor: pointer;
+  position: relative;
+}
+
+.payment-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.payment-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  background: #fff;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.payment-card:hover {
+  border-color: #c83e7c;
+  box-shadow: 0 4px 12px rgba(200, 62, 124, 0.15);
+  transform: translateY(-2px);
+}
+
+.payment-option input[type="radio"]:checked + .payment-card {
+  border-color: #c83e7c;
+  background: linear-gradient(135deg, rgba(200, 62, 124, 0.05), rgba(214, 41, 118, 0.05));
+  box-shadow: 0 4px 15px rgba(200, 62, 124, 0.2);
+}
+
+.payment-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.esewa-icon {
+  background: linear-gradient(135deg, #60d160, #3ab83a);
+  color: white;
+}
+
+.cod-icon {
+  background: linear-gradient(135deg, #ffa726, #ff7043);
+  color: white;
+}
+
+.payment-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.payment-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #2d1f12;
+}
+
+.payment-desc {
+  font-size: 0.85rem;
+  color: #777;
+}
+
+.checkmark {
+  font-size: 24px;
+  color: #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.payment-option input[type="radio"]:checked + .payment-card .checkmark {
+  color: #c83e7c;
+  transform: scale(1.1);
 }

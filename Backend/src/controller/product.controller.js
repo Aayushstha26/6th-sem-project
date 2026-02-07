@@ -129,8 +129,8 @@ const getTopRatedProducts = asyncHandler(async (req, res) => {
       select: "Firstname Lastname",
     });
   
-  const topRatedProducts = getTopRatedProductsManual(products, 5);
-
+  const topRatedProducts = getTopRatedProductsManual(products, 4);
+    console.log("Top Rated Products:", topRatedProducts);
   return res.status(200).json({
     results: topRatedProducts.length,
     products: topRatedProducts,

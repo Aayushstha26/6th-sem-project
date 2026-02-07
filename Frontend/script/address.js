@@ -1,6 +1,5 @@
 import { updateNavbar } from "./slider.js";
 
-
 window.addEventListener("DOMContentLoaded", async () => {
   let form = document.getElementById("address-form");
   let fullName = document.getElementById("fullname");
@@ -18,12 +17,32 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   updateNavbar(false);
 
+    const res = await fetch("http://localhost:4000/user/get", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (res.ok) {
+    const data = await res.json();
+    console.log("User data response:", data);
+    const user = data.data;
+
+    console.log("User data:", user);
+    fullName.value = `${user.Firstname} ${user.Lastname}`;
+    email.value = user.Email;
+    phoneNumber.value = user.Phone || "";
+  } else {
+    showToast("Failed to fetch user information.", "error");
+  }
+
   // ✅ FIXED: Event listeners OUTSIDE submit handler
   fullName.addEventListener("input", () => {
     checkvalid(
       fullName,
       fullName.value.trim() !== "" && isName(fullName.value.trim()),
-      "Full name must be at least 3 characters"
+      "Full name must be at least 3 characters",
     );
   });
 
@@ -31,7 +50,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     checkvalid(
       phoneNumber,
       phoneNumber.value.trim() !== "" && isPhone(phoneNumber.value.trim()),
-      "Phone must be 10 digits"
+      "Phone must be 10 digits",
     );
   });
 
@@ -39,7 +58,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     checkvalid(
       postalCode,
       postalCode.value.trim() !== "" && isPostalCode(postalCode.value.trim()),
-      "Postal code must be 5 digits"
+      "Postal code must be 5 digits",
     );
   });
 
@@ -47,7 +66,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     checkvalid(
       address,
       address.value.trim().length >= 5,
-      "Address must be at least 5 characters"
+      "Address must be at least 5 characters",
     );
   });
 
@@ -55,7 +74,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     checkvalid(
       email,
       email.value.trim() !== "" && isEmail(email.value.trim()),
-      "Not a valid email"
+      "Not a valid email",
     );
   });
 
@@ -63,7 +82,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     checkvalid(
       city,
       city.value.trim() !== "" && isName(city.value.trim()),
-      "City must be at least 3 characters"
+      "City must be at least 3 characters",
     );
   });
 
@@ -90,32 +109,32 @@ window.addEventListener("DOMContentLoaded", async () => {
     checkvalid(
       fullName,
       fullName.value.trim() !== "" && isName(fullName.value.trim()),
-      "Full name can't be blank"
+      "Full name can't be blank",
     );
     checkvalid(
       phoneNumber,
       phoneNumber.value.trim() !== "" && isPhone(phoneNumber.value.trim()),
-      "Phone must be 10 digits"
+      "Phone must be 10 digits",
     );
     checkvalid(
       postalCode,
       postalCode.value.trim() !== "" && isPostalCode(postalCode.value.trim()),
-      "Postal code must be 5 digits"
+      "Postal code must be 5 digits",
     );
     checkvalid(
       address,
       address.value.trim().length >= 5,
-      "Address must be at least 5 characters"
+      "Address must be at least 5 characters",
     );
     checkvalid(
       email,
       email.value.trim() !== "" && isEmail(email.value.trim()),
-      "Not a valid email"
+      "Not a valid email",
     );
     checkvalid(
       city,
       city.value.trim() !== "" && isName(city.value.trim()),
-      "City can't be blank"
+      "City can't be blank",
     );
 
     document
@@ -156,7 +175,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     icon.className = "icon fas fa-times-circle";
   }
 
-  
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -164,6 +182,9 @@ window.addEventListener("DOMContentLoaded", async () => {
     if (!checkAddressform()) {
       return; // Stop if validation fails
     }
+
+    // Get selected payment method
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
 
     // Collect form data
     const formData = {
@@ -191,39 +212,13 @@ window.addEventListener("DOMContentLoaded", async () => {
       if (res.ok) {
         showToast(result.message, "success");
 
-        // Prepare payment
-        let product_code = "EPAYTEST";
-        let total_amount = document
-          .getElementById("total")
-          .innerText.replace("Rs. ", "")
-          .trim();
-        let transaction_uuid = "TXN" + Date.now().toString();
-
-        // Get payment signature
-        const response = await fetch(
-          "http://localhost:4000/payment/generate-signature",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              total_amount: total_amount,
-              transaction_uuid: transaction_uuid,
-              product_code: product_code,
-            }),
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          handlePaymentRedirect(
-            total_amount,
-            transaction_uuid,
-            product_code,
-            data.signature
-          );
+        // Route based on payment method
+        if (paymentMethod === "cod") {
+          // Handle COD Payment
+          await handleCODPayment();
+        } else {
+          // Handle eSewa Payment
+          await handleEsewaPayment();
         }
 
         form.reset();
@@ -236,6 +231,93 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
+  // COD Payment Handler
+  async function handleCODPayment() {
+    try {
+      const buyNowItemJson = sessionStorage.getItem("buyNowItem");
+      const requestBody = {};
+
+      if (buyNowItemJson) {
+        // Buy Now flow
+        requestBody.isBuyNow = true;
+        requestBody.buyNowItem = JSON.parse(buyNowItemJson);
+      } else {
+        // Cart flow
+        requestBody.isBuyNow = false;
+      }
+
+      const response = await fetch("http://localhost:4000/payment/cod-payment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        showToast("Order placed successfully!", "success");
+        // Clear buy now item if exists
+        sessionStorage.removeItem("buyNowItem");
+        // Redirect to success page
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1500);
+      } else {
+        showToast(data.message || "Failed to place order", "error");
+      }
+    } catch (error) {
+      console.error("COD payment error:", error);
+      showToast("Error processing COD payment. Please try again.", "error");
+    }
+  }
+
+  // eSewa Payment Handler
+  async function handleEsewaPayment() {
+    try {
+      let product_code = "EPAYTEST";
+      let total_amount = document
+        .getElementById("total")
+        .innerText.replace("Rs. ", "")
+        .trim();
+      let transaction_uuid = "TXN" + Date.now().toString();
+
+      // Get payment signature
+      const response = await fetch(
+        "http://localhost:4000/payment/generate-signature",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            total_amount: total_amount,
+            transaction_uuid: transaction_uuid,
+            product_code: product_code,
+          }),
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        handlePaymentRedirect(
+          total_amount,
+          transaction_uuid,
+          product_code,
+          data.signature,
+        );
+      } else {
+        showToast("Failed to generate payment signature", "error");
+      }
+    } catch (error) {
+      console.error("eSewa payment error:", error);
+      showToast("Error processing eSewa payment. Please try again.", "error");
+    }
+  }
+
   // Load cart items OR Buy Now item
   let orderItemsDiv = document.getElementById("order-summary");
   const buyNowItemJson = sessionStorage.getItem("buyNowItem");
@@ -244,7 +326,9 @@ window.addEventListener("DOMContentLoaded", async () => {
     // Handle Buy Now flow
     const buyNowItem = JSON.parse(buyNowItemJson);
     try {
-      const res = await fetch(`http://localhost:4000/product/${buyNowItem.productId}`);
+      const res = await fetch(
+        `http://localhost:4000/product/${buyNowItem.productId}`,
+      );
       if (!res.ok) throw new Error("Failed to fetch product details");
 
       const data = await res.json();
@@ -333,7 +417,7 @@ const handlePaymentRedirect = (
   total_amount,
   transaction_uuid,
   product_code,
-  signature
+  signature,
 ) => {
   const form = document.createElement("form");
   form.method = "POST";
