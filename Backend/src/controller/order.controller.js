@@ -1,4 +1,5 @@
 import { Order } from "../models/order.model.js";
+import { Product } from "../models/product.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { Apierror } from "../utils/apiError.js";
 import { Apiresponse } from "../utils/apiRespone.js";
@@ -95,8 +96,20 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   if (!order) {
     throw new Apierror(404, "Order not found");
   }
+  const previousStatus = order.orderStatus;
   order.orderStatus = status;
-  await order.save();
+    await order.save();
+
+  if(previousStatus !== "Cancelled" && status === "Cancelled"){
+    for (const item of order.items) {
+      const product = await Product.findById(item.product);
+      if (product) {
+        product.stock += item.quantity;
+        await product.save();
+      }
+  }
+  }
+
   return res
     .status(200)
     .json(new Apiresponse(200, "Order status updated successfully", order));
