@@ -122,7 +122,7 @@ async function renderView(viewName) {
       const users = await fetchUsers();
       if (users) {
         container.innerHTML = getUsersTemplate(users);
-       
+
         setupUserSearch(users);
       } else {
         container.innerHTML = `<p class="error-message">Failed to load users.</p>`;
@@ -842,6 +842,16 @@ function getAnalyticsTemplate(data) {
                 </div>
             </div>
         </div>
+        <div class="chart-section">
+            <div class="chart-card">
+                 <div class="chart-header">
+                    <h3 class="chart-title">Order Distribution</h3>
+                </div>
+                <div style="position: relative; height: 300px; width: 100%;">
+                    <canvas id="orderChart"></canvas>
+                </div>
+            </div>
+        </div>
         
          <div class="chart-section">
             <div class="chart-card">
@@ -859,34 +869,42 @@ function getAnalyticsTemplate(data) {
 function initAnalyticsCharts(data) {
   const mainCtx = document
     .getElementById("analyticsMainChart")
-    .getContext("2d");
-  const catCtx = document.getElementById("categoryChart").getContext("2d");
+    ?.getContext("2d");
+  const catCtx = document.getElementById("categoryChart")?.getContext("2d");
+  const ordersCtx = document.getElementById("orderChart")?.getContext("2d");
 
   const chartLabels = data.chartData?.data?.labels || [];
   const chartRevenue = data.chartData?.data?.revenue || [];
   const chartOrders = data.chartData?.data?.orders || [];
 
+  // Main Revenue Chart - Beautiful Line Chart with Gradient
   if (mainCtx) {
+    // Create gradient for area fill
+    const revenueGradient = mainCtx.createLinearGradient(0, 0, 0, 300);
+    revenueGradient.addColorStop(0, "rgba(214, 41, 118, 0.4)"); // Pink at top
+    revenueGradient.addColorStop(1, "rgba(214, 41, 118, 0.05)"); // Almost transparent at bottom
+
     new Chart(mainCtx, {
-      type: "bar",
+      type: "line",
       data: {
         labels: chartLabels,
         datasets: [
           {
             label: "Revenue",
             data: chartRevenue,
-            backgroundColor: "rgba(214, 41, 118, 0.8)",
-            yAxisID: "y",
-          },
-          {
-            label: "Orders",
-            data: chartOrders,
-            borderColor: "#fa7e1e",
-            backgroundColor: "transparent",
-            borderWidth: 2,
-            yAxisID: "y1",
-            type: "line",
-            tension: 0.4,
+            borderColor: "#d62976", // Pink line
+            backgroundColor: revenueGradient, // Gradient fill
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4, // Smooth curves
+            pointRadius: 6,
+            pointHoverRadius: 8,
+            pointBackgroundColor: "#d62976",
+            pointBorderColor: "#fff",
+            pointBorderWidth: 2,
+            pointHoverBackgroundColor: "#d62976",
+            pointHoverBorderColor: "#fff",
+            pointHoverBorderWidth: 3,
           },
         ],
       },
@@ -897,25 +915,156 @@ function initAnalyticsCharts(data) {
           mode: "index",
           intersect: false,
         },
+        plugins: {
+          legend: {
+            display: false, // Hide legend like in the screenshot
+          },
+          tooltip: {
+            backgroundColor: "rgba(0, 0, 0, 0.9)",
+            padding: 12,
+            titleFont: {
+              size: 13,
+              weight: "bold",
+            },
+            bodyFont: {
+              size: 13,
+            },
+            borderColor: "#d62976",
+            borderWidth: 1,
+            displayColors: false,
+            callbacks: {
+              title: function (context) {
+                return context[0].label;
+              },
+              label: function (context) {
+                return "Revenue: Rs. " + context.parsed.y.toLocaleString();
+              },
+            },
+          },
+        },
         scales: {
           y: {
-            type: "linear",
-            display: true,
-            position: "left",
-            title: { display: true, text: "Revenue (Rs.)" },
+            beginAtZero: true,
+            grid: {
+              color: "rgba(0, 0, 0, 0.05)",
+              drawBorder: false,
+            },
+            ticks: {
+              callback: function (value) {
+                return "Rs. " + value.toLocaleString();
+              },
+              font: {
+                size: 11,
+              },
+              color: "#666",
+              padding: 8,
+            },
           },
-          y1: {
-            type: "linear",
-            display: true,
-            position: "right",
-            grid: { drawOnChartArea: false },
-            title: { display: true, text: "Order Count" },
+          x: {
+            grid: {
+              display: false,
+            },
+            ticks: {
+              font: {
+                size: 11,
+              },
+              color: "#666",
+            },
           },
         },
       },
     });
   }
 
+  if (ordersCtx) {
+    // Create gradient for bars
+    const ordersGradient = ordersCtx.createLinearGradient(0, 0, 0, 300);
+    ordersGradient.addColorStop(0, 'rgba(250, 126, 30, 0.8)'); // Orange at top
+    ordersGradient.addColorStop(1, 'rgba(250, 126, 30, 0.3)'); // Lighter at bottom
+
+    new Chart(ordersCtx, {
+      type: 'bar',
+      data: {
+        labels: chartLabels,
+        datasets: [
+          {
+            label: 'Orders',
+            data: chartOrders,
+            backgroundColor: ordersGradient,
+            borderColor: '#fa7e1e',
+            borderWidth: 2,
+            borderRadius: 10,
+            borderSkipped: false,
+            barPercentage: 0.3,     // Makes bars narrower (default is 0.9)
+          // categoryPercentage: 0.8 
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            padding: 12,
+            titleFont: {
+              size: 13,
+              weight: 'bold',
+            },
+            bodyFont: {
+              size: 13,
+            },
+            borderColor: '#fa7e1e',
+            borderWidth: 1,
+            displayColors: false,
+            callbacks: {
+              title: function(context) {
+                return context[0].label;
+              },
+              label: function (context) {
+                return 'Orders: ' + context.parsed.y.toLocaleString();
+              },
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)',
+              drawBorder: false,
+            },
+            ticks: {
+              callback: function (value) {
+                return value.toLocaleString();
+              },
+              font: {
+                size: 11,
+              },
+              color: '#666',
+              padding: 8,
+            },
+          },
+          x: {
+            grid: {
+              display: false,
+            },
+            ticks: {
+              font: {
+                size: 11,
+              },
+              color: '#666',
+            },
+          },
+        },
+      },
+    });
+  }
+
+  // Category Distribution Chart
   if (catCtx && data.products) {
     const categoryCounts = {};
     data.products.forEach((p) => {
@@ -931,13 +1080,18 @@ function initAnalyticsCharts(data) {
           {
             data: Object.values(categoryCounts),
             backgroundColor: [
-              "#d62976",
-              "#fa7e1e",
-              "#f39c12",
-              "#2ecc71",
-              "#3498db",
-              "#9b59b6",
+              "#6366f1", // Indigo
+              "#8b5cf6", // Purple
+              "#ec4899", // Pink
+              "#f59e0b", // Orange
+              "#10b981", // Green
+              "#3b82f6", // Blue
+              "#14b8a6", // Teal
+              "#f97316", // Deep Orange
             ],
+            borderColor: "#ffffff",
+            borderWidth: 3,
+            hoverOffset: 15,
           },
         ],
       },
@@ -945,8 +1099,60 @@ function initAnalyticsCharts(data) {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { position: "right" },
+          legend: {
+            position: "right",
+            labels: {
+              padding: 15,
+              font: {
+                size: 12,
+                weight: "600",
+              },
+              usePointStyle: true,
+              pointStyle: "circle",
+              generateLabels: function (chart) {
+                const data = chart.data;
+                if (data.labels.length && data.datasets.length) {
+                  return data.labels.map((label, i) => {
+                    const value = data.datasets[0].data[i];
+                    const total = data.datasets[0].data.reduce(
+                      (a, b) => a + b,
+                      0,
+                    );
+                    const percentage = ((value / total) * 100).toFixed(1);
+                    return {
+                      text: `${label} (${percentage}%)`,
+                      fillStyle: data.datasets[0].backgroundColor[i],
+                      hidden: false,
+                      index: i,
+                    };
+                  });
+                }
+                return [];
+              },
+            },
+          },
+          tooltip: {
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            padding: 12,
+            titleFont: {
+              size: 14,
+              weight: "bold",
+            },
+            bodyFont: {
+              size: 13,
+            },
+            callbacks: {
+              label: function (context) {
+                const label = context.label || "";
+                const value = context.parsed;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return `${label}: ${value} products (${percentage}%)`;
+              },
+            },
+          },
         },
+        cutout: "65%",
       },
     });
   }
@@ -987,32 +1193,30 @@ window.deleteProduct = async (id) => {
 };
 
 window.deleteUserbtn = async (id) => {
-    const confirmed = await showConfirm(
-        "Delete User",
-        "Are you sure you want to delete this user? This action cannot be undone.",
-    );
-    if (!confirmed) return;
-    try {
-        const res = await fetch(`http://localhost:4000/user/delete-user/${id}`, {
-            method: "DELETE",
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-            },
-        });
-        if (res.ok) {
-            showToast("User deleted successfully", "success");
-            // Refresh users
-            renderView("users");
-        }
-
-        else {
-            const data = await res.json();
-            showToast(data.message || "Error deleting user", "error");
-        }
-    } catch (error) {
-        console.error("Delete error:", error);
-        showToast("Failed to delete user", "error");
+  const confirmed = await showConfirm(
+    "Delete User",
+    "Are you sure you want to delete this user? This action cannot be undone.",
+  );
+  if (!confirmed) return;
+  try {
+    const res = await fetch(`http://localhost:4000/user/delete-user/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+      },
+    });
+    if (res.ok) {
+      showToast("User deleted successfully", "success");
+      // Refresh users
+      renderView("users");
+    } else {
+      const data = await res.json();
+      showToast(data.message || "Error deleting user", "error");
     }
+  } catch (error) {
+    console.error("Delete error:", error);
+    showToast("Failed to delete user", "error");
+  }
 };
 
 // Order Actions
