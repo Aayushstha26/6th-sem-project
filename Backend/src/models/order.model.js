@@ -46,6 +46,19 @@ const orderSchema = new mongoose.Schema({
         ref: "Payment",
         default: null,
     },
+    shippingAddress: {
+        fullName: { type: String, required: true },
+        phoneNumber: { type: String, required: true },
+        address: { type: String, required: true },
+        city: { type: String, required: true },
+        postalCode: { type: String, required: true },
+        email: { type: String, required: true },
+    },
+    savedAddress: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Address",
+        default: null,
+    },
     createdAt: {
         type: Date,
         default: Date.now,

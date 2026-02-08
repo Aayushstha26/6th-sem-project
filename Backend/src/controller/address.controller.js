@@ -8,8 +8,21 @@ const addAddress = asyncHandler(async (req, res) => {
     if (!fullName || !phoneNumber || !address || !city || !postalCode || !email) {
         throw new Apierror(400, "All fields are required");
     }
-    
+    const savedAddr = await Address.findOne({ userId: req.user._id });
+    if (savedAddr) {
+        savedAddr.fullName = fullName;
+        savedAddr.phoneNumber = phoneNumber;
+        savedAddr.address = address;
+        savedAddr.city = city;
+        savedAddr.postalCode = postalCode;
+        savedAddr.email = email;
+        await savedAddr.save();
+        return res.status(200).json(
+            new Apiresponse(200, "Address updated successfully", savedAddr)
+        );
+    }
     const newAddress = await Address.create({
+        userId: req.user._id,
         fullName,
         phoneNumber,
         address,

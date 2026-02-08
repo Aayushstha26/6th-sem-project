@@ -6,6 +6,7 @@ import { Order } from "../models/order.model.js";
 import { Cart } from "../models/cart.model.js";
 import { Payment } from "../models/payment.model.js";
 import { Product } from "../models/product.model.js";
+import { Address } from "../models/address.model.js";
 const createSignature = asyncHandler(async (req, res) => {
   const { total_amount, transaction_uuid, product_code } = req.body;
   console.log("Generating signature for:", {
@@ -169,8 +170,24 @@ const verifyPayment = asyncHandler(async (req, res) => {
   }
 
   // CREATE ORDER
+
+  const savedAddr = await Address.findOne({ userId });
+  if (!savedAddr) {
+    throw new Apierror(400, "No address found for user");
+  }
+   let shippingAddress = {
+      fullName: savedAddr.fullName,
+      phoneNumber: savedAddr.phoneNumber,
+      address: savedAddr.address,
+      city: savedAddr.city,
+      postalCode: savedAddr.postalCode,
+      email: savedAddr.email,
+    };
+
   const order = await Order.create({
     user: userId,
+    shippingAddress,
+    savedAddress: savedAddr._id,
     items: itemsToOrder,
     amount: calculatedAmount,
     orderStatus: "Pending",
@@ -289,10 +306,24 @@ const createCODPayment = asyncHandler(async (req, res) => {
     );
 
     // ORDER
+     const savedAddr = await Address.findOne({ userId });
+  if (!savedAddr) {
+    throw new Apierror(400, "No address found for user");
+  }
+   let shippingAddress = {
+      fullName: savedAddr.fullName,
+      phoneNumber: savedAddr.phoneNumber,
+      address: savedAddr.address,
+      city: savedAddr.city,
+      postalCode: savedAddr.postalCode,
+      email: savedAddr.email,
+    };
     const order = await Order.create(
       [
         {
           user: userId,
+          shippingAddress,
+          savedAddress: savedAddr._id,
           items: itemsToOrder,
           amount: totalAmount,
           orderStatus: "Pending",
