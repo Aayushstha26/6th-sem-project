@@ -456,16 +456,19 @@ function getOrdersTemplate(orders) {
     (o) => o.orderStatus === "Pending" || !o.orderStatus,
   ).length;
 
-  const rows = orders
+  const cards = orders
     .map((order) => {
       // Product safe handling
       const firstItem = order.items?.[0];
       const firstProductName =
         firstItem?.product?.product_name || "Product unavailable";
 
+      // Truncate product name if too long
+      const truncatedName = firstProductName.length > 20 ? firstProductName.substring(0, 20) + '...' : firstProductName;
+
       const productDisplay =
         order.items && order.items.length > 1
-          ? `${firstProductName} + ${order.items.length - 1} more`
+          ? `${truncatedName} + ${order.items.length - 1} more`
           : firstProductName;
 
       const totalQty = order.items
@@ -487,24 +490,42 @@ function getOrdersTemplate(orders) {
         : "Unknown";
 
       return `
-            <tr>
-                <td>#ORD-${order._id.slice(0, 8).toUpperCase()}</td>
-                <td>${customerName}</td>
-                <td>${productDisplay}</td>
-                <td>${totalQty}</td>
-                <td>Rs. ${order.totalAmount || order.amount || 0}</td>
-                <td>
+            <div class="data-card">
+                <div class="card-header-row">
+                    <div class="card-title-group">
+                        <div class="card-icon" style="background: rgba(52, 152, 219, 0.1); color: #3498db;">🛍️</div>
+                        <div class="card-main-info">
+                            <h4>#ORD-${order._id.slice(0, 8).toUpperCase()}</h4>
+                            <div class="card-sub-info">${new Date(order.createdAt).toLocaleDateString()}</div>
+                        </div>
+                    </div>
                     <span class="badge ${statusColor}">
                         ${order.orderStatus || "Pending"}
                     </span>
-                </td>
-                <td>${new Date(order.createdAt).toLocaleDateString()}</td>
-                <td class="text-right">
-                    <button class="icon-btn-sm" style="background:#3498db;color:white" onclick="viewOrder('${order._id}')">
-                        View
+                </div>
+
+                <div class="card-body">
+                    <div class="info-row">
+                        <span class="info-label">Customer</span>
+                        <span class="info-value">${customerName}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Items</span>
+                        <span class="info-value">${totalQty} Items</span>
+                    </div>
+                     <div class="info-row">
+                        <span class="info-label">Product</span>
+                        <span class="info-value" title="${firstProductName}">${productDisplay}</span>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <div class="price-tag">Rs. ${order.totalAmount || order.amount || 0}</div>
+                    <button class="btn-primary-sm" onclick="viewOrder('${order._id}')">
+                        View Details
                     </button>
-                </td>
-            </tr>
+                </div>
+            </div>
         `;
     })
     .join("");
@@ -531,24 +552,8 @@ function getOrdersTemplate(orders) {
             </div>
         </div>
 
-        <div class="card table-card">
-            <div class="table-responsive">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Order ID</th>
-                            <th>Customer</th>
-                            <th>Product</th>
-                            <th>Qty</th>
-                            <th>Amount</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                            <th class="text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>${rows}</tbody>
-                </table>
-            </div>
+        <div class="grid-view">
+            ${cards}
         </div>
     `;
 }
@@ -620,7 +625,7 @@ function getProductsTemplate(products) {
   const lowStock = products.filter((p) => p.stock <= 10 && p.stock > 0).length;
   const outStock = products.filter((p) => p.stock === 0).length;
 
-  const rows = products
+  const cards = products
     .map((p) => {
       const stockStatus =
         p.stock > 10 ? "success" : p.stock > 0 ? "warning" : "danger";
@@ -628,28 +633,43 @@ function getProductsTemplate(products) {
         p.stock > 10 ? "In Stock" : p.stock > 0 ? "Low Stock" : "Out of Stock";
 
       return `
-        <tr>
-            <td>#PRD-${p._id ? p._id.slice(-6).toUpperCase() : "N/A"}</td>
-            <td>
-                <div class="user-cell">
-                    <div class="avatar-sm" style="background: #eee; color: #333;">📦</div>
-                    <span>${p.product_name}</span>
+        <div class="data-card">
+             <div class="card-header-row">
+                <div class="card-title-group">
+                     <div class="card-icon" style="background: rgba(250, 126, 30, 0.1); color: #fa7e1e;">📦</div>
+                     <div class="card-main-info">
+                        <h4>${p.product_name}</h4>
+                        <div class="card-sub-info">${p.category ? p.category.name || p.category : "Uncategorized"}</div>
+                    </div>
                 </div>
-            </td>
-            <td>${p.description ? p.description.substring(0, 30) + "..." : "-"}</td>
-            <td>${p.category ? p.category.name || p.category : "Uncategorized"}</td>
-            <td>Rs${p.price}</td>
-            <td>${p.stock}</td>
-             <td>
-                <span class="badge ${stockStatus}">
+                 <span class="badge ${stockStatus}">
                     ${stockLabel}
                 </span>
-            </td>
-            <td class="text-right">
-                <button class="icon-btn-sm" title="Edit" onclick="editProduct('${p._id}')"><span class="material-icons-round">edit</span></button>
-                <button class="icon-btn-sm danger" title="Delete" onclick="deleteProduct('${p._id}')"><span class="material-icons-round">delete</span></button>
-            </td>
-        </tr>
+             </div>
+
+             <div class="card-body">
+                <div class="info-row">
+                    <span class="info-label">ID</span>
+                    <span class="info-value">#PRD-${p._id ? p._id.slice(-6).toUpperCase() : "N/A"}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Stock</span>
+                    <span class="info-value">${p.stock} Units</span>
+                </div>
+                 <div class="info-row">
+                    <span class="info-label">Description</span>
+                    <span class="info-value" title="${p.description}">${p.description ? p.description.substring(0, 20) + "..." : "-"}</span>
+                </div>
+            </div>
+
+            <div class="card-footer">
+                <div class="price-tag">Rs. ${p.price}</div>
+                <div class="action-buttons" style="display: flex; gap: 8px;">
+                    <button class="icon-btn-sm" title="Edit" onclick="editProduct('${p._id}')"><span class="material-icons-round">edit</span></button>
+                    <button class="icon-btn-sm danger" title="Delete" onclick="deleteProduct('${p._id}')"><span class="material-icons-round">delete</span></button>
+                </div>
+            </div>
+        </div>
     `;
     })
     .join("");
@@ -685,51 +705,36 @@ function getProductsTemplate(products) {
             </div>
         </div>
 
-        <div class="card table-card">
-            <div class="table-header-action">
-                <div class="table-filters">
-                    <div class="search-box-sm">
+        <div class="card table-card" style="margin-bottom: 20px; padding: 15px;">
+            <div class="table-header-action" style="padding: 0; justify-content: space-between; display: flex;">
+                 <div class="search-box-sm">
                         <span class="material-icons-round">search</span>
                         <input type="text" id="productSearch" placeholder="Search products...">
                     </div>
                     <button class="btn-primary-sm" onclick="window.location.href='/add-product'">
                         Add Product
                     </button>
-                </div>
             </div>
-            <div class="table-responsive">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Product ID</th>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Category</th>
-                            <th>Price</th>
-                            <th>Stock</th>
-                            <th>Status</th>
-                            <th class="text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="productTableBody">${rows}</tbody>
-                </table>
-            </div>
+        </div>
+
+        <div class="grid-view" id="productGrid">
+            ${cards}
         </div>
     `;
 }
 
 function setupProductSearch(products) {
   const input = document.getElementById("productSearch");
-  const tbody = document.getElementById("productTableBody");
-  if (!input || !tbody) return;
+  const grid = document.getElementById("productGrid");
+  if (!input || !grid) return;
 
   input.addEventListener("input", (e) => {
     const term = e.target.value.toLowerCase();
     const filtered = products.filter((p) =>
       p.product_name.toLowerCase().includes(term),
     );
-    // Simple re-render logic same as users
-    tbody.innerHTML = filtered
+    
+    grid.innerHTML = filtered
       .map((p) => {
         const stockStatus =
           p.stock > 10 ? "success" : p.stock > 0 ? "warning" : "danger";
@@ -740,30 +745,44 @@ function setupProductSearch(products) {
               ? "Low Stock"
               : "Out of Stock";
         return `
-             <tr>
-                <td>
-                    <div class="user-cell">
-                        <div class="avatar-sm" style="background: #eee; color: #333;">📦</div>
-                        <div>
-                            <div class="font-bold">${p.product_name}</div>
-                            <div class="text-xs text-muted">${p.category ? p.category.name : "Uncategorized"}</div>
-                        </div>
+        <div class="data-card">
+             <div class="card-header-row">
+                <div class="card-title-group">
+                     <div class="card-icon" style="background: rgba(250, 126, 30, 0.1); color: #fa7e1e;">📦</div>
+                     <div class="card-main-info">
+                        <h4>${p.product_name}</h4>
+                        <div class="card-sub-info">${p.category ? p.category.name || p.category : "Uncategorized"}</div>
                     </div>
-                </td>
-                <td>$${p.price}</td>
-                <td>
-                    <span class="badge ${stockStatus === "danger" ? "danger" : "warning"}" 
-                          style="background: ${stockStatus === "success" ? "#10b894" : ""}; color: ${stockStatus === "success" ? "white" : ""}">
-                        ${stockLabel} (${p.stock})
-                    </span>
-                </td>
-                <td>${p.description ? p.description.substring(0, 30) + "..." : "-"}</td>
-                <td class="text-right">
+                </div>
+                 <span class="badge ${stockStatus}">
+                    ${stockLabel}
+                </span>
+             </div>
+
+             <div class="card-body">
+                <div class="info-row">
+                    <span class="info-label">ID</span>
+                    <span class="info-value">#PRD-${p._id ? p._id.slice(-6).toUpperCase() : "N/A"}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Stock</span>
+                    <span class="info-value">${p.stock} Units</span>
+                </div>
+                 <div class="info-row">
+                    <span class="info-label">Description</span>
+                    <span class="info-value" title="${p.description}">${p.description ? p.description.substring(0, 20) + "..." : "-"}</span>
+                </div>
+            </div>
+
+            <div class="card-footer">
+                <div class="price-tag">Rs. ${p.price}</div>
+                <div class="action-buttons" style="display: flex; gap: 8px;">
                     <button class="icon-btn-sm" title="Edit" onclick="editProduct('${p._id}')"><span class="material-icons-round">edit</span></button>
                     <button class="icon-btn-sm danger" title="Delete" onclick="deleteProduct('${p._id}')"><span class="material-icons-round">delete</span></button>
-                </td>
-            </tr>
-             `;
+                </div>
+            </div>
+        </div>
+        `;
       })
       .join("");
   });
