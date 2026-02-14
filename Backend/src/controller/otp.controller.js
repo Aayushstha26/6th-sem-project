@@ -1,5 +1,5 @@
 import generateOtp from "../utils/generateOtp.js";
-import sendOtpToEmail from "../utils/sendEmail.js";
+import {sendOtpToEmail} from "../utils/sendEmail.js";
 import { Otp } from "../models/otp.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { Apierror } from "../utils/apiError.js";

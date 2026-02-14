@@ -4,6 +4,8 @@ import asyncHandler from "../utils/asyncHandler.js";
 import { generateHash } from "../utils/crypto.js";
 import { Order } from "../models/order.model.js";
 import { Cart } from "../models/cart.model.js";
+import { User } from "../models/user.model.js";
+import { sendOrderConfirmationEmail } from "../utils/sendEmail.js";
 import { Payment } from "../models/payment.model.js";
 import { Product } from "../models/product.model.js";
 import { Address } from "../models/address.model.js";
@@ -202,6 +204,57 @@ const verifyPayment = asyncHandler(async (req, res) => {
 
   paymentRecord.orderId = order._id;
   await paymentRecord.save();
+ // After creating the order, prepare the email data
+const user = await User.findById(userId);
+
+// Populate product details for the email
+const populatedOrder = await Order.findById(order._id).populate('items.product', 'product_name');
+
+// Transform items for email
+const emailItems = populatedOrder.items.map(item => ({
+  name: item.product.product_name,
+  quantity: item.quantity,
+  price: item.price
+}));
+
+// Calculate dates
+const orderDate = new Date().toLocaleDateString('en-US', { 
+  year: 'numeric', 
+  month: 'long', 
+  day: 'numeric' 
+});
+
+const estimatedDeliveryDate = new Date();
+estimatedDeliveryDate.setDate(estimatedDeliveryDate.getDate() + 7); // 7 days from now
+const estimatedDelivery = estimatedDeliveryDate.toLocaleDateString('en-US', { 
+  year: 'numeric', 
+  month: 'long', 
+  day: 'numeric' 
+});
+
+// Prepare email data with all required fields
+const emailData = {
+  orderId: order._id.toString(),
+  customerName: user.fullName || user.name || 'Valued Customer',
+  items: emailItems,
+  subtotal: calculatedAmount,
+  shipping: 0, // Add your shipping calculation here
+  tax: 0, // Add your tax calculation here
+  total: calculatedAmount,
+  shippingAddress: {
+    street: shippingAddress.address,
+    city: shippingAddress.city,
+    state: '', // Add if you have state
+    zipCode: shippingAddress.postalCode,
+    country: 'Nepal' // Or get from your address data
+  },
+  orderDate,
+  estimatedDelivery
+};
+
+await sendOrderConfirmationEmail(user.Email, emailData);
+  
+
 
   return res.status(200).json({
     success: true,
@@ -341,6 +394,62 @@ const createCODPayment = asyncHandler(async (req, res) => {
 
     await session.commitTransaction();
     session.endSession();
+    try {
+      const user = await User.findById(userId);
+      
+      // Populate product details for email
+      const populatedOrder = await Order.findById(order[0]._id).populate(
+        'items.product', 
+        'product_name'
+      );
+
+      // Transform items for email
+      const emailItems = populatedOrder.items.map(item => ({
+        name: item.product.product_name,
+        quantity: item.quantity,
+        price: item.price
+      }));
+
+      // Calculate dates
+      const orderDate = new Date().toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+
+      const estimatedDeliveryDate = new Date();
+      estimatedDeliveryDate.setDate(estimatedDeliveryDate.getDate() + 7);
+      const estimatedDelivery = estimatedDeliveryDate.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+
+      // Prepare email data
+      const emailData = {
+        orderId: order[0]._id.toString(),
+        customerName: user.fullName || user.name || 'Valued Customer',
+        items: emailItems,
+        subtotal: totalAmount,
+        shipping: 0, // Add your shipping cost
+        tax: 0, // Add your tax calculation
+        total: totalAmount,
+        shippingAddress: {
+          street: shippingAddress.address,
+          city: shippingAddress.city,
+          state: '', // Add if available
+          zipCode: shippingAddress.postalCode,
+          country: 'Nepal'
+        },
+        orderDate,
+        estimatedDelivery
+      };
+
+      await sendOrderConfirmationEmail(user.Email, emailData);
+    } catch (emailError) {
+      // Log email error but don't fail the order
+      console.error('Failed to send order confirmation email:', emailError);
+    }
 
     return res.status(201).json({
       success: true,
