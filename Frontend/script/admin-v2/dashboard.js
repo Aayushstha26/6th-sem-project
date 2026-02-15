@@ -1020,6 +1020,13 @@ function initAnalyticsCharts(data) {
         ],
       },
       options: {
+        onClick: (e, activeElements) => {
+          if (activeElements.length > 0) {
+            const index = activeElements[0].index;
+            const monthLabel = chartLabels[index];
+            handleOrderBarClick(monthLabel);
+          }
+        },
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
@@ -1450,3 +1457,99 @@ window.showConfirm = (title, message) => {
     };
   });
 };
+
+// --- Monthly Orders Modal ---
+async function handleOrderBarClick(monthLabel) {
+  try {
+    showToast(`Loading orders for ${monthLabel}...`, "info");
+    const res = await fetchOrders();
+    if (!res || !res.data) {
+      showToast("Failed to fetch orders.", "error");
+      return;
+    }
+    
+    // Check if monthLabel matches full or short month name
+    const allOrders = res.data;
+    const filteredOrders = allOrders.filter((order) => {
+      const d = new Date(order.createdAt);
+      const longMonth = d.toLocaleString("default", { month: "long" });
+      const shortMonth = d.toLocaleString("default", { month: "short" });
+      return longMonth === monthLabel || shortMonth === monthLabel;
+    });
+
+    if (filteredOrders.length === 0) {
+      showToast(`No orders found for ${monthLabel}.`, "info");
+      return;
+    }
+
+    showOrderListModal(monthLabel, filteredOrders);
+  } catch (error) {
+    console.error("Error handling bar click:", error);
+    showToast("An error occurred.", "error");
+  }
+}
+
+function showOrderListModal(titleSuffix, orders) {
+  const overlay = document.createElement("div");
+  overlay.className = "confirm-modal-overlay show";
+  overlay.style.zIndex = "2000";
+
+  const rows = orders
+    .map(
+      (order) => `
+        <tr>
+            <td>#ORD-${order._id.slice(0, 8).toUpperCase()}</td>
+            <td>${order.user ? order.user.Firstname + " " + order.user.Lastname : "Unknown"}</td>
+            <td>${new Date(order.createdAt).toLocaleDateString()}</td>
+            <td>Rs. ${order.amount || order.totalAmount || 0}</td>
+            <td><span class="badge ${order.orderStatus === "Delivered" ? "success" : order.orderStatus === "Processing" ? "info" : "pending"}">${order.orderStatus || "Pending"}</span></td>
+            <td>
+                <button class="btn-primary-sm" onclick="viewOrder('${order._id}')">View</button>
+            </td>
+        </tr>
+    `,
+    )
+    .join("");
+
+  overlay.innerHTML = `
+        <div class="confirm-modal" style="max-width: 800px; width: 90%;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0; font-size: 1.25rem;">Orders for ${titleSuffix}</h2>
+                <span class="material-icons-round" id="closeListModal" style="cursor: pointer;">close</span>
+            </div>
+            
+             <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+
+            <div class="modal-actions" style="margin-top: 20px; text-align: right;">
+                <button class="confirm-modal-btn btn-cancel" id="closeListModalBtn">Close</button>
+            </div>
+        </div>
+    `;
+
+  document.body.appendChild(overlay);
+
+  const close = () => {
+    overlay.classList.remove("show");
+    setTimeout(() => overlay.remove(), 300);
+  };
+
+  overlay.querySelector("#closeListModal").onclick = close;
+  overlay.querySelector("#closeListModalBtn").onclick = close;
+  overlay.onclick = (e) => {
+    if (e.target === overlay) close();
+  };
+}
