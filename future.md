@@ -118,3 +118,36 @@
                     <span class="search-icon">🔍</span>
                 </div>
 
+
+
+<!-- order -->
+
+
+    <!-- Order Details Box -->
+        <div style="background: #f9fafb; border-left: 4px solid #10b981; padding: 15px; margin: 25px 0; border-radius: 6px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span style="color: #666; font-size: 14px;">Order Number:</span>
+            <span style="color: #111; font-weight: 600;">#${orderId}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span style="color: #666; font-size: 14px;">Order Date:</span>
+            <span style="color: #111;">${orderDate}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: #666; font-size: 14px;">Estimated Delivery:</span>
+            <span style="color: #10b981; font-weight: 600;">${estimatedDelivery}</span>
+          </div>
+        </div>
+
+
+          <!-- CTA Button -->
+        <div style="text-align: center; margin: 30px 0 20px 0;">
+          <a href="${process.env.FRONTEND_URL || 'https://yourstore.com'}/orders/${orderId}" 
+             style="display: inline-block; background: #10b981; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: 500;">
+            Track Your Order
+          </a>
+        </div>
+        
+         <p style="color: #888; font-size: 13px; margin-top: 25px; text-align: center;">
+          Questions? Contact our support team at ${process.env.SUPPORT_EMAIL || 'support@yourstore.com'}
+        </p>
