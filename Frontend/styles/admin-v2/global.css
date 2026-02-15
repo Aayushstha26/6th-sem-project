@@ -139,11 +139,10 @@ body {
     font-size: 20px;
     font-weight: 700;
     margin-bottom: 12px;
-    color: var(--text-dark);
+    color: black
 }
 
 .confirm-modal-message {
-    color: var(--text-muted);
     font-size: 15px;
     margin-bottom: 25px;
     line-height: 1.5;
@@ -167,7 +166,7 @@ body {
 
 .btn-cancel {
     background: #f1f1f1;
-    color: var(--text-dark);
+    /* color: var(--text-dark); */
 }
 
 .btn-cancel:hover {

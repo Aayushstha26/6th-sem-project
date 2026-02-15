@@ -80,13 +80,17 @@ async function fetchDashboardStats() {
   }
 }
 
-async function apiCall(url) {
+async function apiCall(url, options = {}) {
   const token = localStorage.getItem("adminToken");
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+    ...options.headers,
+  };
+
   const res = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
+    ...options,
+    headers,
   });
   return res.json();
 }
@@ -145,6 +149,7 @@ async function renderView(viewName) {
       const categoriesRes = await fetchCategories();
       if (categoriesRes && categoriesRes.data) {
         container.innerHTML = getCategoriesTemplate(categoriesRes.data);
+        setupCategoryActions(categoriesRes.data);
       } else {
         container.innerHTML = `<p class="error-message">Failed to load categories.</p>`;
       }
@@ -517,9 +522,21 @@ function getOrdersTemplate(orders) {
                         <span class="info-label">Product</span>
                         <span class="info-value" title="${firstProductName}">${productDisplay}</span>
                     </div>
+                     <div class="info-row">
+                        <span class="info-label">Payment Status</span>
+                        <span class="info-value" title="${firstProductName}">${order.paymentStatus}</span>
+                    </div>
+                     <div class="info-row">
+                        <span class="info-label">Payment Method</span>
+                        <span class="info-value" title="${firstProductName}">${order.paymentMethod}</span>
+                    </div>
+                     <div class="info-row">
+                        <span class="info-label">Shipping Address</span>
+                        <span class="info-value" title="${firstProductName}">${order.shippingAddress}</span>
+                    </div>
                 </div>
 
-                <div class="card-footer">
+                <div class="card-footer"> 
                     <div class="price-tag">Rs. ${order.totalAmount || order.amount || 0}</div>
                     <button class="btn-primary-sm" onclick="viewOrder('${order._id}')">
                         View Details
@@ -576,6 +593,9 @@ function getCategoriesTemplate(categories) {
         <tr>
             <td>${cat._id ? cat._id.slice(-10).toUpperCase() : "N/A"}</td>
             <td>${cat.name}</td>
+            <td>
+                <button class="btn-primary-sm" onclick="deleteCategory('${cat._id}')">Delete</button>
+            </td>
         </tr>
     `,
     )
@@ -599,6 +619,7 @@ function getCategoriesTemplate(categories) {
                         <tr>
                             <th>Category ID</th>
                             <th>Name</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="categoryTableBody">${rows}</tbody>
@@ -607,6 +628,78 @@ function getCategoriesTemplate(categories) {
         </div>
     `;
 }
+
+function setupCategoryActions(categories) {
+  const input = document.getElementById("categoryInput");
+  const addBtn = document.getElementById("addCategoryBtn");
+
+  // Add Category Logic
+  if (addBtn && input) {
+    addBtn.addEventListener("click", async () => {
+        const newCategoryName = input.value.trim();
+        if (!newCategoryName) {
+        showToast("Please enter a category name", "warning");
+        return;
+        }
+
+        const originalText = addBtn.innerText;
+        addBtn.disabled = true;
+        addBtn.innerText = "Adding...";
+
+        try {
+            const res = await apiCall("http://localhost:4000/category/addCategory", {
+                method: "POST",
+                body: JSON.stringify({ name: newCategoryName, slug: newCategoryName.toLowerCase().replace(/ /g, '-') }),
+            });
+
+            if (res && (res.success || res.message === "Category added successfully")) {
+                showToast("Category added successfully!", "success");
+                input.value = "";
+                
+                // Refresh categories to update the list
+                renderView("categories");
+            } else {
+                showToast(res.message || "Failed to add category", "error");
+            }
+        } catch (error) {
+            console.error("Add category error:", error);
+            showToast("Error adding category", "error");
+        } finally {
+            if(addBtn) {
+                addBtn.disabled = false;
+                addBtn.innerText = "Add New Category";
+            }
+        }
+    });
+  }
+}
+
+// Delete Category Logic
+async function deleteCategory(categoryId) {
+    const confirmed = await showConfirm(
+    "Delete Category",
+    "Are you sure you want to delete this category? This action cannot be undone.",
+  );
+
+  if (!confirmed) return; 
+        try {
+            const res = await apiCall(`http://localhost:4000/category/deleteCategory/${categoryId}`, {
+                method: "DELETE",
+            });
+
+        if (res && (res.success || res.message === "Category deleted successfully")) {
+            showToast("Category deleted successfully!", "success");
+            renderView("categories");
+        } else {
+            showToast(res.message || "Failed to delete category", "error");
+        }
+    } catch (error) {
+        console.error("Delete category error:", error);
+        showToast("Error deleting category", "error");
+    }
+}
+
+
 
 // Product Module Functions
 async function fetchProducts() {
@@ -854,7 +947,7 @@ function getAnalyticsTemplate(data) {
         <div class="chart-section" style="grid-template-columns: 1fr;">
              <div class="chart-card">
                 <div class="chart-header">
-                    <h3 class="chart-title">Monthly Revenue & Orders</h3>
+                    <h3 class="chart-title">Monthly Revenue</h3>
                 </div>
                 <div style="position: relative; height: 300px; width: 100%;">
                     <canvas id="analyticsMainChart"></canvas>
@@ -1331,6 +1424,10 @@ window.viewOrder = async (id) => {
                 </div>
             </div>
         `;
+        if(order.orderStatus === "Delivered"){
+            modalOverlay.querySelector("#updateStatusSelect").disabled = true;
+            modalOverlay.querySelector("#saveStatusBtn").disabled = true;
+        }
 
     document.body.appendChild(modalOverlay);
 
