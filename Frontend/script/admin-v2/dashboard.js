@@ -469,7 +469,10 @@ function getOrdersTemplate(orders) {
         firstItem?.product?.product_name || "Product unavailable";
 
       // Truncate product name if too long
-      const truncatedName = firstProductName.length > 20 ? firstProductName.substring(0, 20) + '...' : firstProductName;
+      const truncatedName =
+        firstProductName.length > 20
+          ? firstProductName.substring(0, 20) + "..."
+          : firstProductName;
 
       const productDisplay =
         order.items && order.items.length > 1
@@ -488,6 +491,7 @@ function getOrdersTemplate(orders) {
             ? "info"
             : "pending";
 
+            // console.log(order);
       // User name safe handling
       const customerName = order.user
         ? `${order.user.Firstname || ""} ${order.user.Lastname || ""}`.trim() ||
@@ -526,13 +530,10 @@ function getOrdersTemplate(orders) {
                         <span class="info-label">Payment Status</span>
                         <span class="info-value" title="${firstProductName}">${order.paymentStatus}</span>
                     </div>
-                     <div class="info-row">
-                        <span class="info-label">Payment Method</span>
-                        <span class="info-value" title="${firstProductName}">${order.paymentMethod}</span>
-                    </div>
+                     
                      <div class="info-row">
                         <span class="info-label">Shipping Address</span>
-                        <span class="info-value" title="${firstProductName}">${order.shippingAddress}</span>
+                        <span class="info-value" title="${firstProductName}">${order.shippingAddress.address}</span>
                     </div>
                 </div>
 
@@ -636,70 +637,83 @@ function setupCategoryActions(categories) {
   // Add Category Logic
   if (addBtn && input) {
     addBtn.addEventListener("click", async () => {
-        const newCategoryName = input.value.trim();
-        if (!newCategoryName) {
+      const newCategoryName = input.value.trim();
+      if (!newCategoryName) {
         showToast("Please enter a category name", "warning");
         return;
+      }
+
+      const originalText = addBtn.innerText;
+      addBtn.disabled = true;
+      addBtn.innerText = "Adding...";
+
+      try {
+        const res = await apiCall(
+          "http://localhost:4000/category/addCategory",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              name: newCategoryName,
+              slug: newCategoryName.toLowerCase().replace(/ /g, "-"),
+            }),
+          },
+        );
+
+        if (
+          res &&
+          (res.success || res.message === "Category added successfully")
+        ) {
+          showToast("Category added successfully!", "success");
+          input.value = "";
+
+          // Refresh categories to update the list
+          renderView("categories");
+        } else {
+          showToast(res.message || "Failed to add category", "error");
         }
-
-        const originalText = addBtn.innerText;
-        addBtn.disabled = true;
-        addBtn.innerText = "Adding...";
-
-        try {
-            const res = await apiCall("http://localhost:4000/category/addCategory", {
-                method: "POST",
-                body: JSON.stringify({ name: newCategoryName, slug: newCategoryName.toLowerCase().replace(/ /g, '-') }),
-            });
-
-            if (res && (res.success || res.message === "Category added successfully")) {
-                showToast("Category added successfully!", "success");
-                input.value = "";
-                
-                // Refresh categories to update the list
-                renderView("categories");
-            } else {
-                showToast(res.message || "Failed to add category", "error");
-            }
-        } catch (error) {
-            console.error("Add category error:", error);
-            showToast("Error adding category", "error");
-        } finally {
-            if(addBtn) {
-                addBtn.disabled = false;
-                addBtn.innerText = "Add New Category";
-            }
+      } catch (error) {
+        console.error("Add category error:", error);
+        showToast("Error adding category", "error");
+      } finally {
+        if (addBtn) {
+          addBtn.disabled = false;
+          addBtn.innerText = "Add New Category";
         }
+      }
     });
   }
 }
 
 // Delete Category Logic
 async function deleteCategory(categoryId) {
-    const confirmed = await showConfirm(
+  const confirmed = await showConfirm(
     "Delete Category",
     "Are you sure you want to delete this category? This action cannot be undone.",
   );
 
-  if (!confirmed) return; 
-        try {
-            const res = await apiCall(`http://localhost:4000/category/deleteCategory/${categoryId}`, {
-                method: "DELETE",
-            });
+  if (!confirmed) return;
+  try {
+    const res = await apiCall(
+      `http://localhost:4000/category/deleteCategory/${categoryId}`,
+      {
+        method: "DELETE",
+      },
+    );
 
-        if (res && (res.success || res.message === "Category deleted successfully")) {
-            showToast("Category deleted successfully!", "success");
-            renderView("categories");
-        } else {
-            showToast(res.message || "Failed to delete category", "error");
-        }
-    } catch (error) {
-        console.error("Delete category error:", error);
-        showToast("Error deleting category", "error");
+    if (
+      res &&
+      (res.success || res.message === "Category deleted successfully")
+    ) {
+      showToast("Category deleted successfully!", "success");
+      renderView("categories");
+    } else {
+      showToast(res.message || "Failed to delete category", "error");
     }
+  } catch (error) {
+    console.error("Delete category error:", error);
+    showToast("Error deleting category", "error");
+  }
 }
-
-
 
 // Product Module Functions
 async function fetchProducts() {
@@ -826,7 +840,7 @@ function setupProductSearch(products) {
     const filtered = products.filter((p) =>
       p.product_name.toLowerCase().includes(term),
     );
-    
+
     grid.innerHTML = filtered
       .map((p) => {
         const stockStatus =
@@ -1091,24 +1105,24 @@ function initAnalyticsCharts(data) {
   if (ordersCtx) {
     // Create gradient for bars
     const ordersGradient = ordersCtx.createLinearGradient(0, 0, 0, 300);
-    ordersGradient.addColorStop(0, 'rgba(250, 126, 30, 0.8)'); // Orange at top
-    ordersGradient.addColorStop(1, 'rgba(250, 126, 30, 0.3)'); // Lighter at bottom
+    ordersGradient.addColorStop(0, "rgba(250, 126, 30, 0.8)"); // Orange at top
+    ordersGradient.addColorStop(1, "rgba(250, 126, 30, 0.3)"); // Lighter at bottom
 
     new Chart(ordersCtx, {
-      type: 'bar',
+      type: "bar",
       data: {
         labels: chartLabels,
         datasets: [
           {
-            label: 'Orders',
+            label: "Orders",
             data: chartOrders,
             backgroundColor: ordersGradient,
-            borderColor: '#fa7e1e',
+            borderColor: "#fa7e1e",
             borderWidth: 2,
             borderRadius: 10,
             borderSkipped: false,
-            barPercentage: 0.3,     // Makes bars narrower (default is 0.9)
-          // categoryPercentage: 0.8 
+            barPercentage: 0.3, // Makes bars narrower (default is 0.9)
+            // categoryPercentage: 0.8
           },
         ],
       },
@@ -1127,24 +1141,24 @@ function initAnalyticsCharts(data) {
             display: false,
           },
           tooltip: {
-            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            backgroundColor: "rgba(0, 0, 0, 0.9)",
             padding: 12,
             titleFont: {
               size: 13,
-              weight: 'bold',
+              weight: "bold",
             },
             bodyFont: {
               size: 13,
             },
-            borderColor: '#fa7e1e',
+            borderColor: "#fa7e1e",
             borderWidth: 1,
             displayColors: false,
             callbacks: {
-              title: function(context) {
+              title: function (context) {
                 return context[0].label;
               },
               label: function (context) {
-                return 'Orders: ' + context.parsed.y.toLocaleString();
+                return "Orders: " + context.parsed.y.toLocaleString();
               },
             },
           },
@@ -1153,7 +1167,7 @@ function initAnalyticsCharts(data) {
           y: {
             beginAtZero: true,
             grid: {
-              color: 'rgba(0, 0, 0, 0.05)',
+              color: "rgba(0, 0, 0, 0.05)",
               drawBorder: false,
             },
             ticks: {
@@ -1163,7 +1177,7 @@ function initAnalyticsCharts(data) {
               font: {
                 size: 11,
               },
-              color: '#666',
+              color: "#666",
               padding: 8,
             },
           },
@@ -1175,7 +1189,7 @@ function initAnalyticsCharts(data) {
               font: {
                 size: 11,
               },
-              color: '#666',
+              color: "#666",
             },
           },
         },
@@ -1424,10 +1438,10 @@ window.viewOrder = async (id) => {
                 </div>
             </div>
         `;
-        if(order.orderStatus === "Delivered"){
-            modalOverlay.querySelector("#updateStatusSelect").disabled = true;
-            modalOverlay.querySelector("#saveStatusBtn").disabled = true;
-        }
+    if (order.orderStatus === "Delivered") {
+      modalOverlay.querySelector("#updateStatusSelect").disabled = true;
+      modalOverlay.querySelector("#saveStatusBtn").disabled = true;
+    }
 
     document.body.appendChild(modalOverlay);
 
@@ -1564,7 +1578,7 @@ async function handleOrderBarClick(monthLabel) {
       showToast("Failed to fetch orders.", "error");
       return;
     }
-    
+
     // Check if monthLabel matches full or short month name
     const allOrders = res.data;
     const filteredOrders = allOrders.filter((order) => {
