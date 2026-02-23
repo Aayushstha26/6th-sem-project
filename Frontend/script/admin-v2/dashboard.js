@@ -80,13 +80,17 @@ async function fetchDashboardStats() {
   }
 }
 
-async function apiCall(url) {
+async function apiCall(url, options = {}) {
   const token = localStorage.getItem("adminToken");
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+    ...options.headers,
+  };
+
   const res = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
+    ...options,
+    headers,
   });
   return res.json();
 }
@@ -145,6 +149,7 @@ async function renderView(viewName) {
       const categoriesRes = await fetchCategories();
       if (categoriesRes && categoriesRes.data) {
         container.innerHTML = getCategoriesTemplate(categoriesRes.data);
+        setupCategoryActions(categoriesRes.data);
       } else {
         container.innerHTML = `<p class="error-message">Failed to load categories.</p>`;
       }
@@ -464,7 +469,10 @@ function getOrdersTemplate(orders) {
         firstItem?.product?.product_name || "Product unavailable";
 
       // Truncate product name if too long
-      const truncatedName = firstProductName.length > 20 ? firstProductName.substring(0, 20) + '...' : firstProductName;
+      const truncatedName =
+        firstProductName.length > 20
+          ? firstProductName.substring(0, 20) + "..."
+          : firstProductName;
 
       const productDisplay =
         order.items && order.items.length > 1
@@ -483,6 +491,7 @@ function getOrdersTemplate(orders) {
             ? "info"
             : "pending";
 
+            // console.log(order);
       // User name safe handling
       const customerName = order.user
         ? `${order.user.Firstname || ""} ${order.user.Lastname || ""}`.trim() ||
@@ -517,9 +526,18 @@ function getOrdersTemplate(orders) {
                         <span class="info-label">Product</span>
                         <span class="info-value" title="${firstProductName}">${productDisplay}</span>
                     </div>
+                     <div class="info-row">
+                        <span class="info-label">Payment Status</span>
+                        <span class="info-value" title="${firstProductName}">${order.paymentStatus}</span>
+                    </div>
+                     
+                     <div class="info-row">
+                        <span class="info-label">Shipping Address</span>
+                        <span class="info-value" title="${firstProductName}">${order.shippingAddress.address}</span>
+                    </div>
                 </div>
 
-                <div class="card-footer">
+                <div class="card-footer"> 
                     <div class="price-tag">Rs. ${order.totalAmount || order.amount || 0}</div>
                     <button class="btn-primary-sm" onclick="viewOrder('${order._id}')">
                         View Details
@@ -576,6 +594,9 @@ function getCategoriesTemplate(categories) {
         <tr>
             <td>${cat._id ? cat._id.slice(-10).toUpperCase() : "N/A"}</td>
             <td>${cat.name}</td>
+            <td>
+                <button class="btn-primary-sm" onclick="deleteCategory('${cat._id}')">Delete</button>
+            </td>
         </tr>
     `,
     )
@@ -599,6 +620,7 @@ function getCategoriesTemplate(categories) {
                         <tr>
                             <th>Category ID</th>
                             <th>Name</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="categoryTableBody">${rows}</tbody>
@@ -606,6 +628,91 @@ function getCategoriesTemplate(categories) {
             </div>
         </div>
     `;
+}
+
+function setupCategoryActions(categories) {
+  const input = document.getElementById("categoryInput");
+  const addBtn = document.getElementById("addCategoryBtn");
+
+  // Add Category Logic
+  if (addBtn && input) {
+    addBtn.addEventListener("click", async () => {
+      const newCategoryName = input.value.trim();
+      if (!newCategoryName) {
+        showToast("Please enter a category name", "warning");
+        return;
+      }
+
+      const originalText = addBtn.innerText;
+      addBtn.disabled = true;
+      addBtn.innerText = "Adding...";
+
+      try {
+        const res = await apiCall(
+          "http://localhost:4000/category/addCategory",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              name: newCategoryName,
+              slug: newCategoryName.toLowerCase().replace(/ /g, "-"),
+            }),
+          },
+        );
+
+        if (
+          res &&
+          (res.success || res.message === "Category added successfully")
+        ) {
+          showToast("Category added successfully!", "success");
+          input.value = "";
+
+          // Refresh categories to update the list
+          renderView("categories");
+        } else {
+          showToast(res.message || "Failed to add category", "error");
+        }
+      } catch (error) {
+        console.error("Add category error:", error);
+        showToast("Error adding category", "error");
+      } finally {
+        if (addBtn) {
+          addBtn.disabled = false;
+          addBtn.innerText = "Add New Category";
+        }
+      }
+    });
+  }
+}
+
+// Delete Category Logic
+async function deleteCategory(categoryId) {
+  const confirmed = await showConfirm(
+    "Delete Category",
+    "Are you sure you want to delete this category? This action cannot be undone.",
+  );
+
+  if (!confirmed) return;
+  try {
+    const res = await apiCall(
+      `http://localhost:4000/category/deleteCategory/${categoryId}`,
+      {
+        method: "DELETE",
+      },
+    );
+
+    if (
+      res &&
+      (res.success || res.message === "Category deleted successfully")
+    ) {
+      showToast("Category deleted successfully!", "success");
+      renderView("categories");
+    } else {
+      showToast(res.message || "Failed to delete category", "error");
+    }
+  } catch (error) {
+    console.error("Delete category error:", error);
+    showToast("Error deleting category", "error");
+  }
 }
 
 // Product Module Functions
@@ -733,7 +840,7 @@ function setupProductSearch(products) {
     const filtered = products.filter((p) =>
       p.product_name.toLowerCase().includes(term),
     );
-    
+
     grid.innerHTML = filtered
       .map((p) => {
         const stockStatus =
@@ -854,7 +961,7 @@ function getAnalyticsTemplate(data) {
         <div class="chart-section" style="grid-template-columns: 1fr;">
              <div class="chart-card">
                 <div class="chart-header">
-                    <h3 class="chart-title">Monthly Revenue & Orders</h3>
+                    <h3 class="chart-title">Monthly Revenue</h3>
                 </div>
                 <div style="position: relative; height: 300px; width: 100%;">
                     <canvas id="analyticsMainChart"></canvas>
@@ -998,28 +1105,35 @@ function initAnalyticsCharts(data) {
   if (ordersCtx) {
     // Create gradient for bars
     const ordersGradient = ordersCtx.createLinearGradient(0, 0, 0, 300);
-    ordersGradient.addColorStop(0, 'rgba(250, 126, 30, 0.8)'); // Orange at top
-    ordersGradient.addColorStop(1, 'rgba(250, 126, 30, 0.3)'); // Lighter at bottom
+    ordersGradient.addColorStop(0, "rgba(250, 126, 30, 0.8)"); // Orange at top
+    ordersGradient.addColorStop(1, "rgba(250, 126, 30, 0.3)"); // Lighter at bottom
 
     new Chart(ordersCtx, {
-      type: 'bar',
+      type: "bar",
       data: {
         labels: chartLabels,
         datasets: [
           {
-            label: 'Orders',
+            label: "Orders",
             data: chartOrders,
             backgroundColor: ordersGradient,
-            borderColor: '#fa7e1e',
+            borderColor: "#fa7e1e",
             borderWidth: 2,
             borderRadius: 10,
             borderSkipped: false,
-            barPercentage: 0.3,     // Makes bars narrower (default is 0.9)
-          // categoryPercentage: 0.8 
+            barPercentage: 0.3, // Makes bars narrower (default is 0.9)
+            // categoryPercentage: 0.8
           },
         ],
       },
       options: {
+        onClick: (e, activeElements) => {
+          if (activeElements.length > 0) {
+            const index = activeElements[0].index;
+            const monthLabel = chartLabels[index];
+            handleOrderBarClick(monthLabel);
+          }
+        },
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
@@ -1027,24 +1141,24 @@ function initAnalyticsCharts(data) {
             display: false,
           },
           tooltip: {
-            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            backgroundColor: "rgba(0, 0, 0, 0.9)",
             padding: 12,
             titleFont: {
               size: 13,
-              weight: 'bold',
+              weight: "bold",
             },
             bodyFont: {
               size: 13,
             },
-            borderColor: '#fa7e1e',
+            borderColor: "#fa7e1e",
             borderWidth: 1,
             displayColors: false,
             callbacks: {
-              title: function(context) {
+              title: function (context) {
                 return context[0].label;
               },
               label: function (context) {
-                return 'Orders: ' + context.parsed.y.toLocaleString();
+                return "Orders: " + context.parsed.y.toLocaleString();
               },
             },
           },
@@ -1053,7 +1167,7 @@ function initAnalyticsCharts(data) {
           y: {
             beginAtZero: true,
             grid: {
-              color: 'rgba(0, 0, 0, 0.05)',
+              color: "rgba(0, 0, 0, 0.05)",
               drawBorder: false,
             },
             ticks: {
@@ -1063,7 +1177,7 @@ function initAnalyticsCharts(data) {
               font: {
                 size: 11,
               },
-              color: '#666',
+              color: "#666",
               padding: 8,
             },
           },
@@ -1075,7 +1189,7 @@ function initAnalyticsCharts(data) {
               font: {
                 size: 11,
               },
-              color: '#666',
+              color: "#666",
             },
           },
         },
@@ -1324,6 +1438,10 @@ window.viewOrder = async (id) => {
                 </div>
             </div>
         `;
+    if (order.orderStatus === "Delivered") {
+      modalOverlay.querySelector("#updateStatusSelect").disabled = true;
+      modalOverlay.querySelector("#saveStatusBtn").disabled = true;
+    }
 
     document.body.appendChild(modalOverlay);
 
@@ -1450,3 +1568,99 @@ window.showConfirm = (title, message) => {
     };
   });
 };
+
+// --- Monthly Orders Modal ---
+async function handleOrderBarClick(monthLabel) {
+  try {
+    showToast(`Loading orders for ${monthLabel}...`, "info");
+    const res = await fetchOrders();
+    if (!res || !res.data) {
+      showToast("Failed to fetch orders.", "error");
+      return;
+    }
+
+    // Check if monthLabel matches full or short month name
+    const allOrders = res.data;
+    const filteredOrders = allOrders.filter((order) => {
+      const d = new Date(order.createdAt);
+      const longMonth = d.toLocaleString("default", { month: "long" });
+      const shortMonth = d.toLocaleString("default", { month: "short" });
+      return longMonth === monthLabel || shortMonth === monthLabel;
+    });
+
+    if (filteredOrders.length === 0) {
+      showToast(`No orders found for ${monthLabel}.`, "info");
+      return;
+    }
+
+    showOrderListModal(monthLabel, filteredOrders);
+  } catch (error) {
+    console.error("Error handling bar click:", error);
+    showToast("An error occurred.", "error");
+  }
+}
+
+function showOrderListModal(titleSuffix, orders) {
+  const overlay = document.createElement("div");
+  overlay.className = "confirm-modal-overlay show";
+  overlay.style.zIndex = "2000";
+
+  const rows = orders
+    .map(
+      (order) => `
+        <tr>
+            <td>#ORD-${order._id.slice(0, 8).toUpperCase()}</td>
+            <td>${order.user ? order.user.Firstname + " " + order.user.Lastname : "Unknown"}</td>
+            <td>${new Date(order.createdAt).toLocaleDateString()}</td>
+            <td>Rs. ${order.amount || order.totalAmount || 0}</td>
+            <td><span class="badge ${order.orderStatus === "Delivered" ? "success" : order.orderStatus === "Processing" ? "info" : "pending"}">${order.orderStatus || "Pending"}</span></td>
+            <td>
+                <button class="btn-primary-sm" onclick="viewOrder('${order._id}')">View</button>
+            </td>
+        </tr>
+    `,
+    )
+    .join("");
+
+  overlay.innerHTML = `
+        <div class="confirm-modal" style="max-width: 800px; width: 90%;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0; font-size: 1.25rem;">Orders for ${titleSuffix}</h2>
+                <span class="material-icons-round" id="closeListModal" style="cursor: pointer;">close</span>
+            </div>
+            
+             <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+
+            <div class="modal-actions" style="margin-top: 20px; text-align: right;">
+                <button class="confirm-modal-btn btn-cancel" id="closeListModalBtn">Close</button>
+            </div>
+        </div>
+    `;
+
+  document.body.appendChild(overlay);
+
+  const close = () => {
+    overlay.classList.remove("show");
+    setTimeout(() => overlay.remove(), 300);
+  };
+
+  overlay.querySelector("#closeListModal").onclick = close;
+  overlay.querySelector("#closeListModalBtn").onclick = close;
+  overlay.onclick = (e) => {
+    if (e.target === overlay) close();
+  };
+}

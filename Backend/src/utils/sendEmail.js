@@ -120,22 +120,6 @@ const sendOrderConfirmationEmail = async (email, orderData) => {
         <p style="font-size: 15px; color: #555; line-height: 1.6;">
           We've received your order and are getting it ready. You'll receive a notification when your order is on its way.
         </p>
-        
-        <!-- Order Details Box -->
-        <div style="background: #f9fafb; border-left: 4px solid #10b981; padding: 15px; margin: 25px 0; border-radius: 6px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-            <span style="color: #666; font-size: 14px;">Order Number:</span>
-            <span style="color: #111; font-weight: 600;">#${orderId}</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-            <span style="color: #666; font-size: 14px;">Order Date:</span>
-            <span style="color: #111;">${orderDate}</span>
-          </div>
-          <div style="display: flex; justify-content: space-between;">
-            <span style="color: #666; font-size: 14px;">Estimated Delivery:</span>
-            <span style="color: #10b981; font-weight: 600;">${estimatedDelivery}</span>
-          </div>
-        </div>
 
         <!-- Order Items -->
         <h3 style="color: #111; font-size: 18px; margin: 25px 0 15px 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
@@ -174,23 +158,11 @@ const sendOrderConfirmationEmail = async (email, orderData) => {
           ${shippingAddress.city}, ${shippingAddress.state} ${shippingAddress.zipCode}<br>
           ${shippingAddress.country}
         </div>
-
-        <!-- CTA Button -->
-        <div style="text-align: center; margin: 30px 0 20px 0;">
-          <a href="${process.env.FRONTEND_URL || 'https://yourstore.com'}/orders/${orderId}" 
-             style="display: inline-block; background: #10b981; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: 500;">
-            Track Your Order
-          </a>
-        </div>
-
-        <p style="color: #888; font-size: 13px; margin-top: 25px; text-align: center;">
-          Questions? Contact our support team at ${process.env.SUPPORT_EMAIL || 'support@yourstore.com'}
-        </p>
       </div>
 
       <!-- Footer -->
       <div style="background: #f3f4f6; text-align: center; padding: 15px; font-size: 12px; color: #666;">
-        © ${new Date().getFullYear()} Your Store. All rights reserved.
+        © ${new Date().getFullYear()} AAVA TREASURES. All rights reserved.
       </div>
 
     </div>
