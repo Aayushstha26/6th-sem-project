@@ -29,4 +29,14 @@ const getCategory = asyncHandler(async (req, res) => {
     const categories = await Category.find();
     return res.status(200).json(new Apiresponse(200, "Categories fetched successfully", categories));
 });
-export { addCategory , getCategory };
+const deleteCategory = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const category = await Category.findByIdAndDelete(id);
+    if (!category) {
+        return res.status(404).json(new Apierror(404, "Category not found"));
+    }
+    return res.status(200).json(new Apiresponse(200, "Category deleted successfully", category));
+}
+);
+
+export { addCategory , getCategory, deleteCategory };
