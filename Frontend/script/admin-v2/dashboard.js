@@ -530,6 +530,10 @@ function getOrdersTemplate(orders) {
                         <span class="info-label">Payment Status</span>
                         <span class="info-value" title="${firstProductName}">${order.paymentStatus}</span>
                     </div>
+                     <div class="info-row">
+                        <span class="info-label">Payment Method</span>
+                        <span class="info-value" title="${firstProductName}">${order.payment.paymentMethod}</span>
+                    </div>
                      
                      <div class="info-row">
                         <span class="info-label">Shipping Address</span>
