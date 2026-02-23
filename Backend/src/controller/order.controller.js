@@ -50,6 +50,7 @@ const createOrder = asyncHandler(async (req, res) => {
 const getAllOrders = asyncHandler(async (req, res) => {
   const orders = await Order.find()
     .populate("user", "Firstname Lastname Email")
+    .populate("payment", "paymentMethod paymentStatus transactionId")
     .populate({
       path: "items.product",
       select: "product_name price productImg",
