@@ -84,9 +84,15 @@ async function apiCall(url, options = {}) {
   const token = localStorage.getItem("adminToken");
   const headers = {
     Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
     ...options.headers,
   };
+
+  if (options.body && options.body instanceof FormData) {
+    // Browser will automatically set multipart/form-data boundary
+    delete headers["Content-Type"];
+  } else if (!headers["Content-Type"]) {
+    headers["Content-Type"] = "application/json";
+  }
 
   const res = await fetch(url, {
     ...options,
@@ -597,7 +603,12 @@ function getCategoriesTemplate(categories) {
       (cat) => `
         <tr>
             <td>${cat._id ? cat._id.slice(-10).toUpperCase() : "N/A"}</td>
-            <td>${cat.name}</td>
+            <td>
+              <div style="display:flex; align-items:center; gap:10px;">
+                ${cat.image ? `<img src="${cat.image}" alt="${cat.name}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;">` : `<div style="width:40px;height:40px;background:#eee;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;">No tag</div>`}
+                <span>${cat.name}</span>
+              </div>
+            </td>
             <td>
                 <button class="btn-primary-sm" onclick="deleteCategory('${cat._id}')">Delete</button>
             </td>
@@ -613,9 +624,12 @@ function getCategoriesTemplate(categories) {
         </div>
         <div class="card table-card">
             <div class="table-header-action">
-                <div class="table-filters">
-                    <input id="categoryInput" type="text" placeholder="Enter categories..." class="filter-input-wide">
-                    <button id="addCategoryBtn" class="btn-primary-sm">Add New Category</button>
+                <div class="table-filters" style="width: 100%;">
+                  <form id="addCategoryForm" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                    <input id="categoryInput" type="text" placeholder="Enter category name..." class="filter-input-wide" required>
+                    <input id="categoryImageInput" type="file" accept="image/*" style="font-size:14px;">
+                    <button type="submit" id="addCategoryBtn" class="btn-primary-sm">Add New Category</button>
+                  </form>
                 </div>
             </div>
             <div class="table-responsive">
@@ -635,40 +649,47 @@ function getCategoriesTemplate(categories) {
 }
 
 function setupCategoryActions(categories) {
+  const form = document.getElementById("addCategoryForm");
   const input = document.getElementById("categoryInput");
+  const imageInput = document.getElementById("categoryImageInput");
   const addBtn = document.getElementById("addCategoryBtn");
 
   // Add Category Logic
-  if (addBtn && input) {
-    addBtn.addEventListener("click", async () => {
+  if (form) {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
       const newCategoryName = input.value.trim();
+      const file = imageInput.files[0];
+
       if (!newCategoryName) {
         showToast("Please enter a category name", "warning");
         return;
       }
 
-      const originalText = addBtn.innerText;
       addBtn.disabled = true;
       addBtn.innerText = "Adding...";
 
       try {
+        const formData = new FormData();
+        formData.append("name", newCategoryName);
+        if (file) {
+          formData.append("image", file);
+        }
+
         const res = await apiCall(
           "http://localhost:4000/category/addCategory",
           {
             method: "POST",
-            body: JSON.stringify({
-              name: newCategoryName,
-              slug: newCategoryName.toLowerCase().replace(/ /g, "-"),
-            }),
+            body: formData,
           },
         );
 
         if (
           res &&
-          (res.success || res.message === "Category added successfully")
+          (res.success || res.message === "Category created successfully" || res.message === "Category added successfully")
         ) {
           showToast("Category added successfully!", "success");
-          input.value = "";
+          form.reset();
 
           // Refresh categories to update the list
           renderView("categories");

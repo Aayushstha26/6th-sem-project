@@ -18,6 +18,9 @@ const productSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Category",     
     },
+    oldCategoryName: {
+        type: String,
+    },
      productImg: {
         type: String,
         required: true,

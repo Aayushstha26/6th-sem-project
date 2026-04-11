@@ -1,7 +1,9 @@
 import { Category } from "../models/category.model.js";
+import { Product } from "../models/product.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { Apierror } from "../utils/apiError.js";
 import { Apiresponse } from "../utils/apiRespone.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const addCategory = asyncHandler(async (req, res) => {
   const { name } = req.body;
@@ -19,7 +21,24 @@ const addCategory = asyncHandler(async (req, res) => {
       .json(new Apierror(400, "Category already exists"));
   }
 
-  const category = await Category.create({ name: name.trim()});
+  let imageUrl = "";
+  if (req.file && req.file.path) {
+    const uploadedImage = await uploadOnCloudinary(req.file.path);
+    if (uploadedImage) {
+      imageUrl = uploadedImage.url;
+    }
+  }
+
+  const category = await Category.create({ 
+    name: name.trim(),
+    image: imageUrl
+  });
+
+  // Re-link orphaned products that previously had a category with this exact name
+  await Product.updateMany(
+    { oldCategoryName: category.name },
+    { $set: { category: category._id }, $unset: { oldCategoryName: "" } }
+  );
 
   return res
     .status(201)
@@ -35,6 +54,13 @@ const deleteCategory = asyncHandler(async (req, res) => {
     if (!category) {
         return res.status(404).json(new Apierror(404, "Category not found"));
     }
+
+    // Keep track of the deleted category name on the orphaned products so they can be re-linked
+    await Product.updateMany(
+      { category: id },
+      { $set: { oldCategoryName: category.name } }
+    );
+
     return res.status(200).json(new Apiresponse(200, "Category deleted successfully", category));
 }
 );
