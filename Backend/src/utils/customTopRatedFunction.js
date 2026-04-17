@@ -1,9 +1,4 @@
-/**
- * Custom sorting function to get top-rated products using selection sort algorithm.
- * @param {Array} products - The array of products to sort.
- * @param {number} limit - The number of products to return.
- * @returns {Array} - The sorted and limited array of products.
- */
+
 export const getTopRatedProductsManual = (products, limit = 4) => {
   // Filter out products with zero or no ratings
   const ratedProducts = products.filter(product => 
