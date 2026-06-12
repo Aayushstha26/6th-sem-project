@@ -1,0 +1,147 @@
+Table User {
+  id ObjectId [pk]
+  Firstname String [note: 'required']
+  Lastname String [note: 'required']
+  Phone String [unique, note: 'required']
+  Email String [unique, note: 'required']
+  Password String [note: 'required']
+  Salt String
+  refreshToken String
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+Table Admin {
+  id ObjectId [pk]
+  email String [unique, note: 'required']
+  password String [note: 'required']
+  refreshToken String
+  salt String
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+Table Address {
+  id ObjectId [pk]
+  fullName String [note: 'required']
+  phoneNumber String [note: 'required']
+  address String [note: 'required']
+  city String [note: 'required']
+  postalCode String [note: 'required']
+  email String [note: 'required']
+  userId ObjectId [note: 'required']
+}
+
+Table Category {
+  id ObjectId [pk]
+  name String [note: 'required']
+  image String
+}
+
+Table Product {
+  id ObjectId [pk]
+  product_name String [note: 'required']
+  description String [note: 'required']
+  price Number [note: 'required']
+  category ObjectId
+  oldCategoryName String
+  productImg String [note: 'required']
+  stock Number [default: 0]
+  averageRating Number [default: 0]
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+
+
+Table Cart {
+  id ObjectId [pk]
+  userId ObjectId [note: 'required']
+  totalAmount Number [default: 0]
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+Table Cart_Product {
+  id ObjectId [pk]
+  cartId ObjectId
+  productId ObjectId [note: 'required']
+  quantity Number [default: 1]
+}
+
+Table Order {
+  id ObjectId [pk]
+  user ObjectId
+  amount Number [note: 'required']
+  orderStatus String [note: 'enum: Pending, Delivered, Cancelled']
+  paymentStatus String [note: 'enum: Pending, Paid, Failed']
+  transactionId String
+  payment ObjectId
+  savedAddress ObjectId
+  shippingAddress_fullName String
+  shippingAddress_phoneNumber String
+  shippingAddress_address String
+  shippingAddress_city String
+  shippingAddress_postalCode String
+  shippingAddress_email String
+  createdAt Date [default: 'Date.now']
+}
+
+Table Order_Item {
+  id ObjectId [pk]
+  orderId ObjectId
+  product ObjectId [note: 'required']
+  quantity Number [default: 1]
+  price Number [note: 'required']
+}
+
+Table Payment {
+  id ObjectId [pk]
+  userId ObjectId [note: 'required']
+  transaction_uuid String [unique]
+  amount Number [note: 'required']
+  orderId ObjectId
+  paymentMethod String [note: 'enum: ESewa, CashOnDelivery']
+  status String [note: 'enum: Pending, Success, Failed']
+  paidAt Date
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+Table Otp {
+  id ObjectId [pk]
+  email String [note: 'required']
+  otp String [note: 'required']
+  createdAt Date [default: 'Date.now']
+}
+
+// Relationships
+
+// Address -> User
+ref: Address.userId > User.id
+
+// Product -> Category
+ref: Product.category > Category.id
+
+
+
+// Cart -> User & Cart_Products
+ref: Cart.userId > User.id
+ref: Cart_Product.cartId > Cart.id
+ref: Cart_Product.productId > Product.id
+
+// Order -> User, Payment, and Address
+ref: Order.user > User.id
+ref: Order.payment - Payment.id
+ref: Order.savedAddress > Address.id
+
+// Items inside Order
+ref: Order_Item.orderId > Order.id
+ref: Order_Item.product > Product.id
+
+// Payment -> User & Order
+ref: Payment.userId > User.id
+ref: Payment.orderId - Order.id
+// Otp logically connects to User via the email address
+ref: Otp.email > User.Email
+

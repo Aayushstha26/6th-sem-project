@@ -292,7 +292,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <p><strong>Amount:</strong> Rs. ${payment.amount}</p>
                     <p><strong>Method:</strong> ${payment.paymentMethod}</p>
                     <p><strong>Status:</strong> <span class="status ${payment.status}">${payment.status}</span></p>
-                    ${payment.status === "Success" ? '<button class="receipt-btn">Download Receipt</button>' : ""}
+                    ${payment.status === "Success" ? '' : ""}
                   </div>
                 </div>
               `;

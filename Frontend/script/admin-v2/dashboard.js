@@ -46,7 +46,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderView("dashboard");
 });
 
-// Mock Data (For Development) - In production, replace with API calls
 async function fetchDashboardStats() {
   try {
     // Here we can call the actual API you have
