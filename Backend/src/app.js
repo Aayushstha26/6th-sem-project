@@ -16,7 +16,7 @@ import cors from "cors";
 const corsOptions = {
   origin: true,
   credentials: true,
-  optionSuccessStatus: 200,
+  optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
