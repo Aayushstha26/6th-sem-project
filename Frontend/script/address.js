@@ -17,7 +17,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   updateNavbar(false);
 
-    const res = await fetch("http://localhost:4000/user/get", {
+    const res = await fetch("https://6th-sem-project-production.up.railway.app/user/get", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -198,7 +198,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     try {
       // Send address to server
-      const res = await fetch("http://localhost:4000/address/add", {
+      const res = await fetch("https://6th-sem-project-production.up.railway.app/address/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -246,7 +246,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         requestBody.isBuyNow = false;
       }
 
-      const response = await fetch("http://localhost:4000/payment/cod-payment", {
+      const response = await fetch("https://6th-sem-project-production.up.railway.app/payment/cod-payment", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -286,7 +286,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
       // Get payment signature
       const response = await fetch(
-        "http://localhost:4000/payment/generate-signature",
+        "https://6th-sem-project-production.up.railway.app/payment/generate-signature",
         {
           method: "POST",
           headers: {
@@ -327,7 +327,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     const buyNowItem = JSON.parse(buyNowItemJson);
     try {
       const res = await fetch(
-        `http://localhost:4000/product/${buyNowItem.productId}`,
+        `https://6th-sem-project-production.up.railway.app/product/${buyNowItem.productId}`,
       );
       if (!res.ok) throw new Error("Failed to fetch product details");
 
@@ -363,7 +363,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
   } else {
     // Original Cart flow
-    const cartItems = await fetch("http://localhost:4000/cart/getCart", {
+    const cartItems = await fetch("https://6th-sem-project-production.up.railway.app/cart/getCart", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -433,8 +433,8 @@ const handlePaymentRedirect = (
     transaction_uuid: transaction_uuid,
     product_code: product_code,
     signature: signature,
-    success_url: "http://localhost:4000/payment-success",
-    failure_url: "http://localhost:4000/payment-failure",
+    success_url: "https://6th-sem-project-production.up.railway.app/payment-success",
+    failure_url: "https://6th-sem-project-production.up.railway.app/payment-failure",
     signed_field_names: "total_amount,transaction_uuid,product_code",
   };
 

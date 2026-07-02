@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   container.innerHTML = `<p>Loading categories...</p>`;
 
   try {
-    const res = await fetch("http://localhost:4000/category/getCategories");
+    const res = await fetch("https://6th-sem-project-production.up.railway.app/category/getCategories");
     if (!res.ok) throw new Error("Network response was not ok");
 
     const data = await res.json();

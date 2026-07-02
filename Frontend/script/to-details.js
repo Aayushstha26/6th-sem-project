@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   try {
-    const res = await fetch(`http://localhost:4000/product/${productId}`);
+    const res = await fetch(`https://6th-sem-project-production.up.railway.app/product/${productId}`);
 
     if (!res.ok) throw new Error("Network response was not ok");
 
@@ -185,7 +185,7 @@ async function saveReview (productId, review) {
   // localStorage.setItem(`reviews_${productId}`, JSON.stringify(reviews));
   const token = localStorage.getItem("accessToken");
 
-  return fetch(`http://localhost:4000/product/rate/${productId}`, {
+  return fetch(`https://6th-sem-project-production.up.railway.app/product/rate/${productId}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"

@@ -51,10 +51,10 @@ async function fetchDashboardStats() {
     // Here we can call the actual API you have
     // Reusing existing endpoint: /admin/monthly-orders for charts maybe
     const [userRes, productRes, orderRes, analysisRes] = await Promise.all([
-      apiCall("http://localhost:4000/user/getUser"),
-      apiCall("http://localhost:4000/product/products"),
-      apiCall("http://localhost:4000/order/All-orders"),
-      apiCall("http://localhost:4000/admin/monthly-orders"),
+      apiCall("https://6th-sem-project-production.up.railway.app/user/getUser"),
+      apiCall("https://6th-sem-project-production.up.railway.app/product/products"),
+      apiCall("https://6th-sem-project-production.up.railway.app/order/All-orders"),
+      apiCall("https://6th-sem-project-production.up.railway.app/admin/monthly-orders"),
     ]);
 
     const stockCount = productRes.products
@@ -326,7 +326,7 @@ function initAnalyticsCharts(data) {
 // User Module Functions
 async function fetchUsers() {
   try {
-    const res = await apiCall("http://localhost:4000/user/getUser");
+    const res = await apiCall("https://6th-sem-project-production.up.railway.app/user/getUser");
     return res.data;
   } catch (e) {
     console.error("Failed to fetch users", e);
@@ -449,7 +449,7 @@ function generateAvatarColor(name) {
 // Order Module Functions
 async function fetchOrders() {
   try {
-    return await apiCall("http://localhost:4000/order/All-orders");
+    return await apiCall("https://6th-sem-project-production.up.railway.app/order/All-orders");
   } catch (e) {
     console.error("Failed to fetch orders", e);
     return null;
@@ -588,7 +588,7 @@ function getOrdersTemplate(orders) {
 // Category Module Functions
 async function fetchCategories() {
   try {
-    return await apiCall("http://localhost:4000/category/getCategories");
+    return await apiCall("https://6th-sem-project-production.up.railway.app/category/getCategories");
   } catch (e) {
     console.error("Failed to fetch categories", e);
     return null;
@@ -676,7 +676,7 @@ function setupCategoryActions(categories) {
         }
 
         const res = await apiCall(
-          "http://localhost:4000/category/addCategory",
+          "https://6th-sem-project-production.up.railway.app/category/addCategory",
           {
             method: "POST",
             body: formData,
@@ -718,7 +718,7 @@ async function deleteCategory(categoryId) {
   if (!confirmed) return;
   try {
     const res = await apiCall(
-      `http://localhost:4000/category/deleteCategory/${categoryId}`,
+      `https://6th-sem-project-production.up.railway.app/category/deleteCategory/${categoryId}`,
       {
         method: "DELETE",
       },
@@ -742,7 +742,7 @@ async function deleteCategory(categoryId) {
 // Product Module Functions
 async function fetchProducts() {
   try {
-    return await apiCall("http://localhost:4000/product/products");
+    return await apiCall("https://6th-sem-project-production.up.railway.app/product/products");
   } catch (e) {
     console.error("Failed to fetch products", e);
     return null;
@@ -923,8 +923,8 @@ function setupProductSearch(products) {
 async function fetchAnalyticsData() {
   try {
     const [analysisRes, productRes] = await Promise.all([
-      apiCall("http://localhost:4000/admin/monthly-orders"),
-      apiCall("http://localhost:4000/product/products"),
+      apiCall("https://6th-sem-project-production.up.railway.app/admin/monthly-orders"),
+      apiCall("https://6th-sem-project-production.up.railway.app/product/products"),
     ]);
 
     return {
@@ -1328,7 +1328,7 @@ window.deleteProduct = async (id) => {
   if (!confirmed) return;
 
   try {
-    const res = await fetch(`http://localhost:4000/product/delete/${id}`, {
+    const res = await fetch(`https://6th-sem-project-production.up.railway.app/product/delete/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
@@ -1356,7 +1356,7 @@ window.deleteUserbtn = async (id) => {
   );
   if (!confirmed) return;
   try {
-    const res = await fetch(`http://localhost:4000/user/delete-user/${id}`, {
+    const res = await fetch(`https://6th-sem-project-production.up.railway.app/user/delete-user/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
@@ -1380,7 +1380,7 @@ window.deleteUserbtn = async (id) => {
 
 window.viewOrder = async (id) => {
   try {
-    const res = await apiCall(`http://localhost:4000/order/${id}`);
+    const res = await apiCall(`https://6th-sem-project-production.up.railway.app/order/${id}`);
     if (!res || !res.data) {
       showToast("Order details not found", "error");
       return;
@@ -1501,7 +1501,7 @@ window.viewOrder = async (id) => {
 
 window.updateOrderStatus = async (id, status) => {
   try {
-    const res = await fetch(`http://localhost:4000/order/update-status/${id}`, {
+    const res = await fetch(`https://6th-sem-project-production.up.railway.app/order/update-status/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

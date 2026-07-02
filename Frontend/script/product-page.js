@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   cTitle.textContent = category;
 
   try {
-    const res = await fetch("http://localhost:4000/product/products");
+    const res = await fetch("https://6th-sem-project-production.up.railway.app/product/products");
     if (!res.ok) throw new Error("Network response was not ok");
 
     const data = await res.json();
@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       '<div class="results-loading">Searching...</div>';
 
     try {
-      const res = await fetch(`http://localhost:4000/product/search`, {
+      const res = await fetch(`https://6th-sem-project-production.up.railway.app/product/search`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

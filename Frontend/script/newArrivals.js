@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   container.innerHTML = `<p>Loading new arrivals...</p>`; // Loading message
 
   try {
-    const res = await fetch("http://localhost:4000/product/new-arrivals");
+    const res = await fetch("https://6th-sem-project-production.up.railway.app/product/new-arrivals");
     if (!res.ok) throw new Error("Network response was not ok");
 
     const data = await res.json();

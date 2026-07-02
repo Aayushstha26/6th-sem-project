@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     try {
-      const res = await fetch("http://localhost:4000/cart/getCart", {
+      const res = await fetch("https://6th-sem-project-production.up.railway.app/cart/getCart", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       input.value = newQty;
 
       try {
-        await fetch("http://localhost:4000/cart/add", {
+        await fetch("https://6th-sem-project-production.up.railway.app/cart/add", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     async function removeItem(productId) {
       try {
-        await fetch(`http://localhost:4000/cart/remove`, {
+        await fetch(`https://6th-sem-project-production.up.railway.app/cart/remove`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,

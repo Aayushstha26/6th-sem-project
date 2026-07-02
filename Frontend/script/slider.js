@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
             };
 
             try {
-              const res = await fetch("http://localhost:4000/user/register", {
+              const res = await fetch("https://6th-sem-project-production.up.railway.app/user/register", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -266,7 +266,7 @@ document.addEventListener("DOMContentLoaded", () => {
       '<div class="results-loading">Searching...</div>';
 
     try {
-      const res = await fetch(`http://localhost:4000/product/search`, {
+      const res = await fetch(`https://6th-sem-project-production.up.railway.app/product/search`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -443,7 +443,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const password = document.getElementById("password").value;
           console.log(email);
           try {
-            const res = await fetch("http://localhost:4000/user/login", {
+            const res = await fetch("https://6th-sem-project-production.up.railway.app/user/login", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ Email: email, Password: password }),
@@ -589,7 +589,7 @@ function updateNavbar(showSearchBox = true) {
   logoutBtn.addEventListener("click", async () => {
     const token = localStorage.getItem("accessToken");
 
-    await fetch("http://localhost:4000/user/logout", {
+    await fetch("https://6th-sem-project-production.up.railway.app/user/logout", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -612,7 +612,7 @@ function updateNavbar(showSearchBox = true) {
 async function getCartCount() {
   const token = localStorage.getItem("accessToken");
   try {
-    const res = await fetch("http://localhost:4000/cart/getCartCount", {
+    const res = await fetch("https://6th-sem-project-production.up.railway.app/cart/getCartCount", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   //   return;
   // }
   try {
-    const response = await fetch("http://localhost:4000/auth/send", {
+    const response = await fetch("https://6th-sem-project-production.up.railway.app/auth/send", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
     try {
-      const response = await fetch("http://localhost:4000/auth/verify", {
+      const response = await fetch("https://6th-sem-project-production.up.railway.app/auth/verify", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const resendBtn = document.getElementById("resendBtn");
   resendBtn.addEventListener("click", async () => {
     try { 
-      const response = await fetch("http://localhost:4000/auth/send", {
+      const response = await fetch("https://6th-sem-project-production.up.railway.app/auth/send", {
         method: "POST",
         headers: {
           "Content-Type": "application/json", 

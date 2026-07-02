@@ -35,7 +35,7 @@ function checkEditMode() {
 // ============================================
 async function loadCategories() {
   try {
-    const res = await fetch("http://localhost:4000/category/getCategories");
+    const res = await fetch("https://6th-sem-project-production.up.railway.app/category/getCategories");
     const result = await res.json();
 
     if (res.ok) {
@@ -62,7 +62,7 @@ async function loadProductData(id) {
   showLoading(true);
 
   try {
-    const res = await fetch(`http://localhost:4000/product/${id}`);
+    const res = await fetch(`https://6th-sem-project-production.up.railway.app/product/${id}`);
     const data = await res.json();
 
     if (res.ok) {
@@ -411,8 +411,8 @@ async function handleFormSubmit(e) {
     }
 
     const url = isEditMode
-      ? `http://localhost:4000/product/update/${productId}`
-      : "http://localhost:4000/product/add";
+      ? `https://6th-sem-project-production.up.railway.app/product/update/${productId}`
+      : "https://6th-sem-project-production.up.railway.app/product/add";
 
     const response = await fetch(url, {
       method: isEditMode ? "PUT" : "POST",

@@ -22,7 +22,7 @@ window.addEventListener("DOMContentLoaded", () => {
       };
 
       try {
-        const res = await fetch("http://localhost:4000/user/register", {
+        const res = await fetch("https://6th-sem-project-production.up.railway.app/user/register", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

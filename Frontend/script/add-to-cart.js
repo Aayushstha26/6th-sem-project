@@ -23,7 +23,7 @@ if (token) {
       const quantity = qty ? Number(qty.value) || 1 : 1;
 
       try {
-        const res = await fetch("http://localhost:4000/cart/add", {
+        const res = await fetch("https://6th-sem-project-production.up.railway.app/cart/add", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
