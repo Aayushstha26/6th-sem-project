@@ -1183,4 +1183,82 @@ body {
   .result-meta {
     font-size: 11px;
   }
+}\n
+/* --- Global Responsive Fixes --- */
+@media (max-width: 1024px) {
+  .nav { padding: 20px 40px; }
+  .nav_bar { margin-left: 50px; }
+  .nav_bar ul { gap: 30px; }
+}
+
+@media (max-width: 950px) {
+  .nav { padding: 20px 20px; }
+  .nav_bar { margin-left: 20px; }
+  .nav_bar ul { gap: 20px; }
+  .logo { left: 0; bottom: 20px; }
+}
+
+@media (max-width: 768px) {
+  .nav { 
+    flex-direction: column; 
+    padding: 15px; 
+    gap: 15px; 
+  }
+  .nav_bar { margin-left: 0; }
+  .logo { 
+    position: static; 
+    height: auto; 
+    margin-bottom: 5px; 
+  }
+  .f-container { 
+    flex-direction: column; 
+    align-items: center; 
+    text-align: center; 
+  }
+  .f-about p { 
+    right: 0; 
+  }
+  .f-links { 
+    left: 0; 
+    top: 0; 
+  }
+  .modal-content, .login-modal-content {
+    width: 90% !important;
+    margin: 10% auto !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav_bar ul {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+  }
+  .right_part {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+\n
+/* --- Homepage Specific Responsive Fixes --- */
+@media (max-width: 768px) {
+  .about-container {
+    flex-direction: column;
+    text-align: center;
+  }
+  .about-image img {
+    width: 100%;
+    max-width: 400px;
+  }
+  .search-box input {
+    width: 150px;
+  }
+}
+\n
+/* --- Product Grid Responsive Fixes --- */
+@media (max-width: 768px) {
+  .product-slots, .categories-slots, .new-arrivals-slots, .top-rated-slots {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    justify-content: center;
+  }
 }
